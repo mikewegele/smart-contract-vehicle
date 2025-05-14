@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/smart-contract-vehicle.iml" filepath="$PROJECT_DIR$/smart-contract-vehicle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/smart-contract-vehicle.iml" filepath="$PROJECT_DIR$/.idea/smart-contract-vehicle.iml" />
     </modules>
   </component>
 </project>
