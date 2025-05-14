@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MeinBackend.Models;
+using SmartContractVehicle.Models;
 
-namespace MeinBackend.Data;
+namespace SmartContractVehicle.Data;
 
 public class AppDbContext : DbContext
 {

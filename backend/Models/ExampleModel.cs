@@ -1,4 +1,4 @@
-namespace MeinBackend.Models;
+namespace SmartContractVehicle.Models;
 
 public class ExampleModel
 {
