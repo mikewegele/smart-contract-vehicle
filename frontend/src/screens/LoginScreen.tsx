@@ -8,7 +8,6 @@ const LoginScreen: React.FC = () => {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('login');
         navigate('/dashboard');
     };
 
