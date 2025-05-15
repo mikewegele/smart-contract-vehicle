@@ -4,7 +4,7 @@ This project is a **web-based carsharing platform** that uses **crypto wallets**
 
 # Project Setup
 
-This project consists of a **backend** built with **ASP.NET Core** and **PostgreSQL**, and a **frontend** built with **React**.
+This project consists of **backend** built with **ASP.NET Core** and **PostgreSQL**, and a **frontend** built with **React**.
 
 ## Prerequisites
 
