@@ -1,21 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
+import EntryPage from './EntryPage';
 
-const App: React.FC = () => {
-
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://localhost:5147/api/hello')
-        .then((res) => res.json())
-        .then((data) => setMessage(data.message))
-        .catch((err) => console.error('API Error:', err));
-  }, []);
-
+function App() {
   return (
-          <div>
-              <h1>Nachricht vom Backend:</h1>
-              <p>{message}</p>
-          </div>
+    <div>
+      <EntryPage />
+    </div>
   );
 }
 
