@@ -1,0 +1,131 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #4c838b);
+  padding: 2rem;
+}
+  
+  .card {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .mainTitle {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #233241; /* optional: dark blue/gray */
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #00796b;
+    font-size: 1.8rem;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input {
+    padding: 0.75rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #00796b;
+    box-shadow: 0 0 0 2px rgba(0, 121, 107, 0.2);
+  }
+  
+  .button {
+    padding: 0.75rem;
+    background-color: #00796b;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #004d40;
+  }
+  
+  .error {
+    color: red;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .toggle {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .link {
+    background: none;
+    border: none;
+    color: #00796b;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-left: 4px;
+    font-size: 1rem;
+  }
+  
+  .link:hover {
+    color: #004d40;
+  }
+  .navLinks {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #34495e;
+  }
+  
+  .navLinks span {
+    cursor: pointer;
+    position: relative;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .navLinks span:hover {
+    color: #4c838b;
+    background-color: white;
+  }
+  
+  .navLinks span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: #4c838b;
+    transition: width 0.3s ease;
+  }
+  
+  .navLinks span:hover::after {
+    width: 100%;
+  }
