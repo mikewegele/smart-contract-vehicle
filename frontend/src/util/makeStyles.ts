@@ -3,7 +3,9 @@ import React from "react";
 const generateClassName = (prefix: string): string => {
     const array = new Uint8Array(9);
     window.crypto.getRandomValues(array);
-    return `${prefix}-${Array.from(array).map(byte => byte.toString(36)).join('')}`;
+    return `${prefix}-${Array.from(array)
+        .map((byte) => byte.toString(36))
+        .join("")}`;
 };
 
 const createCSS = (styles: React.CSSProperties): string =>
@@ -26,7 +28,7 @@ const makeStyles = <
         React.CSSProperties | ((props?: any) => React.CSSProperties)
     >,
 >(
-    styles: (props?: any) => T,
+    styles: (props?: any) => T
 ) => {
     return (props?: any) => {
         const classes = {} as Record<keyof T, string>;
@@ -41,7 +43,7 @@ const makeStyles = <
                     : styleDefinition;
 
             const styleString = createCSS(
-                styleWithDynamicValues as React.CSSProperties,
+                styleWithDynamicValues as React.CSSProperties
             );
             const styleElement = document.createElement("style");
             styleElement.textContent = `.${className} { ${styleString} }`;
@@ -52,7 +54,7 @@ const makeStyles = <
         const cx = (...classNames: (string | undefined | false)[]) =>
             classNames.filter(Boolean).join(" ");
 
-        return {classes, cx};
+        return { classes, cx };
     };
 };
 

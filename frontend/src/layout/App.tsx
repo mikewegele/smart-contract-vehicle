@@ -1,12 +1,8 @@
-import React from 'react';
-import EntryPage from './EntryPage';
+import React from "react";
+import EntryPage from "../screen/EntryPage.tsx";
 
-function App() {
-  return (
-    <div>
-      <EntryPage />
-    </div>
-  );
-}
+const App: React.FC = () => {
+    return <EntryPage />;
+};
 
 export default App;
