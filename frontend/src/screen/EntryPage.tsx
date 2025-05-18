@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import styles from "./EntryPage.module.css";
 import makeStyles from "../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
