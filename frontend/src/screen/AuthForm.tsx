@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import makeStyles from "../util/makeStyles.ts";
+import {apiExec, hasFailed} from "../util/ApiUtils.ts";
+import {getSmartContractVehicle} from "../api";
+import {api} from "../api/axios-config.ts";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -112,28 +115,46 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-interface AuthFormProps {
-    isLogin: boolean;
-    setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
-    onToggle: (event: React.FormEvent) => void;
-    error?: string;
-}
 
-const AuthForm: React.FC<AuthFormProps> = (props) => {
-
-    const {isLogin, onToggle, error, setIsLogin} = props;
+const AuthForm: React.FC = () => {
 
     const { classes } = useStyles();
 
+    const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!email.includes("@")) {
+            setError("Email must contain @");
+            return;
+        }
+        if (!isLogin && username.length < 3) {
+            setError("Username must be at least 3 characters");
+            return;
+        }
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
+
+        setError("");
+        if (isLogin) {
+            console.log("Hey")
+        } else {
+            const response = await apiExec(api => api.postApiUserRegister({}))
+        }
+    };
 
     return (
         <div className={classes.card}>
             <h2 className={classes.title}>{isLogin ? "Log In" : "Sign Up"}</h2>
 
-            <form onSubmit={onToggle} className={classes.form}>
+            <form onSubmit={handleSubmit} className={classes.form}>
                 <label>Email</label>
                 <input
                     className={classes.input}
