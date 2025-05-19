@@ -8,32 +8,32 @@ namespace SmartContractVehicle.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]/")]
-    public class AdressController(AppDbContext db) : ControllerBase
+    public class AddressController(AppDbContext db) : ControllerBase
     {
         private readonly AppDbContext _db = db;
 
         [HttpGet(Name = "Get")]
         public IActionResult Get(int id)
         {
-            var adress = _db.Adresses.Find(id);
-            return Ok(adress);
+            var address = _db.Addresses.Find(id);
+            return Ok(address);
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            db.Adresses.Where(a => a.Id == id).ExecuteDelete();
+            db.Addresses.Where(a => a.Id == id).ExecuteDelete();
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult Post(Adress adress)
+        public IActionResult Post(Address address)
         {
             if (ModelState.IsValid)
             {
-                _db.Adresses.Add(adress);
+                _db.Addresses.Add(address);
                 _db.SaveChanges();
-                return Ok(adress);
+                return Ok(address);
             }
             else
             {
@@ -42,12 +42,12 @@ namespace SmartContractVehicle.Controllers
         }
 
         [HttpPatch]
-        public IActionResult Update(Adress adress)
+        public IActionResult Update(Address address)
         {
             if (ModelState.IsValid)
             {
-                _db.Adresses.Update(adress);
-                return Ok(adress);
+                _db.Addresses.Update(address);
+                return Ok(address);
             }
 
             return BadRequest();

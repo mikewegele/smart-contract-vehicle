@@ -37,7 +37,7 @@ namespace SmartContractVehicle.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Adresses.AddRange(user.Mailing, user.Billing);
+                _db.Addresses.AddRange(user.Mailing, user.Billing);
                 _db.Users.Add(user);
                 _db.SaveChanges();
                 return Ok(user);

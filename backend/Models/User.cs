@@ -21,10 +21,10 @@ namespace SmartContractVehicle.Models
         public required DateOnly Birthday { get; set; } 
 
         [Required]
-        public required Adress Billing { get; set; }
+        public required Address Billing { get; set; }
 
         [Required]
-        public required Adress Mailing { get; set; }
+        public required Address Mailing { get; set; }
 
         [Required]
         public required string Password { get; set; }
