@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import makeStyles from "../util/makeStyles.ts";
 import Header from "./Header";
 import NavLinks from "./NavLinks";
 import AuthForm from "./AuthForm";
+import { getSmartContractVehicle } from '../api';
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -48,6 +49,19 @@ const EntryPage: React.FC = () => {
             console.log("Signing up with:", { email, username, password });
         }
     };
+
+    async function loadVehicle() {
+        try {
+            const response = await getSmartContractVehicle().get();
+            console.log('Daten:', response);
+        } catch (error) {
+            console.error('Fehler beim Laden:', error);
+        }
+    }
+
+    useEffect(() => {
+        loadVehicle();
+    }, [])
 
     return (
         <div className={classes.container}>
