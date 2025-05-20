@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SmartContractVehicle.Models
+namespace SmartContractVehicle.Models;
+
 public class NewUserTO
 {
     [Required, EmailAddress]
