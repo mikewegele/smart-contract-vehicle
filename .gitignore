@@ -531,3 +531,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,macos,windows,visualstudiocode,react,java,python,solidity
+*.suo
+/.vs/smart-contract-vehicle/CopilotIndices/17.14.670.39694
+/.vs/smart-contract-vehicle/FileContentIndex
+/.vs
