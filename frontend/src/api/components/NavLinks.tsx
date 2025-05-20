@@ -1,12 +1,12 @@
 import React from "react";
-import makeStyles from "../util/makeStyles.ts";
+import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     navLinks: {
         display: "flex",
         justifyContent: "center",
         gap: "2rem",
-        marginBottom: "2rem",
+        marginTop: "2rem",
         fontSize: "1.1rem",
         fontWeight: 500,
         color: "#34495e",

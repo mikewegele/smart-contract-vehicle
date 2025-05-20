@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import makeStyles from "../util/makeStyles.ts";
-import {apiExec, hasFailed} from "../util/ApiUtils.ts";
-import {getSmartContractVehicle} from "../api";
-import {api} from "../api/axios-config.ts";
+import {apiExec} from "../util/ApiUtils.ts";
+import {useNavigate} from "react-router-dom";
+import {
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Stack,
+    Alert
+} from "@mui/material";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -17,14 +24,14 @@ const useStyles = makeStyles(() => ({
     card: {
         background: "#fff",
         padding: "2rem 2.5rem",
-        borderRadius: 12,
+        borderRadius: "8px",
         boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
         width: "100%",
         maxWidth: "400px",
     },
     title: {
         textAlign: "center",
-        marginBottom: "1.5rem",
+        paddingBottom: "1rem",
         color: "#00796b",
         fontSize: "1.8rem",
     },
@@ -33,26 +40,15 @@ const useStyles = makeStyles(() => ({
         flexDirection: "column",
     },
     input: {
-        padding: "0.75rem",
-        marginTop: "0.25rem",
-        marginBottom: "1rem",
-        border: "1px solid #ccc",
         borderRadius: 8,
         transition: "border-color 0.2s",
-        "&:focus": {
-            outline: "none",
-            borderColor: "#00796b",
-            boxShadow: "0 0 0 2px rgba(0, 121, 107, 0.2)",
-        },
     },
     button: {
         padding: "0.75rem",
         backgroundColor: "#00796b",
         color: "white",
         fontWeight: "bold",
-        border: "none",
         borderRadius: 8,
-        cursor: "pointer",
         transition: "background 0.3s",
         "&:hover": {
             backgroundColor: "#004d40",
@@ -115,9 +111,7 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-
 const AuthForm: React.FC = () => {
-
     const { classes } = useStyles();
 
     const [isLogin, setIsLogin] = useState(true);
@@ -125,6 +119,8 @@ const AuthForm: React.FC = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -144,66 +140,77 @@ const AuthForm: React.FC = () => {
 
         setError("");
         if (isLogin) {
-            console.log("Hey")
+            console.log("Hey");
         } else {
-            const response = await apiExec(api => api.postApiUserRegister({}))
+            const response = await apiExec(api => api.getApiUserGet());
+            console.log(response);
         }
+        navigate("/home");
     };
 
     return (
-        <div className={classes.card}>
-            <h2 className={classes.title}>{isLogin ? "Log In" : "Sign Up"}</h2>
+        <Box className={classes.card}>
+            <Typography className={classes.title} variant="h5">
+                {isLogin ? "Log In" : "Sign Up"}
+            </Typography>
 
             <form onSubmit={handleSubmit} className={classes.form}>
-                <label>Email</label>
-                <input
-                    className={classes.input}
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
+                <Stack spacing={2}>
+                    <TextField
+                        label="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                        required
+                        className={classes.input}
+                    />
 
-                {!isLogin && (
-                    <>
-                        <label>Username</label>
-                        <input
-                            className={classes.input}
+                    {!isLogin && (
+                        <TextField
+                            label="Username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            fullWidth
                             required
+                            className={classes.input}
                         />
-                    </>
-                )}
+                    )}
 
-                <label>Password</label>
-                <input
-                    className={classes.input}
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
+                    <TextField
+                        label="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
+                        required
+                        className={classes.input}
+                    />
 
-                {error && <p className={classes.error}>{error}</p>}
+                    {error && <Alert severity="error">{error}</Alert>}
 
-                <button type="submit" className={classes.button}>
-                    {isLogin ? "Log In" : "Sign Up"}
-                </button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        className={classes.button}
+                    >
+                        {isLogin ? "Log In" : "Sign Up"}
+                    </Button>
+                </Stack>
             </form>
 
-            <p className={classes.toggle}>
-                {isLogin
-                    ? "Don't have an account?"
-                    : "Already have an account?"}
-                <button
+            <Typography className={classes.toggle}>
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <Button
                     className={classes.link}
-                        onClick={() => setIsLogin(prevState => !prevState)}>
+                    onClick={() => setIsLogin(prev => !prev)}
+                >
                     {isLogin ? "Sign Up" : "Log In"}
-                </button>
-            </p>
-        </div>
+                </Button>
+            </Typography>
+        </Box>
     );
 };
 
