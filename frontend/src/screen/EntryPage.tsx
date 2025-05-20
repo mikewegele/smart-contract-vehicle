@@ -8,7 +8,7 @@ import Container from "../api/components/container/Container.tsx";
 const EntryPage: React.FC = () => {
 
     return (
-        <Container>
+        <Container center>
             <Header />
             <AuthForm/>
             <NavLinks />

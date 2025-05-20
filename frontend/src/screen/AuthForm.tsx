@@ -5,11 +5,12 @@ import {useNavigate} from "react-router-dom";
 import {
     Box,
     Typography,
-    TextField,
     Button,
     Stack,
     Alert
 } from "@mui/material";
+import DefaultTextField from "../api/components/textfield/DefaultTextField.tsx";
+import DefaultButton from "../api/components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -38,21 +39,6 @@ const useStyles = makeStyles(() => ({
     form: {
         display: "flex",
         flexDirection: "column",
-    },
-    input: {
-        borderRadius: 8,
-        transition: "border-color 0.2s",
-    },
-    button: {
-        padding: "0.75rem",
-        backgroundColor: "#00796b",
-        color: "white",
-        fontWeight: "bold",
-        borderRadius: 8,
-        transition: "background 0.3s",
-        "&:hover": {
-            backgroundColor: "#004d40",
-        },
     },
     error: {
         color: "red",
@@ -156,48 +142,40 @@ const AuthForm: React.FC = () => {
 
             <form onSubmit={handleSubmit} className={classes.form}>
                 <Stack spacing={2}>
-                    <TextField
+                    <DefaultTextField
                         label="Email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
-                        required
-                        className={classes.input}
-                    />
+                        required/>
 
                     {!isLogin && (
-                        <TextField
+                        <DefaultTextField
                             label="Username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             fullWidth
-                            required
-                            className={classes.input}
-                        />
+                            required/>
                     )}
 
-                    <TextField
+                    <DefaultTextField
                         label="Password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                         required
-                        className={classes.input}
-                    />
-
+                        />
                     {error && <Alert severity="error">{error}</Alert>}
 
-                    <Button
+                    <DefaultButton
                         variant="contained"
                         color="primary"
-                        type="submit"
-                        className={classes.button}
-                    >
+                        type="submit">
                         {isLogin ? "Log In" : "Sign Up"}
-                    </Button>
+                    </DefaultButton>
                 </Stack>
             </form>
 
