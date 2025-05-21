@@ -21,6 +21,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Mapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

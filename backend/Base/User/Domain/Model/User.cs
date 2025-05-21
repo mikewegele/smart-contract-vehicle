@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SmartContractVehicle.Models
+namespace User.Model
 {
     public class User
     {
@@ -9,16 +9,17 @@ namespace SmartContractVehicle.Models
         public int Id { get; set; }
 
         [Required]
-        public required string LastName { get; set; }
-
-        [Required]
-        public required string FirstName { get; set; }
+        public required string Name { get; set; }
 
         [Required, EmailAddress]
         public required string Email { get; set; }
 
+        [Required]
+        public required string Password { get; set; }
+
+/*
         [Required, DataType(DataType.Date)]
-        public required DateOnly Birthday { get; set; } 
+        public required DateOnly Birthday { get; set; }
 
         [Required]
         public required Address Billing { get; set; }
@@ -26,13 +27,11 @@ namespace SmartContractVehicle.Models
         [Required]
         public required Address Mailing { get; set; }
 
-        [Required]
-        public required string Password { get; set; }
-
         [Phone]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
-        public required string WalletId { get; set; } 
+        public required string WalletId { get; set; }
+        */
     }
 }
