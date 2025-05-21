@@ -8,5 +8,5 @@ export function apiExec<T>(fn: (api: ApiType) => Promise<T>): Promise<T> {
 }
 
 export function hasFailed(status: number): boolean {
-    return status.status < 200 || status.status >= 300;
+    return status < 200 || status >= 300;
 }
