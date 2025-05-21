@@ -1,5 +1,5 @@
 import React, {type PropsWithChildren} from "react";
-import makeStyles from "../../../util/makeStyles.ts";
+import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     container: {

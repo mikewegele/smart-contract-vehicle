@@ -1,14 +1,15 @@
 import React from "react";
-import Container from "../api/components/container/Container.tsx";
+import Container from "../components/container/Container.tsx";
 import { useNavigate } from "react-router-dom";
 import SettingsIcon from '@mui/icons-material/Settings';
-import DefaultButton from "../api/components/button/DefaultButton.tsx";
+import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <Container center>
+        <Container>
+            <VehicleMap/>
             <DefaultButton
                 variant="contained"
                 color="primary"

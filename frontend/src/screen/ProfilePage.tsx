@@ -1,5 +1,5 @@
 import React from "react";
-import Container from "../api/components/container/Container.tsx";
+import Container from "../components/container/Container.tsx";
 
 const ProfilePage: React.FC = () => {
 

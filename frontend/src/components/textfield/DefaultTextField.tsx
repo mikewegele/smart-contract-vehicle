@@ -1,7 +1,7 @@
 import React from "react";
 import { TextField } from "@mui/material";
 import type { TextFieldProps } from "@mui/material";
-import makeStyles from "../../../util/makeStyles.ts";
+import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     input: {
