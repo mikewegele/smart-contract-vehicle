@@ -24,6 +24,9 @@ builder.Services.AddCors(options =>
 // Mapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Services
+builder.Services.AddScoped<User.Services.UserService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

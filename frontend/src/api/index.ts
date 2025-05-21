@@ -42,23 +42,23 @@ export interface Address {
   country: string;
 }
 
+export interface NewUserTO {
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  password: string;
+  /** @minLength 1 */
+  name: string;
+}
+
 export interface User {
   id?: number;
   /** @minLength 1 */
-  lastName: string;
-  /** @minLength 1 */
-  firstName: string;
+  name: string;
   /** @minLength 1 */
   email: string;
-  birthday: string;
-  billing: Address;
-  mailing: Address;
   /** @minLength 1 */
   password: string;
-  /** @nullable */
-  phoneNumber?: string | null;
-  /** @minLength 1 */
-  walletId: string;
 }
 
 export type GetParams = {
@@ -141,12 +141,12 @@ const deleteApiUserDelete = (
     }
   
 const postApiUserRegister = (
-    user: User,
+    newUserTO: NewUserTO,
  ) => {
       return api<void>(
       {url: `/api/User/Register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: user
+      data: newUserTO
     },
       );
     }

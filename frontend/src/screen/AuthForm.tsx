@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
+import type {NewUserTO} from "../api";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -128,7 +129,8 @@ const AuthForm: React.FC = () => {
         if (isLogin) {
             console.log("Hey");
         } else {
-            const response = await apiExec(api => api.getApiUserGet());
+            const newUser: NewUserTO = {name: username, email: email, password: password};
+            const response = await apiExec(api => api.postApiUserRegister(newUser));
             console.log(response);
         }
         navigate("/home");
