@@ -2,6 +2,7 @@ using User.Domain;
 using User.Model;
 using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
+using BCrypt.Net;
 
 namespace User.Services
 {
@@ -19,8 +20,8 @@ namespace User.Services
             var user = new User.Model.User
             {
                 Name = newUser.Name,
-                Password = newUser.Password,
-                Email = newUser.Email
+                Password = BCrypt.Net.BCrypt.HashPassword(newUser.Password),
+                Email = newUser.Email,
             };
 
             _db.Users.Add(user);
