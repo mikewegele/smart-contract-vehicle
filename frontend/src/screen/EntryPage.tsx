@@ -3,6 +3,7 @@ import Header from "../components/Header.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import AuthForm from "./AuthForm";
 import Container from "../components/container/Container.tsx";
+import UserCookieManager from "../components/cookie/UserCookieManager.tsx";
 
 
 const EntryPage: React.FC = () => {
@@ -11,6 +12,7 @@ const EntryPage: React.FC = () => {
         <Container center>
             <Header />
             <AuthForm/>
+            <UserCookieManager/>
             <NavLinks />
         </Container>
     );

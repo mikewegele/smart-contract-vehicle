@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
         width: "80%",
         maxWidth: "1000px",
         height: "500px",
-        borderRadius: 12,
+        borderRadius: "12px",
         overflow: "hidden",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         border: "1px solid #e0e0e0",
