@@ -1,14 +1,8 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import makeStyles from "../util/makeStyles.ts";
-import {apiExec} from "../util/ApiUtils.ts";
+import {apiExec, hasFailed} from "../util/ApiUtils.ts";
 import {useNavigate} from "react-router-dom";
-import {
-    Box,
-    Typography,
-    Button,
-    Stack,
-    Alert
-} from "@mui/material";
+import {Alert, Box, Button, Stack, Typography} from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import type {NewUserTO} from "../api";
@@ -99,7 +93,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const AuthForm: React.FC = () => {
-    const { classes } = useStyles();
+    const {classes} = useStyles();
 
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
@@ -131,9 +125,10 @@ const AuthForm: React.FC = () => {
         } else {
             const newUser: NewUserTO = {name: username, email: email, password: password};
             const response = await apiExec(api => api.postApiUserRegister(newUser));
-            console.log(response);
+            if (!hasFailed(response.status)) {
+                navigate("/home");
+            }
         }
-        navigate("/home");
     };
 
     return (
@@ -169,7 +164,7 @@ const AuthForm: React.FC = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                         required
-                        />
+                    />
                     {error && <Alert severity="error">{error}</Alert>}
 
                     <DefaultButton
