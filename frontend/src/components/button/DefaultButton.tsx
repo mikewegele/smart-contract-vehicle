@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import type { ButtonProps } from "@mui/material"
-import makeStyles from "../../../util/makeStyles";
+import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     button: {

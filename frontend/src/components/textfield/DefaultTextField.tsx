@@ -1,15 +1,16 @@
 import React from "react";
 import { TextField } from "@mui/material";
 import type { TextFieldProps } from "@mui/material";
-import makeStyles from "../../../util/makeStyles.ts";
+import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     input: {
-        borderRadius: 8,
+        borderRadius: "8px",
         transition: "border-color 0.2s",
         "& .MuiOutlinedInput-root": {
-            borderRadius: 8,
+            borderRadius: "8px",
         },
+        margin: "20px",
     },
 }));
 

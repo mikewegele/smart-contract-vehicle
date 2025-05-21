@@ -9,8 +9,8 @@ import {
     Stack,
     Alert
 } from "@mui/material";
-import DefaultTextField from "../api/components/textfield/DefaultTextField.tsx";
-import DefaultButton from "../api/components/button/DefaultButton.tsx";
+import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
+import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     container: {
