@@ -5,11 +5,12 @@ import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
     input: {
-        borderRadius: 8,
+        borderRadius: "8px",
         transition: "border-color 0.2s",
         "& .MuiOutlinedInput-root": {
-            borderRadius: 8,
+            borderRadius: "8px",
         },
+        margin: "20px",
     },
 }));
 

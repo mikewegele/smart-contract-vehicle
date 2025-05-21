@@ -11,7 +11,7 @@ const DashboardPage: React.FC = () => {
     return (
         <Container>
             <SimpleMap/>
-            <DefaultButton
+                <DefaultButton
                 variant="contained"
                 color="primary"
                 startIcon={<SettingsIcon />}
