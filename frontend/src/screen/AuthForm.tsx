@@ -23,17 +23,17 @@ const useStyles = makeStyles(() => ({
         padding: "2rem",
     },
     card: {
-        background: "#fff",
+        background: "transparent", 
         padding: "2rem 2.5rem",
         borderRadius: "8px",
-        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
+        border:"1px solid rgba(0, 0, 0, 0.23)",
         width: "100%",
         maxWidth: "400px",
     },
     title: {
         textAlign: "center",
         paddingBottom: "1rem",
-        color: "#00796b",
+        color: "#233241",
         fontSize: "1.8rem",
     },
     form: {
