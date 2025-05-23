@@ -9,6 +9,7 @@ namespace User.Api.Mapper
         public UserApiMapper()
         {
             CreateMap<NewUserTO, NewUser>();
+            CreateMap<LoginTO, Model.User>();
         }
     }
 }
