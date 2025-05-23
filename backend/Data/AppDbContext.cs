@@ -1,12 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using User.Model;
+using SmartContractVehicle.Model;
 
 namespace SmartContractVehicle.Data;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<User.Model.User> Users { get; set; }
     public DbSet<Address> Addresses { get; set; }
 }

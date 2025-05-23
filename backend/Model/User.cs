@@ -1,22 +1,14 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace User.Model
+namespace SmartContractVehicle.Model
 {
-    public class User
+    public class User : IdentityUser
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         [Required]
         public required string Name { get; set; }
-
-        [Required, EmailAddress]
-        public required string Email { get; set; }
-
-        [Required, MinLength(6)]
-        public required string Password { get; set; }
 
 /*
         [Required, DataType(DataType.Date)]

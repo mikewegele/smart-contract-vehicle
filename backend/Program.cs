@@ -1,5 +1,6 @@
 using SmartContractVehicle.Data;
 using Microsoft.EntityFrameworkCore;
+using SmartContractVehicle.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Services
-builder.Services.AddScoped<User.Services.UserService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

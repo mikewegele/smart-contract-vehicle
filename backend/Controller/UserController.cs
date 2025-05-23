@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartContractVehicle.Data;
-using User.Model;
-using User.Transport;
-using User.Services;
-using User.Domain;
 using AutoMapper;
+using SmartContractVehicle.DTO;
+using Microsoft.AspNetCore.Identity;
 
 
-namespace User.Controllers
+namespace SmartContractVehicle.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]/")]
@@ -39,15 +36,14 @@ namespace User.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(NewUserTO dto)
+        public async Task<IActionResult> Register(RegisterTO dto)
         {
-            var newUser = _mapper.Map<NewUser>(dto);
-            var createdUser = await _userService.CreateUserAsync(newUser);
+            var createdUser = await _userService.CreateUserAsync(dto);
             return Ok(createdUser);
         }
 
         [HttpPatch]
-        public IActionResult Update(User.Model.User user)
+        public IActionResult Update(SmartContractVehicle.Model.User user)
         {
             if (ModelState.IsValid)
             {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace User.Transport
+namespace SmartContractVehicle.DTO
 {
     public class LoginTO
     {

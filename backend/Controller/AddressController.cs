@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
-using User.Model;
+using SmartContractVehicle.Model;
 
-
-namespace User.Controllers
+namespace SmartContractVehicle.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]/")]
