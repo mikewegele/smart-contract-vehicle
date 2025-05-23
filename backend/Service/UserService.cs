@@ -17,7 +17,7 @@ public class UserService
     {
         var user = new User
         {
-            UserName = dto.Name,
+            UserName = dto.Email,
             Email = dto.Email,
             Name = dto.Name,
             //WalletId = dto.WalletId,
@@ -25,10 +25,22 @@ public class UserService
 
         var result = await _userManager.CreateAsync(user, dto.Password);
 
-        //if (result.Succeeded)
-        //{
-        //    await _userManager.AddToRoleAsync(user, "renter"); // Standardrolle
-        //}
+        if (!result.Succeeded)
+            return result;
+
+        var rolesToAssign = new List<string>();
+
+        if (user.IsAdmin)
+            rolesToAssign.Add(Data.DbInitializer.ADMIN);
+
+        if (user.IsLessor)
+            rolesToAssign.Add(Data.DbInitializer.LESSOR);
+
+        if (user.IsRenter)
+            rolesToAssign.Add(Data.DbInitializer.RENTER);
+
+        if (rolesToAssign.Any())
+            await _userManager.AddToRolesAsync(user, rolesToAssign);
 
         return result;
     }

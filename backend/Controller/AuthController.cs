@@ -19,7 +19,7 @@ namespace SmartContractVehicle.Controller
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterTO rto)
         {
-            var user = new User { UserName = rto.Name, Name = rto.Name, Email = rto.Email };
+            var user = new User { UserName = rto.Email, Name = rto.Name, Email = rto.Email };
             var res = await _userManager.CreateAsync(user, rto.Password);
             if (res.Succeeded)
                 return Ok("Registered.");
@@ -38,7 +38,7 @@ namespace SmartContractVehicle.Controller
             if (!res.Succeeded)
                 return Unauthorized("Invalid password.");
 
-            var token = GenerateJwtToken(user);
+            var token = await GenerateJwtTokenAsync(user);
             return Ok(new { token });
         }
 
@@ -50,14 +50,18 @@ namespace SmartContractVehicle.Controller
         }
 
 
-        private object GenerateJwtToken(User user)
+        
+        private async Task<string> GenerateJwtTokenAsync(User user)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-
+                new(JwtRegisteredClaimNames.Sub, user.Email),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Name, user.Name)
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);

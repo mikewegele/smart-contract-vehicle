@@ -75,4 +75,13 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 
 app.MapControllers();
+
+
+// Make sure we actually have the data in the DB we need
+// E.g.: Add Roles to DB
+using (var scope = app.Services.CreateScope())
+{
+    await DbInitializer.SeedRolesAsync(scope.ServiceProvider);
+}
+
 app.Run();

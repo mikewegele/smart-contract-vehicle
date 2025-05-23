@@ -10,6 +10,12 @@ namespace SmartContractVehicle.Model
         [Required]
         public required string Name { get; set; }
 
+        public bool IsAdmin { get; set; } = false;
+        
+        public bool IsRenter { get; set; } = true;
+
+        public bool IsLessor { get; set; } = false;
+
 /*
         [Required, DataType(DataType.Date)]
         public required DateOnly Birthday { get; set; }
@@ -19,9 +25,6 @@ namespace SmartContractVehicle.Model
 
         [Required]
         public required Address Mailing { get; set; }
-
-        [Phone]
-        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
         public required string WalletId { get; set; }
