@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace User.Model
@@ -14,7 +15,7 @@ namespace User.Model
         [Required, EmailAddress]
         public required string Email { get; set; }
 
-        [Required]
+        [Required, MinLength(6)]
         public required string Password { get; set; }
 
 /*
