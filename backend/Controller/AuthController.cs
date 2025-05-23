@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace SmartContractVehicle.Controller
 {
@@ -15,7 +19,7 @@ namespace SmartContractVehicle.Controller
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterTO rto)
         {
-            var user = new User { Name = rto.Name, Email = rto.Email };
+            var user = new User { UserName = rto.Name, Name = rto.Name, Email = rto.Email };
             var res = await _userManager.CreateAsync(user, rto.Password);
             if (res.Succeeded)
                 return Ok("Registered.");
@@ -34,10 +38,9 @@ namespace SmartContractVehicle.Controller
             if (!res.Succeeded)
                 return Unauthorized("Invalid password.");
 
-            var token = generateJwtToken(user);
+            var token = GenerateJwtToken(user);
             return Ok(new { token });
         }
-
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -46,5 +49,29 @@ namespace SmartContractVehicle.Controller
             return Ok("logged out.");
         }
 
+
+        private object GenerateJwtToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var expDate = DateTime.Now.AddDays(1);
+
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Issuer"],
+                claims,
+                expires: expDate,
+                signingCredentials : cred
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

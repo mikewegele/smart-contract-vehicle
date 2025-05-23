@@ -20,15 +20,15 @@ public class UserService
             UserName = dto.Name,
             Email = dto.Email,
             Name = dto.Name,
-            WalletId = dto.WalletId,
+            //WalletId = dto.WalletId,
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
 
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(user, "renter"); // Standardrolle
-        }
+        //if (result.Succeeded)
+        //{
+        //    await _userManager.AddToRoleAsync(user, "renter"); // Standardrolle
+        //}
 
         return result;
     }
