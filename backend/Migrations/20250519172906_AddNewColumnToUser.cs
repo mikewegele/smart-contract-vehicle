@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace backend.Migrations
+namespace SmartContractVehicle.Migrations
 {
     /// <inheritdoc />
     public partial class AddNewColumnToUser : Migration
