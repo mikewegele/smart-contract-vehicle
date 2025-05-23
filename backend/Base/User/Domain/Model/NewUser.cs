@@ -6,7 +6,7 @@ namespace User.Domain
         public string Password { get; }
         public string Name { get; }
 
-            public NewUser(string email, string password, string name)
+        public NewUser(string email, string password, string name)
         {
             Email = email;
             Password = password;
