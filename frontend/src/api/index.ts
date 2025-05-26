@@ -42,23 +42,46 @@ export interface Address {
   country: string;
 }
 
-export interface NewUserTO {
+export interface RegisterTO {
   /** @minLength 1 */
   email: string;
-  /** @minLength 1 */
+  /** @minLength 6 */
   password: string;
   /** @minLength 1 */
   name: string;
 }
 
 export interface User {
-  id?: number;
+  /** @nullable */
+  id?: string | null;
+  /** @nullable */
+  userName?: string | null;
+  /** @nullable */
+  normalizedUserName?: string | null;
+  /** @nullable */
+  email?: string | null;
+  /** @nullable */
+  normalizedEmail?: string | null;
+  emailConfirmed?: boolean;
+  /** @nullable */
+  passwordHash?: string | null;
+  /** @nullable */
+  securityStamp?: string | null;
+  /** @nullable */
+  concurrencyStamp?: string | null;
+  /** @nullable */
+  phoneNumber?: string | null;
+  phoneNumberConfirmed?: boolean;
+  twoFactorEnabled?: boolean;
+  /** @nullable */
+  lockoutEnd?: string | null;
+  lockoutEnabled?: boolean;
+  accessFailedCount?: number;
   /** @minLength 1 */
   name: string;
-  /** @minLength 1 */
-  email: string;
-  /** @minLength 1 */
-  password: string;
+  isAdmin?: boolean;
+  isRenter?: boolean;
+  isLessor?: boolean;
 }
 
 export type GetParams = {
@@ -67,6 +90,17 @@ id?: number;
 
 export type DeleteApiAddressDeleteParams = {
 id?: number;
+};
+
+export type PostApiAuthRegisterRegisterParams = {
+Email: string;
+Password: string;
+Name: string;
+};
+
+export type PostApiAuthLoginLoginParams = {
+Email: string;
+Password: string;
 };
 
 export type GetApiUserGetParams = {
@@ -120,6 +154,35 @@ const patchApiAddressUpdate = (
       );
     }
   
+const postApiAuthRegisterRegister = (
+    params: PostApiAuthRegisterRegisterParams,
+ ) => {
+      return api<void>(
+      {url: `/api/Auth/Register/register`, method: 'POST',
+        params
+    },
+      );
+    }
+  
+const postApiAuthLoginLogin = (
+    params: PostApiAuthLoginLoginParams,
+ ) => {
+      return api<void>(
+      {url: `/api/Auth/Login/login`, method: 'POST',
+        params
+    },
+      );
+    }
+  
+const postApiAuthLogoutLogout = (
+    
+ ) => {
+      return api<void>(
+      {url: `/api/Auth/Logout/logout`, method: 'POST'
+    },
+      );
+    }
+  
 const getApiUserGet = (
     params?: GetApiUserGetParams,
  ) => {
@@ -141,12 +204,12 @@ const deleteApiUserDelete = (
     }
   
 const postApiUserRegister = (
-    newUserTO: NewUserTO,
+    registerTO: RegisterTO,
  ) => {
       return api<void>(
       {url: `/api/User/Register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: newUserTO
+      data: registerTO
     },
       );
     }
@@ -162,11 +225,14 @@ const patchApiUserUpdate = (
       );
     }
   
-return {get,deleteApiAddressDelete,postApiAddressPost,patchApiAddressUpdate,getApiUserGet,deleteApiUserDelete,postApiUserRegister,patchApiUserUpdate}};
+return {get,deleteApiAddressDelete,postApiAddressPost,patchApiAddressUpdate,postApiAuthRegisterRegister,postApiAuthLoginLogin,postApiAuthLogoutLogout,getApiUserGet,deleteApiUserDelete,postApiUserRegister,patchApiUserUpdate}};
 export type GetResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['get']>>>
 export type DeleteApiAddressDeleteResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['deleteApiAddressDelete']>>>
 export type PostApiAddressPostResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['postApiAddressPost']>>>
 export type PatchApiAddressUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['patchApiAddressUpdate']>>>
+export type PostApiAuthRegisterRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['postApiAuthRegisterRegister']>>>
+export type PostApiAuthLoginLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['postApiAuthLoginLogin']>>>
+export type PostApiAuthLogoutLogoutResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['postApiAuthLogoutLogout']>>>
 export type GetApiUserGetResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['getApiUserGet']>>>
 export type DeleteApiUserDeleteResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['deleteApiUserDelete']>>>
 export type PostApiUserRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getSmartContractVehicle>['postApiUserRegister']>>>

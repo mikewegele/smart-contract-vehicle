@@ -5,7 +5,6 @@ import {useNavigate} from "react-router-dom";
 import {Alert, Box, Button, Stack, Typography} from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
-import type {NewUserTO} from "../api";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -121,12 +120,22 @@ const AuthForm: React.FC = () => {
 
         setError("");
         if (isLogin) {
-            console.log("Hey");
-        } else {
-            const newUser: NewUserTO = {name: username, email: email, password: password};
-            const response = await apiExec(api => api.postApiUserRegister(newUser));
+            const response = await apiExec(api => api.postApiAuthLoginLogin({Email: email, Password: password}))
             if (!hasFailed(response.status)) {
                 navigate("/home");
+            } else {
+                setError("Failed to log in");
+            }
+        } else {
+            const response = await apiExec(api => api.postApiAuthRegisterRegister({
+                Email: email,
+                Password: password,
+                Name: username
+            }));
+            if (!hasFailed(response.status)) {
+                navigate("/home");
+            } else {
+                setError("Failed to register");
             }
         }
     };
