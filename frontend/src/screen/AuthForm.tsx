@@ -21,8 +21,7 @@ const useStyles = makeStyles(() => ({
         padding: "2rem 2.5rem",
         borderRadius: "8px",
         border: "1px solid rgba(0, 0, 0, 0.23)",
-        width: "100%",
-        maxWidth: "400px",
+        width: "400px"
     },
     title: {
         textAlign: "center",
