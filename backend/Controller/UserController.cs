@@ -52,7 +52,7 @@ namespace SmartContractVehicle.Controllers
                 user = _db.Users.Find(user.Id);
                 if (user != null)
                 {
-                    return (IActionResult)Results.InternalServerError();
+                    return StatusCode(500);
                 }
 
                 return Ok(user);
