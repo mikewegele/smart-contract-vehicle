@@ -10,10 +10,10 @@ const EntryPage: React.FC = () => {
 
     return (
         <Container center>
-            <Header />
+            <Header/>
             <AuthForm/>
             <UserCookieManager/>
-            <NavLinks />
+            <NavLinks isLoggedIn={false}/>
         </Container>
     );
 };

@@ -5,13 +5,17 @@ const useStyles = makeStyles(() => ({
     container: {
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        height: "100%",
         background: "linear-gradient(135deg, #e0f7fa, #4c838b)",
-        padding: "2rem",
     },
     center: {
         alignItems: "center",
         justifyContent: "center",
+    },
+    box: {
+        display: "flex",
+        flexDirection: "column",
+        padding: "1rem",
     }
 }));
 
@@ -21,11 +25,13 @@ interface Props {
 
 const Container: React.FC<PropsWithChildren<Props>> = (props) => {
 
-    const { classes, cx } = useStyles();
+    const {classes, cx} = useStyles();
 
     return (
         <div className={cx(classes.container, props.center ? classes.center : "")}>
-            {props.children}
+            <div className={classes.box}>
+                {props.children}
+            </div>
         </div>
     );
 };

@@ -1,16 +1,21 @@
 import React from "react";
 import makeStyles from "../util/makeStyles.ts";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
     navLinks: {
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        width: "100%",
         display: "flex",
         justifyContent: "center",
         gap: "2rem",
-        marginTop: "2rem",
+        padding: "1rem 0",
         fontSize: "1.1rem",
         fontWeight: 500,
         color: "#34495e",
+        boxShadow: "0 -2px 5px rgba(0,0,0,0.1)",
         "& span": {
             cursor: "pointer",
             position: "relative",
@@ -38,19 +43,19 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-interface Props{
+interface Props {
     isLoggedIn: boolean;
 }
 
 const NavLinks: React.FC<Props> = ({isLoggedIn}) => {
-    const { classes } = useStyles();
+    const {classes} = useStyles();
     const navigate = useNavigate();
     return (
         <div className={classes.navLinks}>
             <span onClick={() => navigate("/home")}>Home</span>
             <span>About Us</span>
             <span>Locations</span>
-            {isLoggedIn && <span onClick={() => navigate("/profile")}>Profile</span>} 
+            {isLoggedIn && <span onClick={() => navigate("/profile")}>Profile</span>}
         </div>
     );
 };
