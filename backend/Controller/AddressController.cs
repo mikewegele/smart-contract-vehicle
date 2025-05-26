@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
-using SmartContractVehicle.Models;
-
+using SmartContractVehicle.Model;
 
 namespace SmartContractVehicle.Controllers
 {
