@@ -19,6 +19,8 @@ namespace SmartContractVehicle.Model
 
         [Column(TypeName = "geography")]
         public required Point CurrentPosition { get; set; }
+
+        public double RemainingReach { get; set; }
     }
 }
 
