@@ -21,6 +21,8 @@ namespace SmartContractVehicle.Model
         public required Point CurrentPosition { get; set; }
 
         public double RemainingReach { get; set; }
+
+        public required string Colour { get; set; }
     }
 }
 
