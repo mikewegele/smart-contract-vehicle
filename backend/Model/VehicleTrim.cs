@@ -13,7 +13,7 @@ namespace SmartContractVehicle.Model
 
         public required VehicleModel Model { get; set; }
 
-        public required List<Car> Cars { get; set; }
+        public required ICollection<Car> Cars { get; set; }
         // public required string ImagePath { get; set; }
     }
 }
