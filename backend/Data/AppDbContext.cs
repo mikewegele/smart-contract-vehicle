@@ -8,7 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 {
     public DbSet<Address> Addresses { get; set; }
     public DbSet<AutomotiveCompany> AutomotiveCompanys { get; set; }
-    public DbSet<VehicleModel> Vehicles { get; set; }
+    public DbSet<VehicleModel> VehicleModels { get; set; }
     public DbSet<VehicleTrim> VehicleTrims { get; set; }
     public DbSet<Car> Cars { get; set; }
 
