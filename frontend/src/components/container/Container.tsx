@@ -7,6 +7,7 @@ const useStyles = makeStyles(() => ({
         flexDirection: "column",
         height: "100%",
         background: "linear-gradient(135deg, #e0f7fa, #4c838b)",
+        paddingTop: "4rem",
     },
     center: {
         alignItems: "center",
@@ -16,11 +17,14 @@ const useStyles = makeStyles(() => ({
         display: "flex",
         flexDirection: "column",
         padding: "1rem",
+        background: "linear-gradient(135deg, #e0f7fa, #4c838b)",
+        flexGrow: 1,
     }
 }));
 
 interface Props {
     center?: boolean;
+    className?: string;
 }
 
 const Container: React.FC<PropsWithChildren<Props>> = (props) => {
