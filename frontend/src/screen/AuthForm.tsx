@@ -126,7 +126,7 @@ const AuthForm: React.FC = () => {
                         Password: password,
                     })
                 );
-                console.log("response", response);
+                console.log("Response", response);
                 if (!hasFailed(response.status)) {
                     navigate("/home");
                 } else {
