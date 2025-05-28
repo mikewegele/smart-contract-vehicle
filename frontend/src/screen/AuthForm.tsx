@@ -128,8 +128,30 @@ const AuthForm: React.FC = () => {
         if (isLogin) {
             console.log("Hey");
         } else {
+<<<<<<< HEAD
             const response = await apiExec(api => api.getApiUserGet());
             console.log(response);
+=======
+            try {
+                const response = await apiExec(api => api.postApiAuthRegisterRegister({
+                Email: email,
+                Password: password,
+                Name: username
+                }));
+                if (!hasFailed(response.status)) {
+                navigate("/home");
+                } else {
+                setError("Failed to register");
+                }
+            } catch (error: any) {
+                if (error.response && error.response.data) {
+                console.error("Server validation errors:", error.response.data);
+                setError(JSON.stringify(error.response.data));  // or format better if you want
+                } else {
+                setError("Failed to register");
+                }
+            }
+>>>>>>> 62748bc (updates for functionality of sign up in frontend and backend)
         }
         navigate("/home");
     };

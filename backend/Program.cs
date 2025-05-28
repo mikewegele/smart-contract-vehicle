@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5174")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -35,5 +35,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
+<<<<<<< HEAD
+=======
+app.UseAuthentication();
+app.UseAuthorization();
+
+>>>>>>> 62748bc (updates for functionality of sign up in frontend and backend)
 app.MapControllers();
 app.Run();

@@ -120,6 +120,41 @@ const patchApiAddressUpdate = (
       );
     }
   
+<<<<<<< HEAD
+=======
+const postApiAuthRegisterRegister = (
+  body: PostApiAuthRegisterRegisterParams,
+) => {
+  return api<void>({
+    url: `/api/Auth/Register/register`,
+    method: 'POST',
+    data: body, // send in body
+    headers: {
+      'Content-Type': 'application/json' //  ensure correct header
+    }
+  });
+};
+  
+const postApiAuthLoginLogin = (
+    params: PostApiAuthLoginLoginParams,
+ ) => {
+      return api<void>(
+      {url: `/api/Auth/Login/login`, method: 'POST',
+        params
+    },
+      );
+    }
+  
+const postApiAuthLogoutLogout = (
+    
+ ) => {
+      return api<void>(
+      {url: `/api/Auth/Logout/logout`, method: 'POST'
+    },
+      );
+    }
+  
+>>>>>>> 62748bc (updates for functionality of sign up in frontend and backend)
 const getApiUserGet = (
     params?: GetApiUserGetParams,
  ) => {
