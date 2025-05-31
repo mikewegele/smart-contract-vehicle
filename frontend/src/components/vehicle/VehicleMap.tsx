@@ -51,8 +51,6 @@ interface Props {
 const VehicleMap: React.FC<Props> = (props) => {
     const { vehicles } = props;
 
-    console.log(vehicles);
-
     const { classes } = useStyles();
 
     const mapPointToLocation = useCallback((point: Point): LatLngTuple => {
