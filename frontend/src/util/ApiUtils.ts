@@ -47,13 +47,23 @@ export const apiExec = async <API extends BaseAPI, T>(
                 data: undefined,
             };
         }
-    } catch (error) {
-        return {
-            error: {
-                message: error.message,
-                code: 0,
-            },
-            data: undefined,
-        };
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return {
+                error: {
+                    message: error.message,
+                    code: 0,
+                },
+                data: undefined,
+            };
+        } else {
+            return {
+                error: {
+                    message: "Unknown error occurred",
+                    code: 0,
+                },
+                data: undefined,
+            };
+        }
     }
 };
