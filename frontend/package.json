@@ -9,19 +9,22 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generateApi": "npx orval"
+    "generateApi": "openapi-generator-cli generate -i http://localhost:5147/swagger/v1/swagger.json -g typescript-axios -o src/api"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
+    "@openapitools/openapi-generator-cli": "^2.20.2",
+    "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.9.0",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
     "react-leaflet": "^5.0.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0"
   },
   "devDependencies": {
@@ -29,12 +32,12 @@
     "@types/leaflet": "^1.9.18",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/react-redux": "^7.1.34",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "orval": "^7.9.0",
     "prettier": "^3.5.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
