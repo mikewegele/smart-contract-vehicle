@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CarsSlice } from "./reducer/cars.ts";
 
 export const rootReducer = combineReducers({
-    cars: CarsSlice,
+    cars: CarsSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

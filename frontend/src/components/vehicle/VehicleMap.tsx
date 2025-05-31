@@ -1,12 +1,12 @@
 import React from "react";
-import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import makeStyles from "../../util/makeStyles.ts";
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import type {VehicleProp} from "../../screen/DashboardPage.tsx";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import type { VehicleProp } from "../../screen/DashboardPage.tsx";
 
 L.Icon.Default.mergeOptions({
     iconUrl: markerIcon,
@@ -49,31 +49,41 @@ interface Props {
 }
 
 const VehicleMap: React.FC<Props> = (props) => {
+    const { vehicles } = props;
 
-    const {vehicles} = props;
-
-    const {classes} = useStyles();
-
-    console.log(vehicles)
+    const { classes } = useStyles();
 
     return (
         <div className={classes.outerWrapper}>
             <div className={classes.mapWrapper}>
-                <MapContainer center={center} zoom={13} style={{height: "100%", width: "100%"}}>
+                <MapContainer
+                    center={center}
+                    zoom={13}
+                    style={{ height: "100%", width: "100%" }}
+                >
                     <TileLayer
                         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
                     />
                     {vehicles.map((vehicle, index) => (
-                        <Marker key={index} position={vehicle.location} icon={createVehicleIcon(vehicle.image)}>
+                        <Marker
+                            key={index}
+                            position={vehicle.location}
+                            icon={createVehicleIcon(vehicle.image)}
+                        >
                             <Popup maxWidth={200}>
-                                <div style={{textAlign: "center"}}>
+                                <div style={{ textAlign: "center" }}>
                                     <strong>{vehicle.model}</strong>
-                                    <br/>
+                                    <br />
                                     <img
                                         src={vehicle.image}
                                         alt={vehicle.model}
-                                        style={{width: "100%", maxWidth: "150px", height: "auto", marginTop: "0.5rem"}}
+                                        style={{
+                                            width: "100%",
+                                            maxWidth: "150px",
+                                            height: "auto",
+                                            marginTop: "0.5rem",
+                                        }}
                                     />
                                 </div>
                             </Popup>
