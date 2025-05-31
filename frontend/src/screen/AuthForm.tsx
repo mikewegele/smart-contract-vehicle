@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import makeStyles from "../util/makeStyles.ts";
-import {apiExec, hasFailed} from "../util/ApiUtils.ts";
-import {useNavigate} from "react-router-dom";
-import {Alert, Box, Button, Stack, Typography} from "@mui/material";
+import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { useNavigate } from "react-router-dom";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
         padding: "2rem 2.5rem",
         borderRadius: "8px",
         border: "1px solid rgba(0, 0, 0, 0.23)",
-        width: "400px"
+        width: "400px",
     },
     title: {
         textAlign: "center",
@@ -91,7 +91,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const AuthForm: React.FC = () => {
-    const {classes} = useStyles();
+    const { classes } = useStyles();
 
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
@@ -119,18 +119,38 @@ const AuthForm: React.FC = () => {
 
         setError("");
         if (isLogin) {
-            const response = await apiExec(api => api.postApiAuthLoginLogin({Email: email, Password: password}))
-            if (!hasFailed(response.status)) {
-                navigate("/home");
-            } else {
-                setError("Failed to log in");
+            try {
+                const response = await apiExec((api) =>
+                    api.postApiAuthLoginLogin({
+                        Email: email,
+                        Password: password,
+                    })
+                );
+                console.log("Response", response);
+                if (!hasFailed(response.status)) {
+                    navigate("/home");
+                } else {
+                    setError("Failed to log in");
+                }
+            } catch (error: any) {
+                if (error.response && error.response.data) {
+                    console.error(
+                        "Server validation errors:",
+                        error.response.data
+                    );
+                    setError(JSON.stringify(error.response.data));
+                } else {
+                    setError("Failed to register");
+                }
             }
         } else {
-            const response = await apiExec(api => api.postApiAuthRegisterRegister({
-                Email: email,
-                Password: password,
-                Name: username
-            }));
+            const response = await apiExec((api) =>
+                api.postApiAuthRegisterRegister({
+                    Email: email,
+                    Password: password,
+                    Name: username,
+                })
+            );
             if (!hasFailed(response.status)) {
                 navigate("/home");
             } else {
@@ -153,7 +173,8 @@ const AuthForm: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
-                        required/>
+                        required
+                    />
 
                     {!isLogin && (
                         <DefaultTextField
@@ -162,7 +183,8 @@ const AuthForm: React.FC = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             fullWidth
-                            required/>
+                            required
+                        />
                     )}
 
                     <DefaultTextField
@@ -178,17 +200,20 @@ const AuthForm: React.FC = () => {
                     <DefaultButton
                         variant="contained"
                         color="primary"
-                        type="submit">
+                        type="submit"
+                    >
                         {isLogin ? "Log In" : "Sign Up"}
                     </DefaultButton>
                 </Stack>
             </form>
 
             <Typography className={classes.toggle}>
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                {isLogin
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
                 <Button
                     className={classes.link}
-                    onClick={() => setIsLogin(prev => !prev)}
+                    onClick={() => setIsLogin((prev) => !prev)}
                 >
                     {isLogin ? "Sign Up" : "Log In"}
                 </Button>

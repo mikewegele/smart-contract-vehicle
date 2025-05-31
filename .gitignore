@@ -537,3 +537,4 @@ $RECYCLE.BIN/
 /.vs
 /car-rental-service.Server/obj
 /backend/Migrations
+backend/Migrations/*
