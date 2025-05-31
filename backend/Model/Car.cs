@@ -22,7 +22,13 @@ namespace SmartContractVehicle.Model
 
         public double RemainingReach { get; set; }
 
-        public required string Colour { get; set; }
+        public required string Color { get; set; }
+
+        public required string Manufacturer { get; set; }
+
+        public required string Model { get; set; }
+
+        public int Year { get; set; }
     }
 }
 

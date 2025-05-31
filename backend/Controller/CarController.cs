@@ -34,7 +34,7 @@ namespace SmartContractVehicle.Controller
                     },
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
-                    Colour = "black",
+                    Color = "black",
                 }
             ];
             
