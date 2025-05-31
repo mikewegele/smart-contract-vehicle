@@ -1,41 +1,48 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
-import { apiExec } from "../../util/ApiUtils.ts";
+import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
+import { CarApi, type CarTO } from "../../api";
 
 interface State {
-    value: string | undefined;
-    valueNumber: number;
+    value: CarTO[];
+    error?: ApiError;
 }
 
-const reduceAddUser = (draft: Draft<State>, action: PayloadAction<string>) => {
+const reduceCarError = (
+    draft: Draft<State>,
+    action: PayloadAction<ApiError>
+) => {
+    draft.error = action.payload;
+};
+
+const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
+    draft.error = undefined;
     draft.value = action.payload;
-    draft.valueNumber = 2;
 };
 
 const slice = createSlice({
-    name: "Users",
+    name: "Cars",
     initialState: {
-        value: undefined,
-        valueNumber: 1,
+        value: [],
     } as State,
     reducers: {
-        USER: reduceAddUser,
+        SET_CARS: reduceSetCars,
+        SET_ERROR: reduceCarError,
     },
 });
 
-const addUser = slice.actions["USER"];
+const addCars = slice.actions["SET_CARS"];
+const carError = slice.actions["SET_ERROR"];
 
 const fetchAllCars = () => {
     return async (dispatch: RootDispatch): Promise<void> => {
-        const response = await apiExec(ProjectControllerApi, (api) =>
-            api.getAllProject()
-        );
+        const response = await apiExec(CarApi, (api) => api.apiCarQueryGet());
         if (hasFailed(response)) {
-            dispatch(projectError(response.error));
+            dispatch(carError(response.error));
         } else {
-            dispatch(setProjects(response.data));
+            dispatch(addCars(response.data));
         }
     };
 };
 
-export { slice as UsersSlice, addUser, fetchUsers };
+export { slice as CarsSlice, addCars, carError, fetchAllCars };
