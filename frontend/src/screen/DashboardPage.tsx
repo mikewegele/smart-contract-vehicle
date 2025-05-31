@@ -44,8 +44,6 @@ const DashboardPage: React.FC = () => {
 
     const { cars } = useApiStates("cars");
 
-    console.log(cars);
-
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
