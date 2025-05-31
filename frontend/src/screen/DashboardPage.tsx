@@ -44,10 +44,12 @@ const DashboardPage: React.FC = () => {
 
     const { cars } = useApiStates("cars");
 
+    console.log(cars);
+
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
-            <SimpleMap vehicles={vehicles} />
+            <SimpleMap vehicles={cars} />
             <VehicleList vehicles={vehicles} />
         </Container>
     );

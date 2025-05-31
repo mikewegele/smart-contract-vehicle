@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import L from "leaflet";
+import L, { type LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import makeStyles from "../../util/makeStyles.ts";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import type { VehicleProp } from "../../screen/DashboardPage.tsx";
+import type { CarTO, Point } from "../../api";
 
 L.Icon.Default.mergeOptions({
     iconUrl: markerIcon,
@@ -45,13 +45,25 @@ const useStyles = makeStyles(() => ({
 const center: [number, number] = [52.52, 13.405];
 
 interface Props {
-    vehicles: VehicleProp[];
+    vehicles: CarTO[];
 }
 
 const VehicleMap: React.FC<Props> = (props) => {
     const { vehicles } = props;
 
+    console.log(vehicles);
+
     const { classes } = useStyles();
+
+    const mapPointToLocation = useCallback((point: Point): LatLngTuple => {
+        const [lng, lat] = point.coordinates ?? [];
+
+        if (typeof lng !== "number" || typeof lat !== "number") {
+            throw new Error("Invalid coordinates");
+        }
+
+        return [lat, lng];
+    }, []);
 
     return (
         <div className={classes.outerWrapper}>
@@ -68,16 +80,24 @@ const VehicleMap: React.FC<Props> = (props) => {
                     {vehicles.map((vehicle, index) => (
                         <Marker
                             key={index}
-                            position={vehicle.location}
-                            icon={createVehicleIcon(vehicle.image)}
+                            position={mapPointToLocation(
+                                vehicle.currentPosition
+                            )}
+                            icon={createVehicleIcon(
+                                vehicle.trim.model.name || ""
+                            )}
                         >
                             <Popup maxWidth={200}>
                                 <div style={{ textAlign: "center" }}>
-                                    <strong>{vehicle.model}</strong>
+                                    <strong>{vehicle.trim.model.name}</strong>
                                     <br />
                                     <img
-                                        src={vehicle.image}
-                                        alt={vehicle.model}
+                                        src={
+                                            vehicle.trim.model.name || undefined
+                                        }
+                                        alt={
+                                            vehicle.trim.model.name || undefined
+                                        }
                                         style={{
                                             width: "100%",
                                             maxWidth: "150px",
