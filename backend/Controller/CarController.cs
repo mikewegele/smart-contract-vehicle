@@ -1,45 +1,25 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SmartContractVehicle.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using SmartContractVehicle.DTO;
-using NetTopologySuite.Geometries;
-using Microsoft.OpenApi.Extensions;
+using SmartContractVehicle.Model;
+using SmartContractVehicle.Service;
 
 namespace SmartContractVehicle.Controller
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class CarController(AppDbContext db) : ControllerBase
+    public class CarController(CarService carService, IMapper mapper) : ControllerBase
     {
-        private readonly AppDbContext _db = db;
+        private readonly CarService _carService = carService;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public ActionResult<IQueryable<CarTO>> Query()
+        public async Task<ActionResult<List<CarTO>>> Query()
         {
-            IList<CarTO> cars = [
-                new() {
-                    Trim = new VehicleTrimTO
-                    {
-                        Model = new VehicleModelTO
-                        {
-                            Producer = new AutomotiveCompanyTO
-                            {
-                                Name = "BMW",
-                            },
-                            Name = "iX",
-                        },
-                        Name = "M60",
-                        Fuel = FuelType.Electric.GetDisplayName(),
-                        Drivetrain = Drivetrain.AllWheelDrive.GetDisplayName(),
-                    },
-                    CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
-                    RemainingReach = 5555.5,
-                    Color = "black",
-                }
-            ];
-            
-            return Ok(cars);
-        }
+            var carModels = await _carService.GetAllCarsAsync();
+            var carDtos = _mapper.Map<List<CarTO>>(carModels);
 
+            return Ok(carDtos);
+        }
     }
 }
