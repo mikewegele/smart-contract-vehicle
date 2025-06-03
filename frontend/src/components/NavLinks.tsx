@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 const useStyles = makeStyles(() => ({
     navLinks: {
         position: "fixed",
-        bottom: 0,
+        top: 0,
         left: 0,
         width: "100%",
         display: "flex",
@@ -15,7 +15,7 @@ const useStyles = makeStyles(() => ({
         fontSize: "1.1rem",
         fontWeight: 500,
         color: "#34495e",
-        boxShadow: "0 -2px 5px rgba(0,0,0,0.1)",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
         "& span": {
             cursor: "pointer",
             position: "relative",
@@ -42,6 +42,7 @@ const useStyles = makeStyles(() => ({
         },
     },
 }));
+
 
 interface Props {
     isLoggedIn: boolean;

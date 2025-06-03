@@ -46,6 +46,7 @@ TestResults/
 # EF Core Migrations Snapshots (optional ignorieren)
 **/Migrations/*.Designer.cs
 **/Migrations/*ModelSnapshot.cs
+*/Migrations/*
 
 # Sonstiges
 *.swp
