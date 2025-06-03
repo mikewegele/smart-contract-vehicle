@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Extensions;
 using AutoMapper;
 using SmartContractVehicle.Model;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartContractVehicle.Controller
 {
@@ -208,9 +209,12 @@ namespace SmartContractVehicle.Controller
         public IActionResult GetModels(string? ManufactureName, bool WithId)
         {
             IQueryable<VehicleModel> vehiclemodels = _db.VehicleModels;
-
+            
             if (!string.IsNullOrEmpty(ManufactureName) && !string.IsNullOrWhiteSpace(ManufactureName))
-                vehiclemodels = vehiclemodels.Where(vm => vm.Producer.Name.Normalize() == ManufactureName.Normalize());
+            {
+                vehiclemodels = vehiclemodels.Where(vm => EF.Functions.ILike(vm.Producer.Name.Trim(), ManufactureName.Trim()));
+            }
+                
 
             IQueryable res = (WithId) ? vehiclemodels.Select(d => new { d.Name, d.Id }) : vehiclemodels.Select(d => new { d.Name });
 
@@ -224,7 +228,10 @@ namespace SmartContractVehicle.Controller
             IQueryable<VehicleTrim> vehicletrims = _db.VehicleTrims;
 
             if (!string.IsNullOrEmpty(ModelName) && !string.IsNullOrWhiteSpace(ModelName))
-                vehicletrims = vehicletrims.Where(vt => vt.Name.Normalize() == ModelName.Normalize());
+            {
+                vehicletrims = vehicletrims.Where(vt => EF.Functions.ILike(vt.Name.Trim(), ModelName.Trim()));
+            }
+                
 
             IQueryable res = (WithId) ?  vehicletrims.Select(d =>  new { d.Name, d.Id })  : vehicletrims.Select(d => new { d.Name });
 
