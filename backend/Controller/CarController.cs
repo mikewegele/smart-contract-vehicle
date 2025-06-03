@@ -69,6 +69,34 @@ namespace SmartContractVehicle.Controller
                     Colour = "black",
                     Seats = 5,
                     PricePerMinute = 1,
+                },
+                new() {
+                    CompanyLogoPath = "",
+                    CompanyName = "BMW",
+                    DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
+                    Colour = "Blue",
+                    CurrentPosition = new Point(new Coordinate(52.515, 13.39)),
+                    FueltypeName = FuelTypes.Electric.GetDisplayName(),
+                    ModelName = "i3",
+                    PricePerMinute = .35,
+                    Seats = 4,
+                    TrimName = "I01",
+                    RemainingReach = 250,
+                    TrimImagePath = "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp"
+                },
+                new() {
+                    CompanyLogoPath = "",
+                    CompanyName = "Fiat",
+                    DrivetrainName = Drivetrains.FrontWheelDrive.GetDisplayName(),
+                    Colour = "White",
+                    CurrentPosition = new Point(new Coordinate (52.52, 13.405)),
+                    FueltypeName = FuelTypes.Electric.GetDisplayName(),
+                    ModelName = "500e Limousine",
+                    Seats = 4, 
+                    PricePerMinute = .25,
+                    RemainingReach = 230,
+                    TrimImagePath = "https://cdn.sanity.io/images/767s1cf5/production/81923a4526c2622bfd3463f7942c022472c868fc-1000x714.png?rect=0,94,1000,525&w=1200&h=630&fm=png",
+                    TrimName = "La Prima 87 kW (118PS)"
                 }
             ];
             
