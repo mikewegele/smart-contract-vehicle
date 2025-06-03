@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SmartContractVehicle.Data;
 
 [Flags]
-public enum FuelType
+public enum FuelTypes
 {
     [Display(Name = "None")]
     None = 0,
@@ -49,9 +49,9 @@ public static class FuelTypeSeeder
 {
     public static void Seed(ModelBuilder modelBuilder)
     {
-        var fuelTypes = Enum.GetValues<FuelType>()
-            .Cast<FuelType>()
-            .Where(f => f != FuelType.None)  // skip 'None'
+        var fuelTypes = Enum.GetValues<FuelTypes>()
+            .Cast<FuelTypes>()
+            .Where(f => f != FuelTypes.None)  // skip 'None'
             .Select(f => new Model.FuelType
             {
                 Id = (int)f,
