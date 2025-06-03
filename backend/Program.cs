@@ -82,6 +82,8 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         options.RoutePrefix = string.Empty;
     });
+   
+   
 }
 
 app.UseCors("AllowFrontend");
@@ -95,6 +97,42 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     await DbInitializer.SeedRolesAsync(scope.ServiceProvider);
+
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+
+    var mail = "this.is.not@an-email.dd";
+    var user = await userManager.FindByEmailAsync(mail);
+    if (user == null)
+    {
+        user = new User()
+        {
+            UserName = "Dummy",
+            Name = "McDummy",
+            Email = mail,
+            EmailConfirmed = true,
+        };
+        var res = await userManager.CreateAsync(user, "SuperSecurePassword123!");
+        if (!res.Succeeded)
+            throw new Exception("Failed to create seed user: " + string.Join(", ", res.Errors.Select(e => e.Description)));
+    }
+
+    if (!context.Cars.Any())
+    {
+        var fuels = context.FuelTypes.ToArray();
+        var drivetrains = context.Drivetrains.ToArray();
+
+        var (companies, cars) = DbInitializer.SeedCars(user, fuels, drivetrains);
+
+        var tac = context.AutomotiveCompanies.AddRangeAsync(companies);
+        var tc = context.Cars.AddRangeAsync(cars);
+        await tac;
+        await tc;
+        await context.SaveChangesAsync();
+    }
+
 }
+
 
 app.Run();
