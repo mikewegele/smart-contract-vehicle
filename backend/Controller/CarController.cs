@@ -144,5 +144,64 @@ namespace SmartContractVehicle.Controller
 
             return Ok(cars.Select(c => _mapper.Map<CarTO>(c)));
         }
+
+
+        [HttpGet]
+        public IActionResult GetDrivetrains(bool WithId)
+        {
+            var drivetrains = _db.Drivetrains;
+
+            IQueryable res = (WithId) ? drivetrains.Select(d => new { d.Name, d.Id }) : drivetrains.Select(d => new { d.Name });
+
+            return Ok(res);
+        }
+
+        [HttpGet]
+        public IActionResult GetFueltypes(bool WithId)
+        {
+            var fueltypes = _db.FuelTypes;
+
+            IQueryable res = (WithId) ? fueltypes.Select(d => new { d.Name, d.Id }) : fueltypes.Select(d => new { d.Name });
+
+            return Ok(res);
+        }
+
+        [HttpGet]
+        public IActionResult GetAutomotiveCompanies(bool WithId)
+        {
+            var companies = _db.AutomotiveCompanies;
+
+            IQueryable res = (WithId) ? companies.Select(d => new { d.Name, d.Id }) : companies.Select(d => new { d.Name });
+
+            return Ok(res);
+        }
+
+        [HttpGet]
+        public IActionResult GetModels(string? ManufactureName, bool WithId)
+        {
+            IQueryable<VehicleModel> vehiclemodels = _db.VehicleModels;
+
+            if (!string.IsNullOrEmpty(ManufactureName) && !string.IsNullOrWhiteSpace(ManufactureName))
+                vehiclemodels = vehiclemodels.Where(vm => vm.Producer.Name.Normalize() == ManufactureName.Normalize());
+
+            IQueryable res = (WithId) ? vehiclemodels.Select(d => new { d.Name, d.Id }) : vehiclemodels.Select(d => new { d.Name });
+
+            return Ok(res);
+
+        }
+
+        [HttpGet]
+        public IActionResult GetTrims(string? ModelName, bool WithId)
+        {
+            IQueryable<VehicleTrim> vehicletrims = _db.VehicleTrims;
+
+            if (!string.IsNullOrEmpty(ModelName) && !string.IsNullOrWhiteSpace(ModelName))
+                vehicletrims = vehicletrims.Where(vt => vt.Name.Normalize() == ModelName.Normalize());
+
+            IQueryable res = (WithId) ?  vehicletrims.Select(d =>  new { d.Name, d.Id })  : vehicletrims.Select(d => new { d.Name });
+
+            return Ok(res);
+        }
+
     }
 }
