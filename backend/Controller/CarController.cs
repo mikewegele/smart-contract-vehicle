@@ -27,7 +27,9 @@ namespace SmartContractVehicle.Controller
                 Colour = "White",
                 CurrentPosition = new Point(new Coordinate(48.77854989722567, 9.179689206292418)),
                 Owner = _db.Users.First(),
-                RemainingReach = 1000,
+                RemainingReach = 550,
+                PricePerMinute = .38,
+                SeatNumbers = 4,
                 Trim = new VehicleTrim() 
                         {
                     Cars = [],
@@ -64,7 +66,9 @@ namespace SmartContractVehicle.Controller
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
-                    Colour = "black"
+                    Colour = "black",
+                    Seats = 5,
+                    PricePerMinute = 1,
                 }
             ];
             

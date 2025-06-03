@@ -9,7 +9,7 @@ public class CarApiMapper : Profile
         CreateMap<Car, CarTO>()
             // Company (from Trim -> Model -> Producer)
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Trim.Model.Producer.Name))
-            .ForMember(dest => dest.CompanyLogoPath, opt => opt.MapFrom(src => src.Trim.Model.Producer.ImagePath)) // assuming LogoPath exists
+            .ForMember(dest => dest.CompanyLogoPath, opt => opt.MapFrom(src => src.Trim.Model.Producer.ImagePath))
 
             // Model
             .ForMember(dest => dest.ModelName, opt => opt.MapFrom(src => src.Trim.Model.Name))
@@ -18,11 +18,13 @@ public class CarApiMapper : Profile
             .ForMember(dest => dest.TrimName, opt => opt.MapFrom(src => src.Trim.Name))
             .ForMember(dest => dest.FueltypeName, opt => opt.MapFrom(src => src.Trim.Fuel.Name))
             .ForMember(dest => dest.DrivetrainName, opt => opt.MapFrom(src => src.Trim.Drivetrain.Name))
-            .ForMember(dest => dest.TrimImagePath, opt => opt.MapFrom(src => src.Trim.ImagePath)) // assuming you add this manually or it's derived
+            .ForMember(dest => dest.TrimImagePath, opt => opt.MapFrom(src => src.Trim.ImagePath))
 
             // Car details
             .ForMember(dest => dest.CurrentPosition, opt => opt.MapFrom(src => src.CurrentPosition))
             .ForMember(dest => dest.RemainingReach, opt => opt.MapFrom(src => src.RemainingReach))
-            .ForMember(dest => dest.Colour, opt => opt.MapFrom(src => src.Colour));
+            .ForMember(dest => dest.Colour, opt => opt.MapFrom(src => src.Colour))
+            .ForMember(dest => dest.Seats, opt => opt.MapFrom(src => src.SeatNumbers))
+            .ForMember(dest => dest.PricePerMinute, opt => opt.MapFrom(src => src.PricePerMinute));
     }
 }
