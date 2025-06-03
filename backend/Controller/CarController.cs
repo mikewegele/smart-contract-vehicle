@@ -229,7 +229,7 @@ namespace SmartContractVehicle.Controller
 
             if (!string.IsNullOrEmpty(ModelName) && !string.IsNullOrWhiteSpace(ModelName))
             {
-                vehicletrims = vehicletrims.Where(vt => EF.Functions.ILike(vt.Name.Trim(), ModelName.Trim()));
+                vehicletrims = vehicletrims.Where(vt => EF.Functions.ILike(vt.Model.Name.Trim(), ModelName.Trim()));
             }
                 
 
