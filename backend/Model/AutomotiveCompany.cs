@@ -10,6 +10,6 @@ namespace SmartContractVehicle.Model
 
         public required ICollection<VehicleModel> Models { get; set; }
 
-        // public string LogoPath { get; set; } // This should be a path to the file with the Logo of this Company (optional)
+        public string ImagePath { get; set; } // This should be a path to the file with the Logo of this Company (optional)
     }
 }
