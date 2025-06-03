@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using NetTopologySuite.Geometries;
 using Microsoft.OpenApi.Extensions;
 using AutoMapper;
 using SmartContractVehicle.Model;
+using System;
 
 namespace SmartContractVehicle.Controller
 {
@@ -22,7 +22,7 @@ namespace SmartContractVehicle.Controller
 
 
             Car dummy = new()
-                    {
+            {
                 VIN = "WDDTG5CBXFJ045894",
                 Colour = "White",
                 CurrentPosition = new Point(new Coordinate(48.77854989722567, 9.179689206292418)),
@@ -31,14 +31,14 @@ namespace SmartContractVehicle.Controller
                 PricePerMinute = .38,
                 SeatNumbers = 4,
                 Trim = new VehicleTrim() 
-                        {
+                {
                     Cars = [],
                     Drivetrain = _db.Drivetrains.Find((int)Drivetrains.AllWheelDrive),
                     Fuel = _db.FuelTypes.Find((int)FuelTypes.Gasoline),
                     ImagePath = "https://www.mercedes-amg.com/media/images/6b934d9c3eae9dd08b822c03115d5085f3a501ef-1352x1014.jpg?auto=format&fit=max&q=75&w=1352",
                     Name = "45 AMG",
                     Model = new VehicleModel()
-                            {
+                    {
                         Name = "GLA",
                         Trims = [],
                         Producer = new AutomotiveCompany()
@@ -75,5 +75,74 @@ namespace SmartContractVehicle.Controller
             return Ok(cars);
         }
 
+
+        [HttpGet]
+        public IActionResult GeoSpatialQuery(GeoSpatialQueryTO query)
+        {
+            if(!ModelState.IsValid)
+            {  return BadRequest(ModelState); }
+
+            var cars = _db.Cars
+                .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
+                .Where(c => c.CurrentPosition.IsWithinDistance(query.UserLocation, query.MaxDistance));
+
+            if (query.AllowedManufactures is not null)
+            {
+                var allowedManufactures = query.AllowedManufactures.Select(m => m.Normalize()).Distinct();
+                cars = cars.Where(c => allowedManufactures.Contains(c.Trim.Model.Producer.Name.Normalize()));
+            }
+
+            if (query.AllowedModels is not null)
+            {
+                var AllowedModels = query.AllowedModels.Select(m => m.Normalize()).Distinct();
+                cars = cars.Where(c => AllowedModels.Contains(c.Trim.Model.Name.Normalize()));
+            }
+
+            if (query.AllowedTrims is not null)
+            {
+                var AllowedTrims = query.AllowedTrims.Select(m => m.Normalize()).Distinct();
+                cars = cars.Where(c => AllowedTrims.Contains(c.Trim.Name.Normalize()));
+            }
+
+            if (query.AllowedFueltypes is not null)
+            {
+                var AllowedFueltypes = query.AllowedFueltypes.Select(f => f.GetEnumFromDisplayName<FuelTypes>()).Aggregate((f1, f2) => f1 | f2);
+                cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id) );
+            }
+
+            if (query.AllowedDrivetrains is not null)
+            { 
+                var AllowedDrivetrains = query.AllowedDrivetrains.Select(f => f.GetEnumFromDisplayName<Drivetrains>());
+                cars = cars.Where(c => AllowedDrivetrains.Contains((Drivetrains)c.Trim.Drivetrain.Id));
+            }
+
+            if (query.MinRemainingReach is not null)
+            {
+                cars = cars.Where(c => c.RemainingReach >=  query.MinRemainingReach);
+            }
+
+            if (query.MinSeats is not null)
+            {
+                cars = cars.Where(c => c.SeatNumbers >=  query.MinSeats);
+            }
+
+            if (query.MaxSeats is not null)
+            {
+                cars = cars.Where(c => c.SeatNumbers <=  query.MaxSeats);
+            }
+
+            if (query.MinPricePerMinute is not null)
+            {
+                cars = cars.Where(c => c.PricePerMinute >= query.MinPricePerMinute);
+            }
+
+            if (query.MaxPricePerMinute is not null)
+            {
+                cars = cars.Where(c => c.PricePerMinute <= query.MaxPricePerMinute);
+            }
+
+
+            return Ok(cars.Select(c => _mapper.Map<CarTO>(c)));
+        }
     }
 }
