@@ -19,6 +19,6 @@ namespace SmartContractVehicle.Model
 
         public required Drivetrain Drivetrain { get; set; } 
 
-        // public required string ImagePath { get; set; }
+        public required string ImagePath { get; set; }
     }
 }
