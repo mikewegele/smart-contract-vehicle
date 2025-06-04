@@ -21,38 +21,6 @@ namespace SmartContractVehicle.Controller
         public ActionResult<IQueryable<CarTO>> GetDummyData()
         {
 
-
-            Car dummy = new()
-            {
-                VIN = "WDDTG5CBXFJ045894",
-                Colour = "White",
-                CurrentPosition = new Point(new Coordinate(48.77854989722567, 9.179689206292418)),
-                Owner = _db.Users.First(),
-                RemainingReach = 550,
-                PricePerMinute = .38,
-                SeatNumbers = 4,
-                Trim = new VehicleTrim() 
-                {
-                    Cars = [],
-                    Drivetrain = _db.Drivetrains.Find((int)Drivetrains.AllWheelDrive),
-                    Fuel = _db.FuelTypes.Find((int)FuelTypes.Gasoline),
-                    ImagePath = "https://www.mercedes-amg.com/media/images/6b934d9c3eae9dd08b822c03115d5085f3a501ef-1352x1014.jpg?auto=format&fit=max&q=75&w=1352",
-                    Name = "45 AMG",
-                    Model = new VehicleModel()
-                    {
-                        Name = "GLA",
-                        Trims = [],
-                        Producer = new AutomotiveCompany()
-                        {
-                            ImagePath = "https://www.mercedes-amg.com/amg-logo.svg",
-                            Models = [],
-                            Name = "Mercedes AMG"
-                        }
-                    }
-                }
-
-            };
-
             CarTO dummyTO = _mapper.Map<CarTO>(dummy);
 
             IList<CarTO> cars = [
@@ -78,7 +46,7 @@ namespace SmartContractVehicle.Controller
                     CompanyName = "BMW",
                     DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
                     Colour = "Blue",
-                    CurrentPosition = new Point(new Coordinate(52.515, 13.39)),
+                    CurrentPosition = new Point(new Coordinate(13.39, 52.515),
                     FueltypeName = FuelTypes.Electric.GetDisplayName(),
                     ModelName = "i3",
                     PricePerMinute = .35,
@@ -93,7 +61,7 @@ namespace SmartContractVehicle.Controller
                     CompanyName = "Fiat",
                     DrivetrainName = Drivetrains.FrontWheelDrive.GetDisplayName(),
                     Colour = "White",
-                    CurrentPosition = new Point(new Coordinate (52.52, 13.405)),
+                    CurrentPosition = new Point(new Coordinate (13.405, 52.52)),
                     FueltypeName = FuelTypes.Electric.GetDisplayName(),
                     ModelName = "500e Limousine",
                     Seats = 4, 
