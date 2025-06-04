@@ -58,6 +58,7 @@ namespace SmartContractVehicle.Controller
             IList<CarTO> cars = [
                 dummyTO,
                 new() {
+                     CarId = new Guid(),
                      CompanyLogoPath = "",
                      CompanyName = "BMW",
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
@@ -72,6 +73,7 @@ namespace SmartContractVehicle.Controller
                     PricePerMinute = 1,
                 },
                 new() {
+                    CarId = new Guid(),
                     CompanyLogoPath = "",
                     CompanyName = "BMW",
                     DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
@@ -86,6 +88,7 @@ namespace SmartContractVehicle.Controller
                     TrimImagePath = "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp"
                 },
                 new() {
+                    CarId = new Guid(),
                     CompanyLogoPath = "",
                     CompanyName = "Fiat",
                     DrivetrainName = Drivetrains.FrontWheelDrive.GetDisplayName(),

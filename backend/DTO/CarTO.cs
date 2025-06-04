@@ -22,6 +22,7 @@ namespace SmartContractVehicle.DTO
         public required string TrimImagePath { get; set; }
 
         // Information required for the actual Car
+        public required Guid CarId { get; set; }
         public required Point CurrentPosition { get; set; }
         public double RemainingReach { get; set; }
         public required string Colour { get; set; }

@@ -21,6 +21,7 @@ public class CarApiMapper : Profile
             .ForMember(dest => dest.TrimImagePath, opt => opt.MapFrom(src => src.Trim.ImagePath))
 
             // Car details
+            .ForMember(dest => dest.CarId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.CurrentPosition, opt => opt.MapFrom(src => src.CurrentPosition))
             .ForMember(dest => dest.RemainingReach, opt => opt.MapFrom(src => src.RemainingReach))
             .ForMember(dest => dest.Colour, opt => opt.MapFrom(src => src.Colour))
