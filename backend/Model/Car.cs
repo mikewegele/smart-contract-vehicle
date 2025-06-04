@@ -23,6 +23,11 @@ namespace SmartContractVehicle.Model
         public double RemainingReach { get; set; }
 
         public required string Colour { get; set; }
+
+        public required int SeatNumbers { get; set; }
+
+        public required double PricePerMinute { get; set; }
+
     }
 }
 

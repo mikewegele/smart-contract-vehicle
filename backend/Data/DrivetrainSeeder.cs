@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace SmartContractVehicle.Data;
-public enum Drivetrain
+public enum Drivetrains
 {
     [Display(Name = "Front-Wheel Drive (FWD)")]
     FrontWheelDrive = 1,
@@ -20,7 +20,7 @@ public enum Drivetrain
 public static class DrivetrainSeeder
 {    public static void Seed(ModelBuilder modelBuilder)
         {
-            var drivetrains = Enum.GetValues<Data.Drivetrain>()
+            var drivetrains = Enum.GetValues<Data.Drivetrains>()
                 .Select(d => new Model.Drivetrain
                 {
                     Id = (int)d,
