@@ -44,6 +44,9 @@ const useStyles = makeStyles(() => ({
 
 const center: [number, number] = [52.52, 13.405];
 
+const DEFAULT_IMAGE =
+    "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp";
+
 interface Props {
     vehicles: CarTO[];
 }
@@ -62,6 +65,8 @@ const VehicleMap: React.FC<Props> = (props) => {
 
         return [lat, lng];
     }, []);
+
+    console.log(vehicles);
 
     return (
         <div className={classes.outerWrapper}>
@@ -82,20 +87,19 @@ const VehicleMap: React.FC<Props> = (props) => {
                                 vehicle.currentPosition
                             )}
                             icon={createVehicleIcon(
-                                vehicle.trim.model.name || ""
+                                vehicle.trimImagePath || DEFAULT_IMAGE
                             )}
                         >
                             <Popup maxWidth={200}>
                                 <div style={{ textAlign: "center" }}>
-                                    <strong>{vehicle.trim.model.name}</strong>
+                                    <strong>{vehicle.modelName}</strong>
                                     <br />
                                     <img
                                         src={
-                                            vehicle.trim.model.name || undefined
+                                            vehicle.trimImagePath ||
+                                            DEFAULT_IMAGE
                                         }
-                                        alt={
-                                            vehicle.trim.model.name || undefined
-                                        }
+                                        alt={vehicle.trimImagePath || undefined}
                                         style={{
                                             width: "100%",
                                             maxWidth: "150px",

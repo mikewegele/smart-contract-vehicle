@@ -12,6 +12,8 @@ Name | Type | Description | Notes
 **currentPosition** | [**Point**](Point.md) |  | [default to undefined]
 **remainingReach** | **number** |  | [optional] [default to undefined]
 **colour** | **string** |  | [default to undefined]
+**seatNumbers** | **number** |  | [default to undefined]
+**pricePerMinute** | **number** |  | [default to undefined]
 
 ## Example
 
@@ -26,6 +28,8 @@ const instance: Car = {
     currentPosition,
     remainingReach,
     colour,
+    seatNumbers,
+    pricePerMinute,
 };
 ```
 

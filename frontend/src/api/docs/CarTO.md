@@ -5,10 +5,19 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**trim** | [**VehicleTrimTO**](VehicleTrimTO.md) |  | [default to undefined]
+**companyName** | **string** |  | [default to undefined]
+**companyLogoPath** | **string** |  | [default to undefined]
+**modelName** | **string** |  | [default to undefined]
+**trimName** | **string** |  | [default to undefined]
+**fueltypeName** | **string** |  | [default to undefined]
+**drivetrainName** | **string** |  | [default to undefined]
+**trimImagePath** | **string** |  | [default to undefined]
+**carId** | **string** |  | [default to undefined]
 **currentPosition** | [**Point**](Point.md) |  | [default to undefined]
 **remainingReach** | **number** |  | [optional] [default to undefined]
 **colour** | **string** |  | [default to undefined]
+**seats** | **number** |  | [default to undefined]
+**pricePerMinute** | **number** |  | [default to undefined]
 
 ## Example
 
@@ -16,10 +25,19 @@ Name | Type | Description | Notes
 import { CarTO } from './api';
 
 const instance: CarTO = {
-    trim,
+    companyName,
+    companyLogoPath,
+    modelName,
+    trimName,
+    fueltypeName,
+    drivetrainName,
+    trimImagePath,
+    carId,
     currentPosition,
     remainingReach,
     colour,
+    seats,
+    pricePerMinute,
 };
 ```
 

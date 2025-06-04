@@ -102,23 +102,10 @@ export interface AutomotiveCompany {
      * @memberof AutomotiveCompany
      */
     'models': Array<VehicleModel> | null;
-}
-/**
- * 
- * @export
- * @interface AutomotiveCompanyTO
- */
-export interface AutomotiveCompanyTO {
     /**
      * 
      * @type {string}
-     * @memberof AutomotiveCompanyTO
-     */
-    'name': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof AutomotiveCompanyTO
+     * @memberof AutomotiveCompany
      */
     'imagePath'?: string | null;
 }
@@ -170,6 +157,18 @@ export interface Car {
      * @memberof Car
      */
     'colour': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Car
+     */
+    'seatNumbers': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Car
+     */
+    'pricePerMinute': number;
 }
 /**
  * 
@@ -179,10 +178,52 @@ export interface Car {
 export interface CarTO {
     /**
      * 
-     * @type {VehicleTrimTO}
+     * @type {string}
      * @memberof CarTO
      */
-    'trim': VehicleTrimTO;
+    'companyName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'companyLogoPath': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'modelName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'trimName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'fueltypeName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'drivetrainName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'trimImagePath': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CarTO
+     */
+    'carId': string;
     /**
      * 
      * @type {Point}
@@ -201,6 +242,18 @@ export interface CarTO {
      * @memberof CarTO
      */
     'colour': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof CarTO
+     */
+    'seats': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CarTO
+     */
+    'pricePerMinute': number;
 }
 /**
  * 
@@ -483,6 +536,85 @@ export interface FuelType {
      * @memberof FuelType
      */
     'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface GeoSpatialQueryTO
+ */
+export interface GeoSpatialQueryTO {
+    /**
+     * 
+     * @type {Point}
+     * @memberof GeoSpatialQueryTO
+     */
+    'userLocation': Point;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'maxDistance': number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GeoSpatialQueryTO
+     */
+    'allowedManufactures'?: Array<string> | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GeoSpatialQueryTO
+     */
+    'allowedModels'?: Array<string> | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GeoSpatialQueryTO
+     */
+    'allowedTrims'?: Array<string> | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GeoSpatialQueryTO
+     */
+    'allowedFueltypes'?: Array<string> | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GeoSpatialQueryTO
+     */
+    'allowedDrivetrains'?: Array<string> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'minRemainingReach'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'minSeats'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'maxSeats'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'minPricePerMinute'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof GeoSpatialQueryTO
+     */
+    'maxPricePerMinute'?: number | null;
 }
 /**
  * 
@@ -1226,25 +1358,6 @@ export interface VehicleModel {
 /**
  * 
  * @export
- * @interface VehicleModelTO
- */
-export interface VehicleModelTO {
-    /**
-     * 
-     * @type {AutomotiveCompanyTO}
-     * @memberof VehicleModelTO
-     */
-    'producer': AutomotiveCompanyTO;
-    /**
-     * 
-     * @type {string}
-     * @memberof VehicleModelTO
-     */
-    'name': string | null;
-}
-/**
- * 
- * @export
  * @interface VehicleTrim
  */
 export interface VehicleTrim {
@@ -1284,43 +1397,12 @@ export interface VehicleTrim {
      * @memberof VehicleTrim
      */
     'drivetrain': Drivetrain;
-}
-/**
- * 
- * @export
- * @interface VehicleTrimTO
- */
-export interface VehicleTrimTO {
-    /**
-     * 
-     * @type {VehicleModelTO}
-     * @memberof VehicleTrimTO
-     */
-    'model': VehicleModelTO;
     /**
      * 
      * @type {string}
-     * @memberof VehicleTrimTO
+     * @memberof VehicleTrim
      */
-    'name': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof VehicleTrimTO
-     */
-    'fuel': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof VehicleTrimTO
-     */
-    'drivetrain': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof VehicleTrimTO
-     */
-    'imagePath'?: string | null;
+    'imagePath': string | null;
 }
 
 /**
@@ -1895,11 +1977,12 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
     return {
         /**
          * 
+         * @param {GeoSpatialQueryTO} [geoSpatialQueryTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarQueryGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/Car/Query`;
+        apiCarGeoSpatialQueryGet: async (geoSpatialQueryTO?: GeoSpatialQueryTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GeoSpatialQuery`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1910,6 +1993,218 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(geoSpatialQueryTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetAutomotiveCompaniesGet: async (withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetAutomotiveCompanies`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (withId !== undefined) {
+                localVarQueryParameter['WithId'] = withId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetDrivetrainsGet: async (withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetDrivetrains`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (withId !== undefined) {
+                localVarQueryParameter['WithId'] = withId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetDummyDataGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetDummyData`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetFueltypesGet: async (withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetFueltypes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (withId !== undefined) {
+                localVarQueryParameter['WithId'] = withId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [manufactureName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetModelsGet: async (manufactureName?: string, withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetModels`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (manufactureName !== undefined) {
+                localVarQueryParameter['ManufactureName'] = manufactureName;
+            }
+
+            if (withId !== undefined) {
+                localVarQueryParameter['WithId'] = withId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [modelName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetTrimsGet: async (modelName?: string, withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Car/GetTrims`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (modelName !== undefined) {
+                localVarQueryParameter['ModelName'] = modelName;
+            }
+
+            if (withId !== undefined) {
+                localVarQueryParameter['WithId'] = withId;
+            }
 
 
     
@@ -1934,13 +2229,87 @@ export const CarApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {GeoSpatialQueryTO} [geoSpatialQueryTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarQueryGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CarTO>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarQueryGet(options);
+        async apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarQueryGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGeoSpatialQueryGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetAutomotiveCompaniesGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetAutomotiveCompaniesGet(withId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetAutomotiveCompaniesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetDrivetrainsGet(withId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetDrivetrainsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetDummyDataGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CarTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetDummyDataGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetDummyDataGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetFueltypesGet(withId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetFueltypesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} [manufactureName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetModelsGet(manufactureName?: string, withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetModelsGet(manufactureName, withId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetModelsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} [modelName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCarGetTrimsGet(modelName?: string, withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetTrimsGet(modelName, withId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetTrimsGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -1955,11 +2324,67 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
     return {
         /**
          * 
+         * @param {GeoSpatialQueryTO} [geoSpatialQueryTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarQueryGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<CarTO>> {
-            return localVarFp.apiCarQueryGet(options).then((request) => request(axios, basePath));
+        apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetAutomotiveCompaniesGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGetAutomotiveCompaniesGet(withId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGetDrivetrainsGet(withId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetDummyDataGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<CarTO>> {
+            return localVarFp.apiCarGetDummyDataGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGetFueltypesGet(withId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [manufactureName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetModelsGet(manufactureName?: string, withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGetModelsGet(manufactureName, withId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [modelName] 
+         * @param {boolean} [withId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCarGetTrimsGet(modelName?: string, withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGetTrimsGet(modelName, withId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1973,12 +2398,80 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
 export class CarApi extends BaseAPI {
     /**
      * 
+     * @param {GeoSpatialQueryTO} [geoSpatialQueryTO] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CarApi
      */
-    public apiCarQueryGet(options?: RawAxiosRequestConfig) {
-        return CarApiFp(this.configuration).apiCarQueryGet(options).then((request) => request(this.axios, this.basePath));
+    public apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {boolean} [withId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetAutomotiveCompaniesGet(withId?: boolean, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetAutomotiveCompaniesGet(withId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {boolean} [withId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetDrivetrainsGet(withId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetDummyDataGet(options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetDummyDataGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {boolean} [withId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetFueltypesGet(withId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [manufactureName] 
+     * @param {boolean} [withId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetModelsGet(manufactureName?: string, withId?: boolean, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetModelsGet(manufactureName, withId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [modelName] 
+     * @param {boolean} [withId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CarApi
+     */
+    public apiCarGetTrimsGet(modelName?: string, withId?: boolean, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetTrimsGet(modelName, withId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

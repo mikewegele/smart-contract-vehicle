@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **cars** | [**Array&lt;Car&gt;**](Car.md) |  | [default to undefined]
 **fuel** | [**FuelType**](FuelType.md) |  | [default to undefined]
 **drivetrain** | [**Drivetrain**](Drivetrain.md) |  | [default to undefined]
+**imagePath** | **string** |  | [default to undefined]
 
 ## Example
 
@@ -24,6 +25,7 @@ const instance: VehicleTrim = {
     cars,
     fuel,
     drivetrain,
+    imagePath,
 };
 ```
 

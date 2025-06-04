@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **id** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
 **models** | [**Array&lt;VehicleModel&gt;**](VehicleModel.md) |  | [default to undefined]
+**imagePath** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -18,6 +19,7 @@ const instance: AutomotiveCompany = {
     id,
     name,
     models,
+    imagePath,
 };
 ```
 

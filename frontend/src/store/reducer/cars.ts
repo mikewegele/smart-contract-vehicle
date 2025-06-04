@@ -36,7 +36,9 @@ const carError = slice.actions["SET_ERROR"];
 
 const fetchAllCars = () => {
     return async (dispatch: RootDispatch): Promise<void> => {
-        const response = await apiExec(CarApi, (api) => api.apiCarQueryGet());
+        const response = await apiExec(CarApi, (api) =>
+            api.apiCarGetDummyDataGet()
+        );
         if (hasFailed(response)) {
             dispatch(carError(response.error));
         } else {
