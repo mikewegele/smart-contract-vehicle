@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
+import { AuthApi } from "../api";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -120,14 +121,11 @@ const AuthForm: React.FC = () => {
         setError("");
         if (isLogin) {
             try {
-                const response = await apiExec((api) =>
-                    api.postApiAuthLoginLogin({
-                        Email: email,
-                        Password: password,
-                    })
+                const response = await apiExec(AuthApi, (api) =>
+                    api.apiAuthLoginLoginPost(email, password)
                 );
                 console.log("Response", response);
-                if (!hasFailed(response.status)) {
+                if (!hasFailed(response)) {
                     navigate("/home");
                 } else {
                     setError("Failed to log in");
@@ -144,14 +142,10 @@ const AuthForm: React.FC = () => {
                 }
             }
         } else {
-            const response = await apiExec((api) =>
-                api.postApiAuthRegisterRegister({
-                    Email: email,
-                    Password: password,
-                    Name: username,
-                })
+            const response = await apiExec(AuthApi, (api) =>
+                api.apiAuthRegisterRegisterPost(email, password, username)
             );
-            if (!hasFailed(response.status)) {
+            if (!hasFailed(response)) {
                 navigate("/home");
             } else {
                 setError("Failed to register");

@@ -1,0 +1,24 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace SmartContractVehicle.Model
+{
+   
+    public class VehicleTrim
+    {
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public required string Name { get; set; }
+
+        public required VehicleModel Model { get; set; }
+
+        public required ICollection<Car> Cars { get; set; }
+
+        public required FuelType Fuel { get; set; }
+
+        public required Drivetrain Drivetrain { get; set; } 
+
+        public required string ImagePath { get; set; }
+    }
+}

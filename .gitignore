@@ -536,4 +536,5 @@ $RECYCLE.BIN/
 /.vs/smart-contract-vehicle/FileContentIndex
 /.vs
 /car-rental-service.Server/obj
+/backend/Migrations
 backend/Migrations/*
