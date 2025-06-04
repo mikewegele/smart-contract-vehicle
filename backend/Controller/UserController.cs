@@ -60,5 +60,18 @@ namespace SmartContractVehicle.Controllers
 
                 return BadRequest();
         }
+
+        [HttpGet("{id}")]
+        public IActionResult GetUserById(string id)
+        {
+            var user = _db.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userDto = _mapper.Map<UserTO>(user);
+            return Ok(userDto);
+        }
     }
 }
