@@ -1,5 +1,5 @@
 import React from "react";
-import {Card, CardContent, CardMedia, Typography} from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
@@ -19,31 +19,24 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-    image: string;
-    model: string;
-    pricePerMinute: number;
+    image: string | null;
+    model: string | null;
+    pricePerMinute: number | null;
     seats: number;
-    rangeKm: number;
-};
+    rangeKm: number | undefined;
+}
 
 const Vehicle: React.FC<Props> = (props) => {
+    const { image, model, pricePerMinute, seats, rangeKm } = props;
 
-    const {
-        image,
-        model,
-        pricePerMinute,
-        seats,
-        rangeKm,
-    } = props;
-
-    const {classes} = useStyles();
+    const { classes } = useStyles();
 
     return (
         <Card className={classes.card}>
             <CardMedia
                 component="img"
-                image={image}
-                alt={model}
+                image={image || ""}
+                alt={model || ""}
                 className={classes.media}
             />
             <CardContent className={classes.content}>

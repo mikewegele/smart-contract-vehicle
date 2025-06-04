@@ -21,10 +21,7 @@ namespace SmartContractVehicle.Controller
         public ActionResult<IQueryable<CarTO>> GetDummyData()
         {
 
-            CarTO dummyTO = _mapper.Map<CarTO>(dummy);
-
             IList<CarTO> cars = [
-                dummyTO,
                 new() {
                      CarId = new Guid(),
                      CompanyLogoPath = "",
@@ -32,7 +29,7 @@ namespace SmartContractVehicle.Controller
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
                      FueltypeName = FuelTypes.Electric.GetDisplayName(),
                      ModelName = "iX",
-                     TrimImagePath = "",
+                     TrimImagePath = "https://automag.de/app/uploads/2025/04/bmw-ix-xdrive40_47043.jpg",
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
@@ -46,7 +43,7 @@ namespace SmartContractVehicle.Controller
                     CompanyName = "BMW",
                     DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
                     Colour = "Blue",
-                    CurrentPosition = new Point(new Coordinate(13.39, 52.515),
+                    CurrentPosition = new Point(new Coordinate(13.39, 52.515)),
                     FueltypeName = FuelTypes.Electric.GetDisplayName(),
                     ModelName = "i3",
                     PricePerMinute = .35,
