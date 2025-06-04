@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.DTO;
-namespace SmartContractVehicle.Model
+using SmartContractVehicle.Model;
+using SmartContractVehicle.Data;
 
 namespace SmartContractVehicle.Service;
 

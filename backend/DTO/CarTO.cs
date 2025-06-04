@@ -10,17 +10,13 @@ namespace SmartContractVehicle.DTO
 
         public required User Owner { get; set; }
 
+        public required VehicleTrim Trim { get; set; }
+
         [Column(TypeName = "geography")]
         public required Point CurrentPosition { get; set; }
 
         public double RemainingReach { get; set; }
 
-        public required string Color { get; set; }
-
-        public required string Manufacturer { get; set; }
-
-        public required string Model { get; set; }
-
-        public int Year { get; set; }
+        public required string Colour { get; set; }
     }
 }
