@@ -6,6 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**apiUserDeleteDelete**](#apiuserdeletedelete) | **DELETE** /api/User/Delete | |
 |[**apiUserGetGet**](#apiusergetget) | **GET** /api/User/Get | |
+|[**apiUserGetUserByIdIdGet**](#apiusergetuserbyididget) | **GET** /api/User/GetUserById/{id} | |
 |[**apiUserRegisterPost**](#apiuserregisterpost) | **POST** /api/User/Register | |
 |[**apiUserUpdatePatch**](#apiuserupdatepatch) | **PATCH** /api/User/Update | |
 
@@ -86,6 +87,56 @@ const { status, data } = await apiInstance.apiUserGetGet(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **id** | [**number**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiUserGetUserByIdIdGet**
+> apiUserGetUserByIdIdGet()
+
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+let id: string; // (default to undefined)
+
+const { status, data } = await apiInstance.apiUserGetUserByIdIdGet(
+    id
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **id** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
