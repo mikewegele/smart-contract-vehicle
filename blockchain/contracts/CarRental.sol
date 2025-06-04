@@ -23,6 +23,10 @@ contract CarRental {
     event CarRented(uint256 carId, address renter, uint256 daysRented);
     event CarReturned(uint256 carId, address renter);
 
+    function helloWorld() public pure returns (string memory) {
+        return "Hello, world!";
+    }
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can do this");
         _;
