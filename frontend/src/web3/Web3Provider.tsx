@@ -27,7 +27,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
     useEffect(() => {
         async function init() {
             if (!(window as any).ethereum) {
-                alert("Please install MetaMask!");
+                // alert("Please install MetaMask!");
                 return;
             }
 
@@ -43,7 +43,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                 const networkId = await web3Instance.eth.net.getId();
                 const deployedNetwork = CarRentalContract.networks[networkId];
                 if (!deployedNetwork) {
-                    alert("Smart contract not deployed on the current network");
+                    // alert("Smart contract not deployed on the current network");
                     return;
                 }
 
@@ -54,7 +54,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
 
                 setContract(contractInstance);
             } catch {
-                alert("Failed to connect to MetaMask");
+                // alert("Failed to connect to MetaMask");
             }
         }
 

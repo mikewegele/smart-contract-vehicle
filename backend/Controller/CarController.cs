@@ -66,7 +66,22 @@ namespace SmartContractVehicle.Controller
                     RemainingReach = 230,
                     TrimImagePath = "https://cdn.sanity.io/images/767s1cf5/production/81923a4526c2622bfd3463f7942c022472c868fc-1000x714.png?rect=0,94,1000,525&w=1200&h=630&fm=png",
                     TrimName = "La Prima 87 kW (118PS)"
-                }
+                },
+                new() {
+                    CarId = new Guid(),
+                    CompanyLogoPath = "",
+                    CompanyName = "Alexander Dennis",
+                    DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
+                    Colour = "Yellow",
+                    CurrentPosition = new Point(new Coordinate(13.396952, 52.421153)),
+                    FueltypeName = FuelTypes.Diesel.GetDisplayName(),
+                    ModelName = "ADL Enviro500",
+                    Seats = 80,
+                    PricePerMinute = 2.0,
+                    RemainingReach = 600,
+                    TrimImagePath = "https://sdmntprukwest.oaiusercontent.com/files/00000000-86cc-6243-b978-fae9f71e5947/raw?se=2025-06-04T19%3A53%3A37Z&sp=r&sv=2024-08-04&sr=b&scid=93bb9951-355a-54c0-b29b-124e2a7dc8c5&skoid=0a4a0f0c-99ac-4752-9d87-cfac036fa93f&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-04T16%3A08%3A04Z&ske=2025-06-05T16%3A08%3A04Z&sks=b&skv=2024-08-04&sig=FCIVGj8LDVjf9bhtpStXX7DDJHvFVQwpaW0exuzp/6s%3D",
+                    TrimName = "Alexander Dennis Enviro500"
+                },
             ];
             
             return Ok(cars);
