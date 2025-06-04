@@ -7,6 +7,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import type { CarTO, Point } from "../../api";
+import { useGeolocation } from "../../util/location/useGeolocation.ts";
 
 L.Icon.Default.mergeOptions({
     iconUrl: markerIcon,
@@ -42,7 +43,7 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const center: [number, number] = [52.52, 13.405];
+const defaultCenter: [number, number] = [52.52, 13.405];
 
 const DEFAULT_IMAGE =
     "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp";
@@ -66,11 +67,17 @@ const VehicleMap: React.FC<Props> = (props) => {
         return [lat, lng];
     }, []);
 
+    const { position } = useGeolocation();
+
     return (
         <div className={classes.outerWrapper}>
             <div className={classes.mapWrapper}>
                 <MapContainer
-                    center={center}
+                    center={
+                        position
+                            ? [position.latitude, position.longitude]
+                            : defaultCenter
+                    }
                     zoom={13}
                     style={{ height: "100%", width: "100%" }}
                 >
@@ -78,6 +85,24 @@ const VehicleMap: React.FC<Props> = (props) => {
                         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
                     />
+                    {position && (
+                        <Marker
+                            position={[position.latitude, position.longitude]}
+                            icon={L.divIcon({
+                                className: "user-location-marker",
+                                html: `<div style="
+                                width: 16px;
+                                height: 16px;
+                                background-color: #3b82f6;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                box-shadow: 0 0 6px rgba(0,0,0,0.3);
+                            "></div>`,
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8],
+                            })}
+                        ></Marker>
+                    )}
                     {vehicles.map((vehicle, index) => (
                         <Marker
                             key={index}
