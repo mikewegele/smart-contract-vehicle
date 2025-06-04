@@ -66,8 +66,6 @@ const VehicleMap: React.FC<Props> = (props) => {
         return [lat, lng];
     }, []);
 
-    console.log(vehicles);
-
     return (
         <div className={classes.outerWrapper}>
             <div className={classes.mapWrapper}>

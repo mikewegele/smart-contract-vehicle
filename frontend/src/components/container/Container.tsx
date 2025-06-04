@@ -5,7 +5,7 @@ const useStyles = makeStyles(() => ({
     container: {
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "auto",
         background: "linear-gradient(135deg, #e0f7fa, #4c838b)",
         paddingTop: "4rem",
     },
