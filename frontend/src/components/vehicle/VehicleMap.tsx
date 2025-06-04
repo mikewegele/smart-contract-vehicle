@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L, { type LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -57,6 +57,8 @@ const VehicleMap: React.FC<Props> = (props) => {
 
     const { classes } = useStyles();
 
+    const mapRef = useRef<L.Map>(null);
+
     const mapPointToLocation = useCallback((point: Point): LatLngTuple => {
         const [lng, lat] = point.coordinates ?? [];
 
@@ -69,15 +71,18 @@ const VehicleMap: React.FC<Props> = (props) => {
 
     const { position } = useGeolocation();
 
+    useEffect(() => {
+        if (position && mapRef.current) {
+            mapRef.current.setView([position.latitude, position.longitude], 13);
+        }
+    }, [position]);
+
     return (
         <div className={classes.outerWrapper}>
             <div className={classes.mapWrapper}>
                 <MapContainer
-                    center={
-                        position
-                            ? [position.latitude, position.longitude]
-                            : defaultCenter
-                    }
+                    ref={mapRef}
+                    center={defaultCenter}
                     zoom={13}
                     style={{ height: "100%", width: "100%" }}
                 >
