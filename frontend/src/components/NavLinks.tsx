@@ -1,6 +1,6 @@
 import React from "react";
 import makeStyles from "../util/makeStyles.ts";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
     navLinks: {
@@ -43,20 +43,22 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-
 interface Props {
     isLoggedIn: boolean;
 }
 
-const NavLinks: React.FC<Props> = ({isLoggedIn}) => {
-    const {classes} = useStyles();
+const NavLinks: React.FC<Props> = ({ isLoggedIn }) => {
+    const { classes } = useStyles();
     const navigate = useNavigate();
     return (
         <div className={classes.navLinks}>
             <span onClick={() => navigate("/home")}>Home</span>
             <span>About Us</span>
+            <span onClick={() => navigate("/smart")}>Smart</span>
             <span>Locations</span>
-            {isLoggedIn && <span onClick={() => navigate("/profile")}>Profile</span>}
+            {isLoggedIn && (
+                <span onClick={() => navigate("/profile")}>Profile</span>
+            )}
         </div>
     );
 };

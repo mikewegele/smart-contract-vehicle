@@ -1,18 +1,18 @@
-// src/web3/Web3Provider.tsx
 import React, {
     createContext,
-    ReactNode,
+    type ReactNode,
     useContext,
     useEffect,
     useState,
 } from "react";
 import Web3 from "web3";
 import CarRentalContract from "../contracts/CarRental.json";
+import type { CarRental } from "../../types/CarRental";
 
 interface IWeb3Context {
     web3: Web3 | null;
     account: string | null;
-    contract: any | null;
+    contract: CarRental | null;
 }
 
 const Web3Context = createContext<IWeb3Context | undefined>(undefined);
@@ -22,11 +22,12 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
 }) => {
     const [web3, setWeb3] = useState<Web3 | null>(null);
     const [account, setAccount] = useState<string | null>(null);
-    const [contract, setContract] = useState<any | null>(null);
+    const [contract, setContract] = useState<CarRental | null>(null);
 
     useEffect(() => {
         async function init() {
             if (!(window as any).ethereum) {
+                alert("Please install MetaMask!");
                 return;
             }
 
@@ -42,16 +43,18 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                 const networkId = await web3Instance.eth.net.getId();
                 const deployedNetwork = CarRentalContract.networks[networkId];
                 if (!deployedNetwork) {
+                    alert("Smart contract not deployed on the current network");
                     return;
                 }
 
                 const contractInstance = new web3Instance.eth.Contract(
                     CarRentalContract.abi,
                     deployedNetwork.address
-                );
+                ) as unknown as CarRental;
+
                 setContract(contractInstance);
             } catch {
-                return;
+                alert("Failed to connect to MetaMask");
             }
         }
 
