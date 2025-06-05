@@ -30,20 +30,22 @@ namespace SmartContractVehicle.Data
             var random = new Random();
             var geometryFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            string[] brands = ["Tesla", "BMW", "Audi", "Mercedes", "Volkswagen"];
+            string[] brands = ["Tesla", "BMW", "Audi", "Mercedes", "Volkswagen", "Alexander Dennis"];
             string[][] modelNames = [
             ["Model S", "Model X"],
             ["X5", "i3"],
             ["A4", "Q7"],
             ["C-Class", "GLA"],
-            ["Golf", "Tiguan"]
+            ["Golf", "Tiguan"],
+            ["Enviro500"]
         ];
             string[][][] trimNames = [
             [["Long Range", "Plaid"], ["Standard", "Performance"]],
             [["xDrive40", "xDrive50"], ["Urban", "Sport"]],
             [["Premium", "Sport"], ["Base", "Luxury"]],
             [["AMG", "Avantgarde"], ["Base", "Style"]],
-            [["Life", "Style"], ["Base", "R-Line"]]
+            [["Life", "Style"], ["Base", "R-Line"]],
+            [[""]]
         ];
 
             var companies = new List<AutomotiveCompany>();
@@ -56,7 +58,7 @@ namespace SmartContractVehicle.Data
                     Id = Guid.NewGuid(),
                     Name = brands[b],
                     Models = [],
-                    ImagePath = $"images/{brands[b].ToLower()}.png"
+                    ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}.png"
                 };
 
                 for (int m = 0; m < modelNames[b].Length; m++)
@@ -78,7 +80,7 @@ namespace SmartContractVehicle.Data
                             Model = model,
                             Fuel = fuels[random.Next(0, fuels.Length)], // z. B. 0: Electric, 1: Diesel
                             Drivetrain = drivetrains[random.Next(0, drivetrains.Length)], // z. B. 0: FWD, 1: AWD
-                            ImagePath = $"images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}_{trimNames[b][m][t].ToLower().Replace(" ", "")}.png",
+                            ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}_{trimNames[b][m][t].ToLower().Replace(" ", "")}.png",
                             Cars = new List<Car>()
                         };
 
