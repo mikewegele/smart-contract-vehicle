@@ -46,12 +46,10 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                     // alert("Smart contract not deployed on the current network");
                     return;
                 }
-
                 const contractInstance = new web3Instance.eth.Contract(
                     CarRentalContract.abi,
                     deployedNetwork.address
                 ) as unknown as CarRental;
-
                 setContract(contractInstance);
             } catch {
                 // alert("Failed to connect to MetaMask");

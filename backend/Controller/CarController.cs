@@ -18,13 +18,19 @@ namespace SmartContractVehicle.Controller
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public async Task<ActionResult<IQueryable<Car>>> GetAllCars()
+        public ActionResult<IQueryable<CarTO>> GetAllCars()
         {
-            var cars = await _db.Cars
-                .Include(c => c.Owner)
+
+            var cars = _db.Cars
                 .Include(c => c.Trim)
-                .ToListAsync();
-            // var carTOs = _mapper.Map<List<CarTO>>(cars); DOES NOT WORK
+                .ThenInclude(t => t.Fuel)
+                .Include(c => c.Trim)
+                .ThenInclude(t => t.Drivetrain)
+                .Include(c => c.Trim)
+                .ThenInclude(t => t.Model)
+                .ThenInclude(m => m.Producer)
+                .Include(c => c.Owner)
+                .Select(c => _mapper.Map<CarTO>(c));
             return Ok(cars);
         }
 
