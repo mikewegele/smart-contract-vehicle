@@ -13,9 +13,9 @@ namespace SmartContractVehicle.Model
 
         public required string VIN { get; set; }
 
-        public required User Owner { get; set; }
+        public virtual User Owner { get; set; }
 
-        public required VehicleTrim Trim { get; set; }
+        public virtual VehicleTrim Trim { get; set; }
 
         [Column(TypeName = "geography")]
         public required Point CurrentPosition { get; set; }

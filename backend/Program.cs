@@ -11,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
+    options
+    .UseLazyLoadingProxies()
+    .UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         o => o.UseNetTopologySuite()
     )
