@@ -5,7 +5,6 @@ using NetTopologySuite.Geometries;
 using Microsoft.OpenApi.Extensions;
 using AutoMapper;
 using SmartContractVehicle.Model;
-using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace SmartContractVehicle.Controller
@@ -73,8 +72,31 @@ namespace SmartContractVehicle.Controller
         }
 
 
-        [HttpGet]
-        public IActionResult GeoSpatialQuery(GeoSpatialQueryTO query)
+        /** 
+         * JSON Call Beispiel:
+           {
+              "userLocation": {
+                  "type": "Point",
+                  "coordinates": [
+                   13.25, 52.5 
+                  ]
+                },
+                "maxDistance" : 5000,
+                "minRemainingReach" : 200,
+                "minSeats" : 4,
+                "maxSeats" : 5,
+                "minPricePerMinute" : 0.3,
+                "maxPricePerMinute" : 0.7,
+                "allowedTrims" : ["avantgarde", "life" ],
+                "allowedModels" : ["E-Class", "C-Class"],
+                "allowedManufactures" : ["Tesla", "Mercedes" ],
+                "allowedDrivetrains" : [ "All-Wheel Drive (AWD)", "Four-Wheel Drive (4WD)"],
+                "allowedFueltypes" : ["Ethanol", "Diesel" ]
+            }
+        */
+
+        [HttpPost]
+        public async Task<IActionResult> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
         {
             if(!ModelState.IsValid)
             {  return BadRequest(ModelState); }
@@ -83,31 +105,31 @@ namespace SmartContractVehicle.Controller
                 .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
                 .Where(c => c.CurrentPosition.IsWithinDistance(query.UserLocation, query.MaxDistance));
 
-            if (query.AllowedManufactures is not null)
+            if (query.AllowedManufactures is not null && query.AllowedManufactures.Length > 0)
             {
                 var allowedManufactures = query.AllowedManufactures.Select(m => m.Normalize()).Distinct();
-                cars = cars.Where(c => allowedManufactures.Contains(c.Trim.Model.Producer.Name.Normalize()));
+                cars = cars.Where(c =>  allowedManufactures.Any(ap => EF.Functions.ILike(c.Trim.Model.Producer.Name, ap)));
             }
 
-            if (query.AllowedModels is not null)
+            if (query.AllowedModels is not null && query.AllowedModels.Length > 0)
             {
                 var AllowedModels = query.AllowedModels.Select(m => m.Normalize()).Distinct();
-                cars = cars.Where(c => AllowedModels.Contains(c.Trim.Model.Name.Normalize()));
+                cars = cars.Where(c => AllowedModels.Any(am => EF.Functions.ILike(c.Trim.Model.Name, am)));
             }
 
-            if (query.AllowedTrims is not null)
+            if (query.AllowedTrims is not null && query.AllowedTrims.Length > 0)
             {
                 var AllowedTrims = query.AllowedTrims.Select(m => m.Normalize()).Distinct();
-                cars = cars.Where(c => AllowedTrims.Contains(c.Trim.Name.Normalize()));
+                cars = cars.Where(c => AllowedTrims.Any(at => EF.Functions.ILike(c.Trim.Name, at)));
             }
 
-            if (query.AllowedFueltypes is not null)
+            if (query.AllowedFueltypes is not null && query.AllowedFueltypes.Length > 0)
             {
                 var AllowedFueltypes = query.AllowedFueltypes.Select(f => f.GetEnumFromDisplayName<FuelTypes>()).Aggregate((f1, f2) => f1 | f2);
                 cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id) );
             }
 
-            if (query.AllowedDrivetrains is not null)
+            if (query.AllowedDrivetrains is not null && query.AllowedDrivetrains.Length > 0)
             { 
                 var AllowedDrivetrains = query.AllowedDrivetrains.Select(f => f.GetEnumFromDisplayName<Drivetrains>());
                 cars = cars.Where(c => AllowedDrivetrains.Contains((Drivetrains)c.Trim.Drivetrain.Id));
@@ -138,8 +160,9 @@ namespace SmartContractVehicle.Controller
                 cars = cars.Where(c => c.PricePerMinute <= query.MaxPricePerMinute);
             }
 
-
-            return Ok(cars.Select(c => _mapper.Map<CarTO>(c)));
+            var data = (await cars.ToArrayAsync(cancellationToken: token)).Select(c => _mapper.Map<CarTO>(c));
+            var count = data.Count();
+            return Ok(new { count, data });
         }
 
 
