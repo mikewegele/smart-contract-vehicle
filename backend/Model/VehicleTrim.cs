@@ -13,8 +13,6 @@ namespace SmartContractVehicle.Model
 
         public required VehicleModel Model { get; set; }
 
-        public required ICollection<Car> Cars { get; set; }
-
         public required FuelType Fuel { get; set; }
 
         public required Drivetrain Drivetrain { get; set; } 

@@ -68,7 +68,6 @@ namespace SmartContractVehicle.Data
                         Id = Guid.NewGuid(),
                         Name = modelNames[b][m],
                         Producer = company,
-                        Trims = new List<VehicleTrim>()
                     };
 
                     for (int t = 0; t < trimNames[b][m].Length; t++)
@@ -81,7 +80,6 @@ namespace SmartContractVehicle.Data
                             Fuel = fuels[random.Next(0, fuels.Length)], // z. B. 0: Electric, 1: Diesel
                             Drivetrain = drivetrains[random.Next(0, drivetrains.Length)], // z. B. 0: FWD, 1: AWD
                             ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}_{trimNames[b][m][t].ToLower().Replace(" ", "")}.png",
-                            Cars = new List<Car>()
                         };
 
                         for (int c = 0; c < 5; c++) // 5 Autos pro Trim
@@ -102,11 +100,8 @@ namespace SmartContractVehicle.Data
                                 SeatNumbers = 4 + random.Next(3),
                                 PricePerMinute = Math.Round(random.NextDouble() * 0.5 + 0.1, 2)
                             };
-                            trim.Cars.Add(car);
                             cars.Add(car);
                         }
-
-                        model.Trims.Add(trim);
                     }
 
                     company.Models.Add(model);

@@ -13,7 +13,5 @@ namespace SmartContractVehicle.Model
 
         public required AutomotiveCompany Producer { get; set; }
 
-        public required ICollection<VehicleTrim> Trims { get; set; }
-
     }
 }
