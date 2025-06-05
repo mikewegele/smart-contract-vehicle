@@ -29,7 +29,7 @@ namespace SmartContractVehicle.Controller
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
                      FueltypeName = FuelTypes.Electric.GetDisplayName(),
                      ModelName = "iX",
-                     TrimImagePath = "https://automag.de/app/uploads/2025/04/bmw-ix-xdrive40_47043.jpg",
+                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/bmw-ix",
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
@@ -50,7 +50,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4,
                     TrimName = "I01",
                     RemainingReach = 250,
-                    TrimImagePath = "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp"
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/bmw-i3",
                 },
                 new() {
                     CarId = new Guid(),
@@ -64,7 +64,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4, 
                     PricePerMinute = .25,
                     RemainingReach = 230,
-                    TrimImagePath = "https://cdn.sanity.io/images/767s1cf5/production/81923a4526c2622bfd3463f7942c022472c868fc-1000x714.png?rect=0,94,1000,525&w=1200&h=630&fm=png",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/fiat-500e-limousine.png",
                     TrimName = "La Prima 87 kW (118PS)"
                 },
                 new() {
@@ -79,7 +79,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 80,
                     PricePerMinute = 2.0,
                     RemainingReach = 600,
-                    TrimImagePath = "https://sdmntprukwest.oaiusercontent.com/files/00000000-86cc-6243-b978-fae9f71e5947/raw?se=2025-06-04T19%3A53%3A37Z&sp=r&sv=2024-08-04&sr=b&scid=93bb9951-355a-54c0-b29b-124e2a7dc8c5&skoid=0a4a0f0c-99ac-4752-9d87-cfac036fa93f&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-04T16%3A08%3A04Z&ske=2025-06-05T16%3A08%3A04Z&sks=b&skv=2024-08-04&sig=FCIVGj8LDVjf9bhtpStXX7DDJHvFVQwpaW0exuzp/6s%3D",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/alexander-dennis-enviro500.png",
                     TrimName = "Alexander Dennis Enviro500"
                 },
             ];
