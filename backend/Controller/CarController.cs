@@ -29,7 +29,7 @@ namespace SmartContractVehicle.Controller
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
                      FueltypeName = FuelTypes.Electric.GetDisplayName(),
                      ModelName = "iX",
-                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-ix",
+                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-ix.png",
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
@@ -50,7 +50,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4,
                     TrimName = "I01",
                     RemainingReach = 250,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-i3",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-i3.png",
                 },
                 new() {
                     CarId = new Guid(),
