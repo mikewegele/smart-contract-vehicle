@@ -29,7 +29,7 @@ namespace SmartContractVehicle.Controller
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
                      FueltypeName = FuelTypes.Electric.GetDisplayName(),
                      ModelName = "iX",
-                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/bmw-ix",
+                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-ix",
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
@@ -50,7 +50,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4,
                     TrimName = "I01",
                     RemainingReach = 250,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/bmw-i3",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-i3",
                 },
                 new() {
                     CarId = new Guid(),
@@ -64,7 +64,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4, 
                     PricePerMinute = .25,
                     RemainingReach = 230,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/fiat-500e-limousine.png",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/fiat-500e-limousine.png",
                     TrimName = "La Prima 87 kW (118PS)"
                 },
                 new() {
@@ -79,7 +79,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 80,
                     PricePerMinute = 2.0,
                     RemainingReach = 600,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/iamges/alexander-dennis-enviro500.png",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/alexander-dennis-enviro500.png",
                     TrimName = "Alexander Dennis Enviro500"
                 },
             ];
