@@ -18,6 +18,14 @@ namespace SmartContractVehicle.Controller
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
+        public async Task<ActionResult<IQueryable<CarTO>>> GetAllCars()
+        {
+            var cars = await _db.Cars.ToListAsync();
+            var carDtos = _mapper.Map<List<CarTO>>(cars);
+            return Ok(carDtos);
+        }
+
+        [HttpGet]
         public ActionResult<IQueryable<CarTO>> GetDummyData()
         {
 
