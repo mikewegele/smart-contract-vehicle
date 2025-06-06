@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract CarRental {
+contract SimpleCarRental {
     address public owner;
 
     constructor() {
@@ -23,21 +23,11 @@ contract CarRental {
     event CarRented(uint256 carId, address renter, uint256 daysRented);
     event CarReturned(uint256 carId, address renter);
 
-    function helloWorld() public pure returns (string memory) {
-        return "Hello, world!";
-    }
+     function helloWorld() public pure returns (string memory) {
+            return "Hello, world!";
+        }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can do this");
-        _;
-    }
-
-    modifier onlyRenter(uint256 carId) {
-        require(cars[carId].renter == msg.sender, "You didn't rent this car");
-        _;
-    }
-
-    function addCar(string memory model, uint256 pricePerDay) public onlyOwner {
+    function addCar(string memory model, uint256 pricePerDay) public {
         cars[nextCarId] = Car(nextCarId, model, pricePerDay, true, address(0));
         emit CarAdded(nextCarId, model, pricePerDay);
         nextCarId++;
@@ -45,21 +35,15 @@ contract CarRental {
 
     function rentCar(uint256 carId, uint256 numberOfDays) public payable {
         Car storage car = cars[carId];
-        require(car.isAvailable, "Car not available");
-        uint256 totalCost = car.pricePerDay * numberOfDays;
-        require(msg.value >= totalCost, "Not enough ETH sent");
-
         car.isAvailable = false;
         car.renter = msg.sender;
-
         emit CarRented(carId, msg.sender, numberOfDays);
     }
 
-    function returnCar(uint256 carId) public onlyRenter(carId) {
+    function returnCar(uint256 carId) public {
         Car storage car = cars[carId];
         car.isAvailable = true;
         car.renter = address(0);
-
         emit CarReturned(carId, msg.sender);
     }
 
@@ -67,7 +51,7 @@ contract CarRental {
         return cars[carId];
     }
 
-    function withdraw() public onlyOwner {
+    function withdraw() public {
         payable(owner).transfer(address(this).balance);
     }
 }
