@@ -11,11 +11,13 @@ namespace SmartContractVehicle.Model
 
         public required string Name { get; set; }
 
-        public required VehicleModel Model { get; set; }
+        public virtual VehicleModel Model { get; set; }
 
-        public required FuelType Fuel { get; set; }
+        public virtual ICollection<Car> Cars { get; set; }
 
-        public required Drivetrain Drivetrain { get; set; } 
+        public virtual FuelType Fuel { get; set; }
+
+        public virtual Drivetrain Drivetrain { get; set; } 
 
         public required string ImagePath { get; set; }
     }

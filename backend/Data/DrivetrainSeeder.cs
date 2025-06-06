@@ -1,19 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.OpenApi.Attributes;
 
 namespace SmartContractVehicle.Data;
 public enum Drivetrains
 {
-    [Display(Name = "Front-Wheel Drive (FWD)")]
+    [Display("Front-Wheel Drive (FWD)")]
     FrontWheelDrive = 1,
 
-    [Display(Name = "Rear-Wheel Drive (RWD)")]
+    [Display("Rear-Wheel Drive (RWD)")]
     RearWheelDrive = 2,
 
-    [Display(Name = "All-Wheel Drive (AWD)")]
+    [Display("All-Wheel Drive (AWD)")]
     AllWheelDrive = 3,
 
-    [Display(Name = "Four-Wheel Drive (4WD)")]
+    [Display("Four-Wheel Drive (4WD)")]
     FourWheelDrive = 4
 }
 

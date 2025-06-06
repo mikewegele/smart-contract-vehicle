@@ -100,8 +100,11 @@ namespace SmartContractVehicle.Data
                                 SeatNumbers = 4 + random.Next(3),
                                 PricePerMinute = Math.Round(random.NextDouble() * 0.5 + 0.1, 2)
                             };
+                            trim.Cars.Add(car);
                             cars.Add(car);
                         }
+
+                        model.Trims.Add(trim);
                     }
 
                     company.Models.Add(model);

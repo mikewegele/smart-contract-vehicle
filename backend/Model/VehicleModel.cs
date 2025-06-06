@@ -11,7 +11,9 @@ namespace SmartContractVehicle.Model
 
         public required string Name { get; set; }
 
-        public required AutomotiveCompany Producer { get; set; }
+        public virtual AutomotiveCompany Producer { get; set; }
+
+        public virtual ICollection<VehicleTrim> Trims { get; set; }
 
     }
 }

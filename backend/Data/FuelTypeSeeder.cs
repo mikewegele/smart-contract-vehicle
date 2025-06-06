@@ -1,45 +1,45 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.OpenApi.Attributes;
 
 namespace SmartContractVehicle.Data;
 
 [Flags]
 public enum FuelTypes
 {
-    [Display(Name = "None")]
+    [Display("None")]
     None = 0,
 
-    [Display(Name = "Gasoline")]
+    [Display("Gasoline")]
     Gasoline = 1 << 0,           // 1
 
-    [Display(Name = "Diesel")]
+    [Display("Diesel")]
     Diesel = 1 << 1,             // 2
 
-    [Display(Name = "Flex Fuel")]
+    [Display("Flex Fuel")]
     FlexFuel = 1 << 2,           // 4
 
-    [Display(Name = "Electric")]
+    [Display("Electric")]
     Electric = 1 << 3,           // 8
 
-    [Display(Name = "Hybrid")]
+    [Display("Hybrid")]
     Hybrid = 1 << 4,             // 16
 
-    [Display(Name = "Plug-in Hybrid")]
+    [Display("Plug-in Hybrid")]
     PlugInHybrid = 1 << 5,       // 32
 
-    [Display(Name = "Hydrogen")]
+    [Display("Hydrogen")]
     Hydrogen = 1 << 6,           // 64
 
-    [Display(Name = "Compressed Natural Gas (CNG)")]
+    [Display("Compressed Natural Gas (CNG)")]
     CompressedNaturalGas = 1 << 7,  // 128
 
-    [Display(Name = "Liquefied Petroleum Gas (LPG)")]
+    [Display("Liquefied Petroleum Gas (LPG)")]
     LiquefiedPetroleumGas = 1 << 8, // 256
 
-    [Display(Name = "Biodiesel")]
+    [Display("Biodiesel")]
     Biodiesel = 1 << 9,          // 512
 
-    [Display(Name = "Ethanol")]
+    [Display("Ethanol")]
     Ethanol = 1 << 10            // 1024
 }
 
