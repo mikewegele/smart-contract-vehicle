@@ -16,7 +16,7 @@ namespace SmartContractVehicle.Model
 
         public bool IsLessor { get; set; } = false;
 
-        public ICollection<Car>? Cars { get; set; }
+        public virtual ICollection<Car>? Cars { get; set; }
 
 /*
         [Required, DataType(DataType.Date)]

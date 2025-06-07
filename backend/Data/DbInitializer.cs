@@ -55,7 +55,6 @@ namespace SmartContractVehicle.Data
                 {
                     Id = Guid.NewGuid(),
                     Name = brands[b],
-                    Models = [],
                     ImagePath = $"images/{brands[b].ToLower()}.png"
                 };
 
@@ -66,7 +65,6 @@ namespace SmartContractVehicle.Data
                         Id = Guid.NewGuid(),
                         Name = modelNames[b][m],
                         Producer = company,
-                        Trims = new List<VehicleTrim>()
                     };
 
                     for (int t = 0; t < trimNames[b][m].Length; t++)
@@ -79,7 +77,6 @@ namespace SmartContractVehicle.Data
                             Fuel = fuels[random.Next(0, fuels.Length)], // z. B. 0: Electric, 1: Diesel
                             Drivetrain = drivetrains[random.Next(0, drivetrains.Length)], // z. B. 0: FWD, 1: AWD
                             ImagePath = $"images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}_{trimNames[b][m][t].ToLower().Replace(" ", "")}.png",
-                            Cars = new List<Car>()
                         };
 
                         for (int c = 0; c < 5; c++) // 5 Autos pro Trim
