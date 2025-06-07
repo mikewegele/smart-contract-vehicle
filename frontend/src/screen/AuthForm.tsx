@@ -2,32 +2,32 @@ import React, { useState } from "react";
 import makeStyles from "../util/makeStyles.ts";
 import { apiExec, hasFailed } from "../util/ApiUtils.ts";
 import { useNavigate } from "react-router-dom";
-import { Alert, Box, Stack, Typography, Button } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { AuthApi } from "../api";
 import { jwtDecode } from "jwt-decode"; // <-- added
 
 interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    userName: string;
-    email: string;
-    name: string;
-    isAdmin: boolean;
-    isLessor: boolean;
-    isRenter: boolean;
-  };
+    token: string;
+    user: {
+        id: string;
+        userName: string;
+        email: string;
+        name: string;
+        isAdmin: boolean;
+        isLessor: boolean;
+        isRenter: boolean;
+    };
 }
 
 interface DecodedToken {
-  sub: string;
-  name: string;
-  exp: number;
-  iss: string;
-  aud: string;
-  jti: string;
+    sub: string;
+    name: string;
+    exp: number;
+    iss: string;
+    aud: string;
+    jti: string;
 }
 
 const useStyles = makeStyles(() => ({
@@ -142,149 +142,116 @@ const AuthForm: React.FC = () => {
         }
 
         setError("");
-        if (isLogin) {
-            try {
+
+        try {
+            if (isLogin) {
                 const response = await apiExec(AuthApi, (api) =>
                     api.apiAuthLoginLoginPost(email, password)
                 );
-                console.log("Response", response);
+
                 if (!hasFailed(response)) {
+                    const data = response.data as unknown as LoginResponse;
+
+                    // Save token and user
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    // Decode token (optional)
+                    const decoded = jwtDecode<DecodedToken>(data.token);
+                    console.log("Decoded JWT:", decoded);
+
                     navigate("/home");
                 } else {
                     setError("Failed to log in");
                 }
-            } catch (error: any) {
-                if (error.response && error.response.data) {
-                    console.error(
-                        "Server validation errors:",
-                        error.response.data
-                    );
-                    setError(JSON.stringify(error.response.data));
+            } else {
+                const response = await apiExec(AuthApi, (api) =>
+                    api.apiAuthRegisterRegisterPost(email, password, username)
+                );
+
+                if (!hasFailed(response)) {
+                    const data = response.data as unknown as LoginResponse;
+
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    navigate("/home");
                 } else {
                     setError("Failed to register");
                 }
             }
-        } else {
-            const response = await apiExec(AuthApi, (api) =>
-                api.apiAuthRegisterRegisterPost(email, password, username)
-            );
-            if (!hasFailed(response)) {
-                navigate("/home");
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                setError(JSON.stringify(error.response.data));
             } else {
-                setError("Failed to register");
+                setError(isLogin ? "Failed to log in" : "Failed to register");
             }
-=======
-    setError("");
-
-    try {
-      if (isLogin) {
-        const response = await apiExec(AuthApi, (api) =>
-          api.apiAuthLoginLoginPost(email, password)
-        );
-
-        if (!hasFailed(response)) {
-          const data = response.data as unknown as LoginResponse;
-          // Save token and user
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          // Decode token (optional)
-          const decoded = jwtDecode<DecodedToken>(data.token);
-          console.log("Decoded JWT:", decoded);
-
-          // Optional: Check token expiration
-          // if (decoded.exp * 1000 < Date.now()) {
-          //   setError("Session has expired. Please log in again.");
-          //   return;
-          // }
-
-          navigate("/home");
-        } else {
-          setError("Failed to log in");
->>>>>>> Stashed changes
         }
-      } else {
-        const response = await apiExec(AuthApi, (api) =>
-          api.apiAuthRegisterRegisterPost(email, password, username)
-        );
+    };
 
-        if (!hasFailed(response)) {
-          const data = response.data as unknown as LoginResponse;
+    return (
+        <Box className={classes.card}>
+            <Typography className={classes.title} variant="h5">
+                {isLogin ? "Log In" : "Sign Up"}
+            </Typography>
 
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
+            <form onSubmit={handleSubmit} className={classes.form}>
+                <Stack spacing={2}>
+                    <DefaultTextField
+                        label="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                        required
+                    />
 
-          navigate("/home");
-        } else {
-          setError("Failed to register");
-        }
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        setError(JSON.stringify(error.response.data));
-      } else {
-        setError(isLogin ? "Failed to log in" : "Failed to register");
-      }
-    }
-  };
+                    {!isLogin && (
+                        <DefaultTextField
+                            label="Username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            fullWidth
+                            required
+                        />
+                    )}
 
-  return (
-    <Box className={classes.card}>
-      <Typography className={classes.title} variant="h5">
-        {isLogin ? "Log In" : "Sign Up"}
-      </Typography>
+                    <DefaultTextField
+                        label="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
+                        required
+                    />
 
-      <form onSubmit={handleSubmit} className={classes.form}>
-        <Stack spacing={2}>
-          <DefaultTextField
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-            required
-          />
+                    {error && <Alert severity="error">{error}</Alert>}
 
-          {!isLogin && (
-            <DefaultTextField
-              label="Username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              fullWidth
-              required
-            />
-          )}
+                    <DefaultButton
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                    >
+                        {isLogin ? "Log In" : "Sign Up"}
+                    </DefaultButton>
+                </Stack>
+            </form>
 
-          <DefaultTextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            required
-          />
-
-          {error && <Alert severity="error">{error}</Alert>}
-
-          <DefaultButton variant="contained" color="primary" type="submit">
-            {isLogin ? "Log In" : "Sign Up"}
-          </DefaultButton>
-        </Stack>
-      </form>
-
-      <Typography className={classes.toggle}>
-        {isLogin ? "Don't have an account?" : "Already have an account?"}
-        <Button
-          className={classes.link}
-          onClick={() => setIsLogin((prev) => !prev)}
-          type="button"
-        >
-          {isLogin ? "Sign Up" : "Log In"}
-        </Button>
-      </Typography>
-    </Box>
-  );
+            <Typography className={classes.toggle}>
+                {isLogin
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
+                <Button
+                    className={classes.link}
+                    onClick={() => setIsLogin((prev) => !prev)}
+                    type="button"
+                >
+                    {isLogin ? "Sign Up" : "Log In"}
+                </Button>
+            </Typography>
+        </Box>
+    );
 };
 
 export default AuthForm;
