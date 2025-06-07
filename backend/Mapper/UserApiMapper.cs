@@ -10,6 +10,7 @@ namespace SmartContractVehicle.Mapper
         {
             CreateMap<RegisterTO, User>();
             CreateMap<LoginTO, User>();
+            CreateMap<User, UserTO>();
         }
     }
 }

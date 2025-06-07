@@ -1,25 +1,16 @@
 import React from "react";
-import {CookiesProvider} from "react-cookie";
+import { CookiesProvider } from "react-cookie";
 import Layout from "./Layout.tsx";
-
-
-import { SessionProvider } from "next-auth/react";
+import { Provider } from "react-redux";
+import { store } from "../store/Store.ts";
 
 const App: React.FC = () => {
     return (
-<<<<<<< Updated upstream
-        <CookiesProvider>
-            <Layout/>
-        </CookiesProvider>
-=======
         <Provider store={store}>
             <CookiesProvider>
-                <SessionProvider>
-                    <Layout />
-                </SessionProvider>
+                <Layout />
             </CookiesProvider>
         </Provider>
->>>>>>> Stashed changes
     );
 };
 
