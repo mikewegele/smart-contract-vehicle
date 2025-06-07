@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
+using NetTopologySuite.Geometries;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
-using NetTopologySuite.Geometries;
-using Microsoft.OpenApi.Extensions;
-using AutoMapper;
 using SmartContractVehicle.Model;
-using Microsoft.EntityFrameworkCore;
+using SmartContractVehicle.Service;
 
 namespace SmartContractVehicle.Controller
 {
@@ -98,17 +99,21 @@ namespace SmartContractVehicle.Controller
         [HttpPost]
         public async Task<IActionResult> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
         {
-            if(!ModelState.IsValid)
-            {  return BadRequest(ModelState); }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var allowedGreaterCircleArea = GeometryService.CreateCircleFromPoint(query.UserLocation, query.MaxDistance);
+
+            // Use DB spatial filtering in degrees (approximate filtering)
             var cars = _db.Cars
                 .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
-                .Where(c => c.CurrentPosition.IsWithinDistance(query.UserLocation, query.MaxDistance));
+                .Where(c => allowedGreaterCircleArea.Covers(c.CurrentPosition));
+            // Rough conversion from meters to degrees
 
             if (query.AllowedManufactures is not null && query.AllowedManufactures.Length > 0)
             {
                 var allowedManufactures = query.AllowedManufactures.Select(m => m.Normalize()).Distinct();
-                cars = cars.Where(c =>  allowedManufactures.Any(ap => EF.Functions.ILike(c.Trim.Model.Producer.Name, ap)));
+                cars = cars.Where(c => allowedManufactures.Any(ap => EF.Functions.ILike(c.Trim.Model.Producer.Name, ap)));
             }
 
             if (query.AllowedModels is not null && query.AllowedModels.Length > 0)
@@ -126,28 +131,28 @@ namespace SmartContractVehicle.Controller
             if (query.AllowedFueltypes is not null && query.AllowedFueltypes.Length > 0)
             {
                 var AllowedFueltypes = query.AllowedFueltypes.Select(f => f.GetEnumFromDisplayName<FuelTypes>()).Aggregate((f1, f2) => f1 | f2);
-                cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id) );
+                cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id));
             }
 
             if (query.AllowedDrivetrains is not null && query.AllowedDrivetrains.Length > 0)
-            { 
+            {
                 var AllowedDrivetrains = query.AllowedDrivetrains.Select(f => f.GetEnumFromDisplayName<Drivetrains>());
                 cars = cars.Where(c => AllowedDrivetrains.Contains((Drivetrains)c.Trim.Drivetrain.Id));
             }
 
             if (query.MinRemainingReach is not null)
             {
-                cars = cars.Where(c => c.RemainingReach >=  query.MinRemainingReach);
+                cars = cars.Where(c => c.RemainingReach >= query.MinRemainingReach);
             }
 
             if (query.MinSeats is not null)
             {
-                cars = cars.Where(c => c.SeatNumbers >=  query.MinSeats);
+                cars = cars.Where(c => c.SeatNumbers >= query.MinSeats);
             }
 
             if (query.MaxSeats is not null)
             {
-                cars = cars.Where(c => c.SeatNumbers <=  query.MaxSeats);
+                cars = cars.Where(c => c.SeatNumbers <= query.MaxSeats);
             }
 
             if (query.MinPricePerMinute is not null)
@@ -160,10 +165,14 @@ namespace SmartContractVehicle.Controller
                 cars = cars.Where(c => c.PricePerMinute <= query.MaxPricePerMinute);
             }
 
-            var data = (await cars.ToArrayAsync(cancellationToken: token)).Select(c => _mapper.Map<CarTO>(c));
-            var count = data.Count();
-            return Ok(new { count, data });
+            var result = await cars.ToArrayAsync(token);
+
+            var data = result.Select(c => _mapper.Map<CarTO>(c)).ToList();
+
+
+            return Ok(new { count = data.Count, data });
         }
+
 
 
         [HttpGet]
