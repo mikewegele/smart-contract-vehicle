@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Container from "../components/container/Container.tsx";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
-import { Alert, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import NavLinks from "../components/NavLinks.tsx";
 import makeStyles from "../util/makeStyles.ts";
 import { UserApi, type UserProfileUpdateTO } from "../api";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
 import useApiStates from "../util/useApiStates.ts";
-import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
+import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     textField: {
@@ -68,7 +69,7 @@ const ProfilePage: React.FC = () => {
         setLoading(true);
         setError(null);
         setSaveSuccess(false);
-        const response = await apiExec(UserApi, (api) =>
+        const response = await apiExecWithToken(UserApi, (api) =>
             api.apiUserUpdateProfilePatch(profile)
         );
         if (!hasFailed(response)) {
@@ -151,6 +152,16 @@ const ProfilePage: React.FC = () => {
                     handleChange("confirmNewPassword", e.target.value)
                 }
             />
+
+            <Box mt={3}>
+                <DefaultButton
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSave}
+                >
+                    Save Changes
+                </DefaultButton>
+            </Box>
 
             <NavLinks isLoggedIn={true} />
         </Container>

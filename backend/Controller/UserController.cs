@@ -104,16 +104,15 @@ namespace SmartContractVehicle.Controllers
                 return NotFound();
 
             _mapper.Map(dto, user);
-            await _userService.UpdateUserAsync(user); // dein Service ruft _userManager.UpdateAsync auf
+            await _userService.UpdateUserAsync(user);
 
-            // handle password update
             if (!string.IsNullOrWhiteSpace(dto.NewPassword))
             {
                 if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                    return BadRequest("Aktuelles Passwort ist erforderlich.");
+                    return BadRequest();
 
                 if (dto.NewPassword != dto.ConfirmNewPassword)
-                    return BadRequest("Neue Passwörter stimmen nicht überein.");
+                    return BadRequest();
 
                 var result = await _userService.ChangeUserPasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
                 if (!result.Succeeded)
