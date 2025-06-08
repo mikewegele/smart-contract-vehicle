@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
-**models** | [**Array&lt;VehicleModel&gt;**](VehicleModel.md) |  | [default to undefined]
+**models** | [**Array&lt;VehicleModel&gt;**](VehicleModel.md) |  | [optional] [default to undefined]
 **imagePath** | **string** |  | [optional] [default to undefined]
 
 ## Example

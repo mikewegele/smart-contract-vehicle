@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost*
 |[**apiUserDeleteDelete**](#apiuserdeletedelete) | **DELETE** /api/User/Delete | |
 |[**apiUserGetGet**](#apiusergetget) | **GET** /api/User/Get | |
 |[**apiUserGetUserByIdIdGet**](#apiusergetuserbyididget) | **GET** /api/User/GetUserById/{id} | |
+|[**apiUserProfileGet**](#apiuserprofileget) | **GET** /api/User/Profile | |
 |[**apiUserRegisterPost**](#apiuserregisterpost) | **POST** /api/User/Register | |
 |[**apiUserUpdatePatch**](#apiuserupdatepatch) | **PATCH** /api/User/Update | |
 
@@ -111,7 +112,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiUserGetUserByIdIdGet**
-> apiUserGetUserByIdIdGet()
+> Array<UserTO> apiUserGetUserByIdIdGet()
 
 
 ### Example
@@ -141,7 +142,7 @@ const { status, data } = await apiInstance.apiUserGetUserByIdIdGet(
 
 ### Return type
 
-void (empty response body)
+**Array<UserTO>**
 
 ### Authorization
 
@@ -150,7 +151,50 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiUserProfileGet**
+> UserTO apiUserProfileGet()
+
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+const { status, data } = await apiInstance.apiUserProfileGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**UserTO**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

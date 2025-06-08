@@ -31,6 +31,7 @@ docs/PrecisionModels.md
 docs/RegisterTO.md
 docs/User.md
 docs/UserApi.md
+docs/UserTO.md
 docs/VehicleModel.md
 docs/VehicleTrim.md
 git_push.sh

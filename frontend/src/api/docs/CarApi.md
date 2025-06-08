@@ -4,7 +4,7 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**apiCarGeoSpatialQueryGet**](#apicargeospatialqueryget) | **GET** /api/Car/GeoSpatialQuery | |
+|[**apiCarGeoSpatialQueryPost**](#apicargeospatialquerypost) | **POST** /api/Car/GeoSpatialQuery | |
 |[**apiCarGetAllCarsGet**](#apicargetallcarsget) | **GET** /api/Car/GetAllCars | |
 |[**apiCarGetAutomotiveCompaniesGet**](#apicargetautomotivecompaniesget) | **GET** /api/Car/GetAutomotiveCompanies | |
 |[**apiCarGetDrivetrainsGet**](#apicargetdrivetrainsget) | **GET** /api/Car/GetDrivetrains | |
@@ -13,8 +13,8 @@ All URIs are relative to *http://localhost*
 |[**apiCarGetModelsGet**](#apicargetmodelsget) | **GET** /api/Car/GetModels | |
 |[**apiCarGetTrimsGet**](#apicargettrimsget) | **GET** /api/Car/GetTrims | |
 
-# **apiCarGeoSpatialQueryGet**
-> apiCarGeoSpatialQueryGet()
+# **apiCarGeoSpatialQueryPost**
+> apiCarGeoSpatialQueryPost()
 
 
 ### Example
@@ -31,7 +31,7 @@ const apiInstance = new CarApi(configuration);
 
 let geoSpatialQueryTO: GeoSpatialQueryTO; // (optional)
 
-const { status, data } = await apiInstance.apiCarGeoSpatialQueryGet(
+const { status, data } = await apiInstance.apiCarGeoSpatialQueryPost(
     geoSpatialQueryTO
 );
 ```

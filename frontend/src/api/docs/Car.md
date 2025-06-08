@@ -7,8 +7,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional] [default to undefined]
 **vin** | **string** |  | [default to undefined]
-**owner** | [**User**](User.md) |  | [default to undefined]
-**trim** | [**VehicleTrim**](VehicleTrim.md) |  | [default to undefined]
+**owner** | [**User**](User.md) |  | [optional] [default to undefined]
+**trim** | [**VehicleTrim**](VehicleTrim.md) |  | [optional] [default to undefined]
 **currentPosition** | [**Point**](Point.md) |  | [default to undefined]
 **remainingReach** | **number** |  | [optional] [default to undefined]
 **colour** | **string** |  | [default to undefined]

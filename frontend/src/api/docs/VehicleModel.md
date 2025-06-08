@@ -7,8 +7,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
-**producer** | [**AutomotiveCompany**](AutomotiveCompany.md) |  | [default to undefined]
-**trims** | [**Array&lt;VehicleTrim&gt;**](VehicleTrim.md) |  | [default to undefined]
+**producer** | [**AutomotiveCompany**](AutomotiveCompany.md) |  | [optional] [default to undefined]
+**trims** | [**Array&lt;VehicleTrim&gt;**](VehicleTrim.md) |  | [optional] [default to undefined]
 
 ## Example
 

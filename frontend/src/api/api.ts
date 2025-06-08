@@ -101,7 +101,7 @@ export interface AutomotiveCompany {
      * @type {Array<VehicleModel>}
      * @memberof AutomotiveCompany
      */
-    'models': Array<VehicleModel> | null;
+    'models'?: Array<VehicleModel> | null;
     /**
      * 
      * @type {string}
@@ -132,13 +132,13 @@ export interface Car {
      * @type {User}
      * @memberof Car
      */
-    'owner': User;
+    'owner'?: User;
     /**
      * 
      * @type {VehicleTrim}
      * @memberof Car
      */
-    'trim': VehicleTrim;
+    'trim'?: VehicleTrim;
     /**
      * 
      * @type {Point}
@@ -1327,6 +1327,55 @@ export interface User {
 /**
  * 
  * @export
+ * @interface UserTO
+ */
+export interface UserTO {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTO
+     */
+    'id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTO
+     */
+    'userName'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTO
+     */
+    'email'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTO
+     */
+    'name'?: string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserTO
+     */
+    'isAdmin'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserTO
+     */
+    'isRenter'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserTO
+     */
+    'isLessor'?: boolean;
+}
+/**
+ * 
+ * @export
  * @interface VehicleModel
  */
 export interface VehicleModel {
@@ -1347,13 +1396,13 @@ export interface VehicleModel {
      * @type {AutomotiveCompany}
      * @memberof VehicleModel
      */
-    'producer': AutomotiveCompany;
+    'producer'?: AutomotiveCompany;
     /**
      * 
      * @type {Array<VehicleTrim>}
      * @memberof VehicleModel
      */
-    'trims': Array<VehicleTrim> | null;
+    'trims'?: Array<VehicleTrim> | null;
 }
 /**
  * 
@@ -1378,25 +1427,25 @@ export interface VehicleTrim {
      * @type {VehicleModel}
      * @memberof VehicleTrim
      */
-    'model': VehicleModel;
+    'model'?: VehicleModel;
     /**
      * 
      * @type {Array<Car>}
      * @memberof VehicleTrim
      */
-    'cars': Array<Car> | null;
+    'cars'?: Array<Car> | null;
     /**
      * 
      * @type {FuelType}
      * @memberof VehicleTrim
      */
-    'fuel': FuelType;
+    'fuel'?: FuelType;
     /**
      * 
      * @type {Drivetrain}
      * @memberof VehicleTrim
      */
-    'drivetrain': Drivetrain;
+    'drivetrain'?: Drivetrain;
     /**
      * 
      * @type {string}
@@ -1981,7 +2030,7 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGeoSpatialQueryGet: async (geoSpatialQueryTO?: GeoSpatialQueryTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCarGeoSpatialQueryPost: async (geoSpatialQueryTO?: GeoSpatialQueryTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/Car/GeoSpatialQuery`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1990,7 +2039,7 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2262,10 +2311,10 @@ export const CarApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options);
+        async apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGeoSpatialQueryPost(geoSpatialQueryTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGeoSpatialQueryGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGeoSpatialQueryPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2368,8 +2417,8 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options).then((request) => request(axios, basePath));
+        apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiCarGeoSpatialQueryPost(geoSpatialQueryTO, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2451,8 +2500,8 @@ export class CarApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CarApi
      */
-    public apiCarGeoSpatialQueryGet(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig) {
-        return CarApiFp(this.configuration).apiCarGeoSpatialQueryGet(geoSpatialQueryTO, options).then((request) => request(this.axios, this.basePath));
+    public apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGeoSpatialQueryPost(geoSpatialQueryTO, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2644,6 +2693,35 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiUserProfileGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/User/Profile`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {RegisterTO} [registerTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2748,10 +2826,21 @@ export const UserApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiUserGetUserByIdIdGet(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiUserGetUserByIdIdGet(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<UserTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiUserGetUserByIdIdGet(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.apiUserGetUserByIdIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiUserProfileGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiUserProfileGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.apiUserProfileGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2812,8 +2901,16 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiUserGetUserByIdIdGet(id: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiUserGetUserByIdIdGet(id: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<UserTO>> {
             return localVarFp.apiUserGetUserByIdIdGet(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiUserProfileGet(options?: RawAxiosRequestConfig): AxiosPromise<UserTO> {
+            return localVarFp.apiUserProfileGet(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2874,6 +2971,16 @@ export class UserApi extends BaseAPI {
      */
     public apiUserGetUserByIdIdGet(id: string, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).apiUserGetUserByIdIdGet(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public apiUserProfileGet(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).apiUserProfileGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

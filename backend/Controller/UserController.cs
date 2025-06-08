@@ -3,7 +3,8 @@ using SmartContractVehicle.Data;
 using AutoMapper;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Service;
-
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SmartContractVehicle.Controllers
 {
@@ -62,7 +63,7 @@ namespace SmartContractVehicle.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetUserById(string id)
+        public ActionResult<IQueryable<UserTO>> GetUserById(string id)
         {
             var user = _db.Users.Find(id);
             if (user == null)
@@ -73,5 +74,21 @@ namespace SmartContractVehicle.Controllers
             var userDto = _mapper.Map<UserTO>(user);
             return Ok(userDto);
         }
+
+            [Authorize]
+            [HttpGet]
+            public ActionResult<UserTO> Profile()
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null)
+                    return Unauthorized();
+
+                var user = _db.Users.Find(int.Parse(userIdClaim));
+                if (user == null)
+                    return NotFound();
+
+                var userDto = _mapper.Map<UserTO>(user);
+                return Ok(userDto);
+            }
     }
 }
