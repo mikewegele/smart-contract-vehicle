@@ -39,7 +39,6 @@ const fetchUser = () => {
         const response = await apiExec(UserApi, (api) =>
             api.apiUserProfileGet()
         );
-        console.log(response);
         if (hasFailed(response)) {
             dispatch(userError(response.error));
         } else {

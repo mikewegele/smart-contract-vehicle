@@ -1327,6 +1327,55 @@ export interface User {
 /**
  * 
  * @export
+ * @interface UserProfileUpdateTO
+ */
+export interface UserProfileUpdateTO {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'email'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'phoneNumber'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'currentPassword'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'newPassword'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserProfileUpdateTO
+     */
+    'confirmNewPassword'?: string | null;
+}
+/**
+ * 
+ * @export
  * @interface UserTO
  */
 export interface UserTO {
@@ -2786,6 +2835,39 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {UserProfileUpdateTO} [userProfileUpdateTO] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiUserUpdateProfilePatch: async (userProfileUpdateTO?: UserProfileUpdateTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/User/UpdateProfile`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(userProfileUpdateTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2867,6 +2949,18 @@ export const UserApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['UserApi.apiUserUpdatePatch']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @param {UserProfileUpdateTO} [userProfileUpdateTO] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiUserUpdateProfilePatch(userProfileUpdateTO?: UserProfileUpdateTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiUserUpdateProfilePatch(userProfileUpdateTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.apiUserUpdateProfilePatch']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -2929,6 +3023,15 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          */
         apiUserUpdatePatch(user?: User, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.apiUserUpdatePatch(user, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {UserProfileUpdateTO} [userProfileUpdateTO] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiUserUpdateProfilePatch(userProfileUpdateTO?: UserProfileUpdateTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiUserUpdateProfilePatch(userProfileUpdateTO, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3003,6 +3106,17 @@ export class UserApi extends BaseAPI {
      */
     public apiUserUpdatePatch(user?: User, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).apiUserUpdatePatch(user, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {UserProfileUpdateTO} [userProfileUpdateTO] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public apiUserUpdateProfilePatch(userProfileUpdateTO?: UserProfileUpdateTO, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).apiUserUpdateProfilePatch(userProfileUpdateTO, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

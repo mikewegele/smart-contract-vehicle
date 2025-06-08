@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Container from "../components/container/Container.tsx";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import makeStyles from "../util/makeStyles.ts";
-import type {UserTO} from "../api";
+import { UserApi, type UserProfileUpdateTO } from "../api";
+import { useAppDispatch } from "../store/Store.ts";
+import { fetchUser } from "../store/reducer/user.ts";
+import useApiStates from "../util/useApiStates.ts";
+import { apiExec, hasFailed } from "../util/ApiUtils.ts";
 
 const useStyles = makeStyles(() => ({
     textField: {
@@ -14,34 +18,72 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const backendUrl = "http://localhost:5147"; // Change if needed
-
 const ProfilePage: React.FC = () => {
     const { classes } = useStyles();
-
-    const [profile, setProfile] = useState<UserTO>({
-        userId: "",
-        username: "",
-        email: "",
-        name: "",
-        password: "",
-        address: "",
-        walletId: "",
-    });
-
+    const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
+    const { user } = useApiStates("user");
+
+    const [profile, setProfile] = useState<UserProfileUpdateTO>({
+        id: null,
+        name: null,
+        email: null,
+        currentPassword: null,
+        newPassword: null,
+        confirmNewPassword: null,
+    });
+
     useEffect(() => {
+        if (user.value) {
+            setProfile({
+                id: user.value.id ?? null,
+                name: user.value.name ?? null,
+                email: user.value.email ?? null,
+                currentPassword: null,
+                newPassword: null,
+                confirmNewPassword: null,
+            });
+        }
+    }, [user]);
 
-    }, []);
-
-    const handleChange = (field: keyof UserTO, value: string) => {
+    const handleChange = (field: keyof UserProfileUpdateTO, value: string) => {
         setProfile((prev) => ({ ...prev, [field]: value }));
     };
 
-    if (loading) {
+    const handleSave = useCallback(async () => {
+        if (!profile) return;
+        if (
+            profile.newPassword &&
+            profile.newPassword !== profile.confirmNewPassword
+        ) {
+            setError("New password and confirmation do not match.");
+            return;
+        }
+        setLoading(true);
+        setError(null);
+        setSaveSuccess(false);
+        const response = await apiExec(UserApi, (api) =>
+            api.apiUserUpdateProfilePatch(profile)
+        );
+        if (!hasFailed(response)) {
+            setSaveSuccess(true);
+            dispatch(fetchUser());
+            setProfile((prev) => ({
+                ...prev,
+                currentPassword: null,
+                newPassword: null,
+                confirmNewPassword: null,
+            }));
+        } else {
+            setError(response.error.message);
+            setLoading(false);
+        }
+    }, [profile, dispatch]);
+
+    if (!profile.id) {
         return (
             <Container>
                 <Box display="flex" justifyContent="center" mt={5}>
@@ -71,47 +113,50 @@ const ProfilePage: React.FC = () => {
 
             <DefaultTextField
                 className={classes.textField}
-                label={"Username"}
-                type={"text"}
-                value={profile.userName}
-                onChange={(e) => handleChange("username", e.target.value)}
-            />
-
-            <DefaultTextField
-                className={classes.textField}
-                label={"E-mail"}
-                type="email"
-                value={profile.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-            />
-
-            <DefaultTextField
-                className={classes.textField}
                 label="Name"
                 type="text"
-                value={profile.name}
+                value={profile.name ?? ""}
                 onChange={(e) => handleChange("name", e.target.value)}
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label="Address"
-                value={profile.}
-                onChange={(e) => handleChange("address", e.target.value)}
+                label="E-mail"
+                type="email"
+                value={profile.email ?? ""}
+                onChange={(e) => handleChange("email", e.target.value)}
+            />
+
+            <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+                Change Password
+            </Typography>
+
+            <DefaultTextField
+                className={classes.textField}
+                label="Current Password"
+                type="password"
+                value={profile.currentPassword ?? ""}
+                onChange={(e) =>
+                    handleChange("currentPassword", e.target.value)
+                }
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label="Wallet ID"
-                value={profile.walletId}
-                disabled
+                label="New Password"
+                type="password"
+                value={profile.newPassword ?? ""}
+                onChange={(e) => handleChange("newPassword", e.target.value)}
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label="User ID"
-                value={profile.userId}
-                disabled
+                label="Confirm New Password"
+                type="password"
+                value={profile.confirmNewPassword ?? ""}
+                onChange={(e) =>
+                    handleChange("confirmNewPassword", e.target.value)
+                }
             />
 
             <Box mt={3}>
@@ -119,8 +164,9 @@ const ProfilePage: React.FC = () => {
                     variant="contained"
                     color="primary"
                     onClick={handleSave}
+                    disabled={loading}
                 >
-                    Save Changes
+                    {loading ? <CircularProgress size={24} /> : "Save Changes"}
                 </DefaultButton>
             </Box>
 
