@@ -23,7 +23,7 @@ interface Profile {
   walletId: string;
 }
 
-const backendUrl = "http://localhost:5147"; // Change if needed
+const backendUrl = "http://localhost:5147"; // Adjust if needed
 
 const ProfilePage: React.FC = () => {
   const { classes } = useStyles();
@@ -55,7 +55,7 @@ const ProfilePage: React.FC = () => {
         setProfile((prev) => ({
           ...prev,
           email: user.email || "",
-          username: user.userName || "",
+          username: user.username || "",
           userId: user.id || "",
           name: user.name || "",
         }));
@@ -70,9 +70,21 @@ const ProfilePage: React.FC = () => {
       setLoading(true);
       setError(null);
 
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        setError("No authorization token found");
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await fetch(
-          `${backendUrl}/api/User/by-email?email=${encodeURIComponent(email)}`
+          `${backendUrl}/api/User/by-email?email=${encodeURIComponent(email)}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+            },
+          }
         );
 
         if (!res.ok) {
@@ -86,12 +98,12 @@ const ProfilePage: React.FC = () => {
         setProfile((prev) => ({
           ...prev,
           userId: userData.id || prev.userId,
-          username: userData.userName || prev.username,
+          username: userData.username || prev.username,
           email: userData.email || prev.email,
           name: userData.name || prev.name,
-          address: userData.address || "", // if your backend returns this
+          address: userData.address || "",
           walletId: userData.walletId || "",
-          password: "", // never populate password
+          password: "", // never populate password field
         }));
       } catch (err) {
         setError("Failed to fetch user data");
@@ -111,7 +123,6 @@ const ProfilePage: React.FC = () => {
     setError(null);
     setSaveSuccess(false);
 
-    // Basic validation
     if (!profile.email.trim()) {
       setError("Email cannot be empty");
       return;
@@ -121,9 +132,15 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      setError("No authorization token found");
+      return;
+    }
+
     const payload: any = {
       id: profile.userId,
-      userName: profile.username,
+      username: profile.username,
       email: profile.email,
       name: profile.name,
       address: profile.address,
@@ -132,6 +149,7 @@ const ProfilePage: React.FC = () => {
       isLessor: false,
       isRenter: false,
     };
+
     if (profile.password.trim()) {
       payload.password = profile.password;
     }
@@ -139,7 +157,10 @@ const ProfilePage: React.FC = () => {
     try {
       const res = await fetch(`${backendUrl}/api/User/update`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -147,11 +168,11 @@ const ProfilePage: React.FC = () => {
 
       const updatedUser = await res.json();
 
-      // Update localStorage user copy if backend returns updated user info
+      // Update localStorage copy of user if backend returns updated info
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
       setSaveSuccess(true);
-      setProfile((prev) => ({ ...prev, password: "" })); // clear password
+      setProfile((prev) => ({ ...prev, password: "" })); // Clear password field
     } catch (err) {
       setError((err as Error).message || "Update failed");
     }

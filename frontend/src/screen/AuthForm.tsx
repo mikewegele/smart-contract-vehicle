@@ -6,19 +6,10 @@ import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { AuthApi } from "../api";
-import { jwtDecode } from "jwt-decode"; // <-- added
+import { jwtDecode } from "jwt-decode";
 
 interface LoginResponse {
     token: string;
-    user: {
-        id: string;
-        userName: string;
-        email: string;
-        name: string;
-        isAdmin: boolean;
-        isLessor: boolean;
-        isRenter: boolean;
-    };
 }
 
 interface DecodedToken {
@@ -151,14 +142,19 @@ const AuthForm: React.FC = () => {
 
                 if (!hasFailed(response)) {
                     const data = response.data as unknown as LoginResponse;
+                    console.log("Login/Register response data:", data);
 
-                    // Save token and user
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
-
-                    // Decode token (optional)
                     const decoded = jwtDecode<DecodedToken>(data.token);
                     console.log("Decoded JWT:", decoded);
+
+                    const user = {
+                        id: decoded.jti,
+                        email: decoded.sub,
+                        name: decoded.name,
+                    };
+
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(user));
 
                     navigate("/home");
                 } else {
@@ -172,8 +168,17 @@ const AuthForm: React.FC = () => {
                 if (!hasFailed(response)) {
                     const data = response.data as unknown as LoginResponse;
 
+                    const decoded = jwtDecode<DecodedToken>(data.token);
+                    console.log("Decoded JWT:", decoded);
+
+                    const user = {
+                        id: decoded.jti,
+                        email: decoded.sub,
+                        name: decoded.name,
+                    };
+
                     localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
+                    localStorage.setItem("user", JSON.stringify(user));
 
                     navigate("/home");
                 } else {
