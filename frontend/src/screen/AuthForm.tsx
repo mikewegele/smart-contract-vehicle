@@ -6,6 +6,29 @@ import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { AuthApi } from "../api";
+import { jwtDecode } from "jwt-decode"; // <-- added
+
+interface LoginResponse {
+    token: string;
+    user: {
+        id: string;
+        userName: string;
+        email: string;
+        name: string;
+        isAdmin: boolean;
+        isLessor: boolean;
+        isRenter: boolean;
+    };
+}
+
+interface DecodedToken {
+    sub: string;
+    name: string;
+    exp: number;
+    iss: string;
+    aud: string;
+    jti: string;
+}
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -119,36 +142,49 @@ const AuthForm: React.FC = () => {
         }
 
         setError("");
-        if (isLogin) {
-            try {
+
+        try {
+            if (isLogin) {
                 const response = await apiExec(AuthApi, (api) =>
                     api.apiAuthLoginLoginPost(email, password)
                 );
-                console.log("Response", response);
+
                 if (!hasFailed(response)) {
+                    const data = response.data as unknown as LoginResponse;
+
+                    // Save token and user
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    // Decode token (optional)
+                    const decoded = jwtDecode<DecodedToken>(data.token);
+                    console.log("Decoded JWT:", decoded);
+
                     navigate("/home");
                 } else {
                     setError("Failed to log in");
                 }
-            } catch (error: any) {
-                if (error.response && error.response.data) {
-                    console.error(
-                        "Server validation errors:",
-                        error.response.data
-                    );
-                    setError(JSON.stringify(error.response.data));
+            } else {
+                const response = await apiExec(AuthApi, (api) =>
+                    api.apiAuthRegisterRegisterPost(email, password, username)
+                );
+
+                if (!hasFailed(response)) {
+                    const data = response.data as unknown as LoginResponse;
+
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    navigate("/home");
                 } else {
                     setError("Failed to register");
                 }
             }
-        } else {
-            const response = await apiExec(AuthApi, (api) =>
-                api.apiAuthRegisterRegisterPost(email, password, username)
-            );
-            if (!hasFailed(response)) {
-                navigate("/home");
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                setError(JSON.stringify(error.response.data));
             } else {
-                setError("Failed to register");
+                setError(isLogin ? "Failed to log in" : "Failed to register");
             }
         }
     };
@@ -189,6 +225,7 @@ const AuthForm: React.FC = () => {
                         fullWidth
                         required
                     />
+
                     {error && <Alert severity="error">{error}</Alert>}
 
                     <DefaultButton
@@ -208,6 +245,7 @@ const AuthForm: React.FC = () => {
                 <Button
                     className={classes.link}
                     onClick={() => setIsLogin((prev) => !prev)}
+                    type="button"
                 >
                     {isLogin ? "Sign Up" : "Log In"}
                 </Button>

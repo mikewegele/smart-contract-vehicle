@@ -20,7 +20,10 @@
     "@openapitools/openapi-generator-cli": "^2.20.2",
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.9.0",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
+    "next-auth": "^4.24.11",
+    "process": "^0.11.10",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
@@ -31,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/jwt-decode": "^2.2.1",
     "@types/leaflet": "^1.9.18",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
