@@ -21,7 +21,6 @@ const useStyles = makeStyles(() => ({
 const ProfilePage: React.FC = () => {
     const { classes } = useStyles();
     const dispatch = useAppDispatch();
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -66,7 +65,6 @@ const ProfilePage: React.FC = () => {
             setError("New password and confirmation do not match.");
             return;
         }
-        setLoading(true);
         setError(null);
         setSaveSuccess(false);
         const response = await apiExecWithToken(UserApi, (api) =>
@@ -83,7 +81,6 @@ const ProfilePage: React.FC = () => {
             }));
         } else {
             setError(response.error.message);
-            setLoading(false);
         }
     }, [profile, dispatch]);
 
