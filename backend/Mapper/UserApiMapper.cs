@@ -11,6 +11,11 @@ namespace SmartContractVehicle.Mapper
             CreateMap<RegisterTO, User>();
             CreateMap<LoginTO, User>();
             CreateMap<User, UserTO>();
+            CreateMap<UserProfileUpdateTO, User>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         }
     }
 }
