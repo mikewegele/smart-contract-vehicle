@@ -79,7 +79,7 @@ namespace SmartContractVehicle.Data
                             Model = model,
                             Fuel = fuels[random.Next(0, fuels.Length)], // z. B. 0: Electric, 1: Diesel
                             Drivetrain = drivetrains[random.Next(0, drivetrains.Length)], // z. B. 0: FWD, 1: AWD
-                            ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}_{trimNames[b][m][t].ToLower().Replace(" ", "")}.png",
+                            ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}.png",
                         };
 
                         for (int c = 0; c < 5; c++) // 5 Autos pro Trim
