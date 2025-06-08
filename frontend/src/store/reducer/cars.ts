@@ -39,7 +39,6 @@ const fetchAllCars = () => {
         const response = await apiExec(CarApi, (api) =>
             api.apiCarGetAllCarsGet()
         );
-        console.log(response);
         if (hasFailed(response)) {
             dispatch(carError(response.error));
         } else {

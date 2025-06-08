@@ -18,7 +18,7 @@ import type { Configuration } from "./configuration";
 import type { AxiosInstance, AxiosPromise, RawAxiosRequestConfig } from "axios";
 import globalAxios from "axios";
 
-export const BASE_PATH = "http://localhost:5174";
+export const BASE_PATH = "http://localhost:5147";
 
 /**
  *

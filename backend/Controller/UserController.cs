@@ -79,11 +79,11 @@ namespace SmartContractVehicle.Controllers
         [HttpGet]
         public ActionResult<UserTO> Profile()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null)
+            var emailClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (emailClaim == null)
                 return Unauthorized();
 
-            var user = _db.Users.Find(int.Parse(userIdClaim));
+            var user = _db.Users.SingleOrDefault(u => u.Email == emailClaim);
             if (user == null)
                 return NotFound();
 

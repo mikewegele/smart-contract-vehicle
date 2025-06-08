@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Container from "../components/container/Container.tsx";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
-import { Alert, Box, CircularProgress, Typography } from "@mui/material";
-import DefaultButton from "../components/button/DefaultButton.tsx";
+import { Alert, Typography } from "@mui/material";
 import NavLinks from "../components/NavLinks.tsx";
 import makeStyles from "../util/makeStyles.ts";
 import { UserApi, type UserProfileUpdateTO } from "../api";
@@ -35,6 +34,10 @@ const ProfilePage: React.FC = () => {
         newPassword: null,
         confirmNewPassword: null,
     });
+
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
 
     useEffect(() => {
         if (user.value) {
@@ -82,16 +85,6 @@ const ProfilePage: React.FC = () => {
             setLoading(false);
         }
     }, [profile, dispatch]);
-
-    if (!profile.id) {
-        return (
-            <Container>
-                <Box display="flex" justifyContent="center" mt={5}>
-                    <CircularProgress />
-                </Box>
-            </Container>
-        );
-    }
 
     return (
         <Container>
@@ -158,17 +151,6 @@ const ProfilePage: React.FC = () => {
                     handleChange("confirmNewPassword", e.target.value)
                 }
             />
-
-            <Box mt={3}>
-                <DefaultButton
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSave}
-                    disabled={loading}
-                >
-                    {loading ? <CircularProgress size={24} /> : "Save Changes"}
-                </DefaultButton>
-            </Box>
 
             <NavLinks isLoggedIn={true} />
         </Container>

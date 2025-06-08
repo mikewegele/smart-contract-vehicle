@@ -1353,12 +1353,6 @@ export interface UserProfileUpdateTO {
      * @type {string}
      * @memberof UserProfileUpdateTO
      */
-    'phoneNumber'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserProfileUpdateTO
-     */
     'currentPassword'?: string | null;
     /**
      * 

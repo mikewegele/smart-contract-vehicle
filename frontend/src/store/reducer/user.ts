@@ -1,6 +1,10 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
-import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
+import {
+    type ApiError,
+    apiExecWithToken,
+    hasFailed,
+} from "../../util/ApiUtils.ts";
 import { UserApi, type UserTO } from "../../api";
 
 interface State {
@@ -36,9 +40,10 @@ const userError = slice.actions["SET_ERROR"];
 
 const fetchUser = () => {
     return async (dispatch: RootDispatch): Promise<void> => {
-        const response = await apiExec(UserApi, (api) =>
+        const response = await apiExecWithToken(UserApi, (api) =>
             api.apiUserProfileGet()
         );
+        console.log(response);
         if (hasFailed(response)) {
             dispatch(userError(response.error));
         } else {
