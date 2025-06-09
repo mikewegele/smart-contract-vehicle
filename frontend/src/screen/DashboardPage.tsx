@@ -10,6 +10,7 @@ import VehicleFilterPanel, {
     type FilterValues,
 } from "../components/vehicle/VehicleFilterPanel.tsx";
 import { Box } from "@mui/material";
+import { useGeolocation } from "../util/location/useGeolocation.ts";
 
 const DashboardPage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -18,8 +19,10 @@ const DashboardPage: React.FC = () => {
         dispatch(fetchAllCars());
     }, [dispatch]);
 
+    const { position } = useGeolocation();
+
     const handleFilterApply = (filters: FilterValues) => {
-        dispatch(fetchCarsByFilter(filters));
+        dispatch(fetchCarsByFilter(filters, position));
     };
 
     const { cars } = useApiStates("cars");

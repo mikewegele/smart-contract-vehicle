@@ -71,9 +71,18 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     }
                 >
                     <MenuItem value="">All</MenuItem>
-                    <MenuItem value="FWD">FWD</MenuItem>
-                    <MenuItem value="AWD">AWD</MenuItem>
-                    <MenuItem value="RWD">RWD</MenuItem>
+                    <MenuItem value="Front-Wheel Drive (FWD)">
+                        Front-Wheel Drive (FWD)
+                    </MenuItem>
+                    <MenuItem value="Rear-Wheel Drive (RWD)">
+                        Rear-Wheel Drive (RWD)
+                    </MenuItem>
+                    <MenuItem value="All-Wheel Drive (AWD)">
+                        All-Wheel Drive (AWD)
+                    </MenuItem>
+                    <MenuItem value="Four-Wheel Drive (4WD)">
+                        Four-Wheel Drive (4WD)
+                    </MenuItem>
                 </Select>
             </FormControl>
 

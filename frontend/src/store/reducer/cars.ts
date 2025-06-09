@@ -3,6 +3,7 @@ import type { RootDispatch } from "../Store";
 import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
 import { CarApi, type CarTO } from "../../api";
 import type { FilterValues } from "../../components/vehicle/VehicleFilterPanel.tsx";
+import type { Position } from "../../util/location/useGeolocation.ts";
 
 interface State {
     value: CarTO[];
@@ -48,13 +49,16 @@ const fetchAllCars = () => {
     };
 };
 
-const fetchCarsByFilter = (filters: FilterValues) => {
+const fetchCarsByFilter = (
+    filters: FilterValues,
+    position: Position | null
+) => {
     return async (dispatch: RootDispatch): Promise<void> => {
         const response = await apiExec(CarApi, (api) =>
             api.apiCarGeoSpatialQueryPost({
                 userLocation: {
                     type: "Point",
-                    coordinates: [13.4, 52.5],
+                    coordinates: position,
                 },
                 maxDistance: 10000,
                 minSeats: filters.minSeats,
