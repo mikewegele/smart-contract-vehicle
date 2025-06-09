@@ -36,7 +36,7 @@ const SmartContractTestPage: React.FC = () => {
 
     return (
         <Container>
-            <NavLinks isLoggedIn={false} />
+            <NavLinks isLoggedIn={true} />
             <Typography>{message}</Typography>
         </Container>
     );

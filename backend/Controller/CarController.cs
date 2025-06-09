@@ -129,7 +129,7 @@ namespace SmartContractVehicle.Controller
         */
 
         [HttpPost]
-        public async Task<IActionResult> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
+        public async Task<ActionResult<List<CarTO>>> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -202,7 +202,7 @@ namespace SmartContractVehicle.Controller
             var data = result.Select(c => _mapper.Map<CarTO>(c)).ToList();
 
 
-            return Ok(new { count = data.Count, data });
+            return Ok(data);
         }
 
 

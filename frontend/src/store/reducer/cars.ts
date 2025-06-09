@@ -2,6 +2,7 @@ import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
 import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
 import { CarApi, type CarTO } from "../../api";
+import type { FilterValues } from "../../components/vehicle/VehicleFilterPanel.tsx";
 
 interface State {
     value: CarTO[];
@@ -47,4 +48,37 @@ const fetchAllCars = () => {
     };
 };
 
-export { slice as CarsSlice, addCars, carError, fetchAllCars };
+const fetchCarsByFilter = (filters: FilterValues) => {
+    return async (dispatch: RootDispatch): Promise<void> => {
+        const response = await apiExec(CarApi, (api) =>
+            api.apiCarGeoSpatialQueryPost({
+                userLocation: {
+                    type: "Point",
+                    coordinates: [13.4, 52.5],
+                },
+                maxDistance: 10000,
+                minSeats: filters.minSeats,
+                maxSeats: filters.maxSeats,
+                minPricePerMinute: filters.minPrice,
+                maxPricePerMinute: filters.maxPrice,
+                allowedDrivetrains: filters.drivetrain
+                    ? [filters.drivetrain]
+                    : undefined,
+            })
+        );
+        console.log(response);
+        if (hasFailed(response)) {
+            dispatch(carError(response.error));
+        } else {
+            dispatch(addCars(response.data));
+        }
+    };
+};
+
+export {
+    slice as CarsSlice,
+    addCars,
+    carError,
+    fetchAllCars,
+    fetchCarsByFilter,
+};

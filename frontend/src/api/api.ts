@@ -2354,7 +2354,7 @@ export const CarApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CarTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGeoSpatialQueryPost(geoSpatialQueryTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGeoSpatialQueryPost']?.[localVarOperationServerIndex]?.url;
@@ -2460,7 +2460,7 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiCarGeoSpatialQueryPost(geoSpatialQueryTO?: GeoSpatialQueryTO, options?: RawAxiosRequestConfig): AxiosPromise<Array<CarTO>> {
             return localVarFp.apiCarGeoSpatialQueryPost(geoSpatialQueryTO, options).then((request) => request(axios, basePath));
         },
         /**

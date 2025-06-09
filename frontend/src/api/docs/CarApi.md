@@ -14,7 +14,7 @@ All URIs are relative to *http://localhost*
 |[**apiCarGetTrimsGet**](#apicargettrimsget) | **GET** /api/Car/GetTrims | |
 
 # **apiCarGeoSpatialQueryPost**
-> apiCarGeoSpatialQueryPost()
+> Array<CarTO> apiCarGeoSpatialQueryPost()
 
 
 ### Example
@@ -45,7 +45,7 @@ const { status, data } = await apiInstance.apiCarGeoSpatialQueryPost(
 
 ### Return type
 
-void (empty response body)
+**Array<CarTO>**
 
 ### Authorization
 
@@ -54,7 +54,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json, text/json, application/*+json
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details
