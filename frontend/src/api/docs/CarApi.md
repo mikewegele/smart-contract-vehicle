@@ -251,7 +251,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiCarGetFueltypesGet**
-> apiCarGetFueltypesGet()
+> Array<string> apiCarGetFueltypesGet()
 
 
 ### Example
@@ -265,23 +265,16 @@ import {
 const configuration = new Configuration();
 const apiInstance = new CarApi(configuration);
 
-let withId: boolean; // (optional) (default to undefined)
-
-const { status, data } = await apiInstance.apiCarGetFueltypesGet(
-    withId
-);
+const { status, data } = await apiInstance.apiCarGetFueltypesGet();
 ```
 
 ### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **withId** | [**boolean**] |  | (optional) defaults to undefined|
+This endpoint does not have any parameters.
 
 
 ### Return type
 
-void (empty response body)
+**Array<string>**
 
 ### Authorization
 
@@ -290,7 +283,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

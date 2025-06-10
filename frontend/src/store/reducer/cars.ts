@@ -1,12 +1,12 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
 import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
-import { CarApi, type CarTO } from "../../api";
-import type { FilterValues } from "../../components/vehicle/VehicleFilterPanel.tsx";
+import { CarApi, type CarTO, type GeoSpatialQueryTO } from "../../api";
 import type { Position } from "../../util/location/useGeolocation.ts";
 
 interface State {
     value: CarTO[];
+    fuelTypes: string[];
     error?: ApiError;
 }
 
@@ -22,18 +22,29 @@ const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
     draft.value = action.payload;
 };
 
+const reduceSetFuelTypes = (
+    draft: Draft<State>,
+    action: PayloadAction<string[]>
+) => {
+    draft.error = undefined;
+    draft.fuelTypes = action.payload;
+};
+
 const slice = createSlice({
     name: "Cars",
     initialState: {
         value: [],
+        fuelTypes: [],
     } as State,
     reducers: {
         SET_CARS: reduceSetCars,
         SET_ERROR: reduceCarError,
+        SET_FUEL_TYPES: reduceSetFuelTypes,
     },
 });
 
 const addCars = slice.actions["SET_CARS"];
+const addFuelTypes = slice.actions["SET_FUEL_TYPES"];
 const carError = slice.actions["SET_ERROR"];
 
 const fetchAllCars = () => {
@@ -49,8 +60,21 @@ const fetchAllCars = () => {
     };
 };
 
+const fetchAllFuelTypes = () => {
+    return async (dispatch: RootDispatch): Promise<void> => {
+        const response = await apiExec(CarApi, (api) =>
+            api.apiCarGetFueltypesGet()
+        );
+        if (hasFailed(response)) {
+            dispatch(carError(response.error));
+        } else {
+            dispatch(addFuelTypes(response.data));
+        }
+    };
+};
+
 const fetchCarsByFilter = (
-    filters: FilterValues,
+    filters: GeoSpatialQueryTO,
     position: Position | null
 ) => {
     return async (dispatch: RootDispatch): Promise<void> => {
@@ -60,17 +84,14 @@ const fetchCarsByFilter = (
                     type: "Point",
                     coordinates: [position?.longitude, position?.latitude],
                 },
-                maxDistance: filters.distance || 10,
+                maxDistance: filters.maxDistance || 10,
                 minSeats: filters.minSeats,
                 maxSeats: filters.maxSeats,
-                minPricePerMinute: filters.minPrice,
-                maxPricePerMinute: filters.maxPrice,
-                allowedDrivetrains: filters.drivetrain
-                    ? [filters.drivetrain]
-                    : undefined,
+                minPricePerMinute: filters.minPricePerMinute,
+                maxPricePerMinute: filters.maxPricePerMinute,
+                allowedDrivetrains: filters.allowedDrivetrains,
             })
         );
-        console.log(response);
         if (hasFailed(response)) {
             dispatch(carError(response.error));
         } else {
@@ -85,4 +106,5 @@ export {
     carError,
     fetchAllCars,
     fetchCarsByFilter,
+    fetchAllFuelTypes,
 };

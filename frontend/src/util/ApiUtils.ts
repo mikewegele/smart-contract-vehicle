@@ -74,7 +74,6 @@ export const apiExecWithToken = async <API extends BaseAPI, T>(
 ): Promise<ApiResponse<T>> => {
     try {
         const token = localStorage.getItem("token");
-        console.log(token);
         const config = new Configuration({
             baseOptions: {
                 headers: {

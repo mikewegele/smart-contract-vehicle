@@ -208,7 +208,7 @@ namespace SmartContractVehicle.Controller
 
 
         [HttpGet]
-        public IActionResult GetDrivetrains(bool WithId)
+        public async Task<ActionResult<List<string>>> GetDrivetrains(bool WithId)
         {
             var drivetrains = _db.Drivetrains;
 
@@ -218,11 +218,11 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
-        public IActionResult GetFueltypes(bool WithId)
+        public async Task<ActionResult<List<string>>> GetFueltypes()
         {
             var fueltypes = _db.FuelTypes;
 
-            IQueryable res = (WithId) ? fueltypes.Select(d => new { d.Name, d.Id }) : fueltypes.Select(d => new { d.Name });
+            IQueryable res = fueltypes.Select(d => new { d.Name });
 
             return Ok(res);
         }
