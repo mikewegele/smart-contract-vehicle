@@ -60,7 +60,7 @@ const fetchCarsByFilter = (
                     type: "Point",
                     coordinates: position,
                 },
-                maxDistance: 10000,
+                maxDistance: filters.distance || 10,
                 minSeats: filters.minSeats,
                 maxSeats: filters.maxSeats,
                 minPricePerMinute: filters.minPrice,
