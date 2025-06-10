@@ -6,6 +6,8 @@ import type { Position } from "../../util/location/useGeolocation.ts";
 
 interface State {
     value: CarTO[];
+    maxSeats: number;
+    maxPricePerMinute: number;
     fuelTypes: string[];
     driveTrains: string[];
     error?: ApiError;
@@ -21,6 +23,18 @@ const reduceCarError = (
 const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
     draft.error = undefined;
     draft.value = action.payload;
+
+    const seatCounts = action.payload.map((car) => car.seats);
+    draft.maxSeats =
+        seatCounts.length > 0 ? Math.max(...seatCounts) : draft.maxSeats;
+
+    const pricePerMinuteCounts = action.payload.map(
+        (car) => car.pricePerMinute
+    );
+    draft.maxPricePerMinute =
+        pricePerMinuteCounts.length > 0
+            ? Math.max(...pricePerMinuteCounts)
+            : draft.maxPricePerMinute;
 };
 
 const reduceSetFuelTypes = (

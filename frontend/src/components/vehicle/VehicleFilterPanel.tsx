@@ -1,6 +1,6 @@
 import { Box, Slider, TextField, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
 import type { GeoSpatialQueryTO } from "../../api";
@@ -40,7 +40,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
     useEffect(() => {
         setFilters({
             ...filters,
-            maxDistance: 1000,
+            maxDistance: 3000,
             userLocation: {
                 coordinates: [position?.longitude, position?.latitude],
             },
@@ -48,18 +48,6 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
     }, [position]);
 
     const { cars } = useApiStates("cars");
-
-    const maxPossibleSeats = useMemo(() => {
-        if (!cars.value || cars.value.length === 0) return 10;
-        return Math.max(...cars.value.map((car) => car.seats || 0));
-    }, [cars.value]);
-
-    const maxPricePerMinutes = useMemo(() => {
-        if (!cars.value || cars.value.length === 0) return 5;
-        return Math.max(...cars.value.map((car) => car.pricePerMinute || 0));
-    }, [cars.value]);
-
-    console.log(cars.driveTrains);
 
     return (
         <Box className={classes.root}>
@@ -71,7 +59,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     className={classes.slider}
                     value={[
                         filters.minSeats ?? 1,
-                        filters.maxSeats ?? maxPossibleSeats,
+                        filters.maxSeats ?? cars.maxSeats,
                     ]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
@@ -85,7 +73,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     step={1}
                     marks
                     min={1}
-                    max={maxPossibleSeats}
+                    max={cars.maxSeats}
                 />
             </Box>
             <TextField
@@ -107,7 +95,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     className={classes.slider}
                     value={[
                         filters.minPricePerMinute ?? 0,
-                        filters.maxPricePerMinute ?? 1,
+                        filters.maxPricePerMinute ?? cars.maxPricePerMinute,
                     ]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
@@ -119,7 +107,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     }}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={maxPricePerMinutes}
+                    max={cars.maxPricePerMinute}
                     step={0.01}
                 />
             </Box>
