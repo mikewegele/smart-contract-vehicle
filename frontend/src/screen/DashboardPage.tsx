@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import SimpleMap from "../components/vehicle/VehicleMap.tsx";
@@ -11,30 +11,77 @@ import VehicleFilterPanel, {
 } from "../components/vehicle/VehicleFilterPanel.tsx";
 import { Box } from "@mui/material";
 import { useGeolocation } from "../util/location/useGeolocation.ts";
+import makeStyles from "../util/makeStyles.ts";
+
+const useStyles = makeStyles(() => ({
+    mainContainer: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: "32px",
+        marginTop: "16px",
+        alignItems: "flex-start",
+        padding: "2rem",
+    },
+    filterBox: {
+        width: "300px",
+        flexShrink: 0,
+    },
+    mapWrapper: {
+        flex: 1,
+        display: "flex",
+        justifyContent: "center",
+    },
+    mapBox: {
+        width: "100%",
+    },
+    rightBox: {
+        width: "300px",
+        flexShrink: 0,
+    },
+}));
 
 const DashboardPage: React.FC = () => {
+    const { classes } = useStyles();
     const dispatch = useAppDispatch();
+
+    const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
 
     useEffect(() => {
         dispatch(fetchAllCars());
     }, [dispatch]);
 
     const { position } = useGeolocation();
+    const { cars } = useApiStates("cars");
 
     const handleFilterApply = (filters: FilterValues) => {
         dispatch(fetchCarsByFilter(filters, position));
+        setAppliedFilters(true);
     };
-
-    const { cars } = useApiStates("cars");
 
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
-            <SimpleMap vehicles={cars.value} />
-            <Box width="300px">
-                <VehicleFilterPanel onApply={handleFilterApply} />
+
+            <Box className={classes.mainContainer}>
+                <Box className={classes.filterBox}>
+                    <VehicleFilterPanel onApply={handleFilterApply} />
+                </Box>
+
+                <Box className={classes.mapWrapper}>
+                    <Box className={classes.mapBox}>
+                        <SimpleMap vehicles={cars.value} />
+                    </Box>
+                </Box>
+
+                <Box className={classes.rightBox}></Box>
             </Box>
-            <VehicleList vehicles={cars.value} />
+
+            {appliedFilters && (
+                <Box mt={4}>
+                    <VehicleList vehicles={cars.value} />
+                </Box>
+            )}
         </Container>
     );
 };
