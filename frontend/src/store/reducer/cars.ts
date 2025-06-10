@@ -58,7 +58,7 @@ const fetchCarsByFilter = (
             api.apiCarGeoSpatialQueryPost({
                 userLocation: {
                     type: "Point",
-                    coordinates: position,
+                    coordinates: [position?.longitude, position?.latitude],
                 },
                 maxDistance: filters.distance || 10,
                 minSeats: filters.minSeats,

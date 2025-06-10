@@ -89,7 +89,7 @@ const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
                 />
             </Box>
             <TextField
-                label="Max Distance (km)"
+                label="Max Distance (m)"
                 type="number"
                 inputProps={{ min: 0 }}
                 value={filters.distance ?? ""}
