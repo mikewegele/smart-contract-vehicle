@@ -44,4 +44,73 @@ public class UserService
 
         return result;
     }
+    public async Task<UserTO?> GetUserByEmailAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return null;
+
+        return new UserTO
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            Name = user.Name,
+            IsAdmin = user.IsAdmin,
+            IsLessor = user.IsLessor,
+            IsRenter = user.IsRenter
+        };
+    }
+
+    public async Task<UserTO?> UpdateUserAsync(UserTO dto)
+    {
+        var user = await _userManager.FindByIdAsync(dto.Id);
+        if (user == null) return null;
+
+        user.Name = dto.Name;
+        user.UserName = dto.UserName;
+        user.Email = dto.Email;
+        user.IsAdmin = dto.IsAdmin;
+        user.IsRenter = dto.IsRenter;
+        user.IsLessor = dto.IsLessor;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded) return null;
+
+        return new UserTO
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            Name = user.Name,
+            IsAdmin = user.IsAdmin,
+            IsLessor = user.IsLessor,
+            IsRenter = user.IsRenter
+        };
+    }
+    public async Task<User?> AuthenticateUserAsync(string email, string password)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return null;
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+        if (!passwordValid) return null;
+
+        return user;
+    }
+
+    public async Task<User?> GetUserByIdAsync(string id)
+    {
+        return await _userManager.FindByIdAsync(id);
+    }
+
+    public async Task<IdentityResult> UpdateUserAsync(User user)
+    {
+        return await _userManager.UpdateAsync(user);
+    }
+
+    public async Task<IdentityResult> ChangeUserPasswordAsync(User user, string currentPassword, string newPassword)
+    {
+        return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+    }
 }

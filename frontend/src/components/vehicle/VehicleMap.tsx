@@ -29,7 +29,6 @@ const useStyles = makeStyles(() => ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "2rem",
         width: "100%",
     },
     mapWrapper: {

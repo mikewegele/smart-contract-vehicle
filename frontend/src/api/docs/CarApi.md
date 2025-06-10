@@ -4,7 +4,8 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**apiCarGeoSpatialQueryGet**](#apicargeospatialqueryget) | **GET** /api/Car/GeoSpatialQuery | |
+|[**apiCarGeoSpatialQueryPost**](#apicargeospatialquerypost) | **POST** /api/Car/GeoSpatialQuery | |
+|[**apiCarGetAllCarsGet**](#apicargetallcarsget) | **GET** /api/Car/GetAllCars | |
 |[**apiCarGetAutomotiveCompaniesGet**](#apicargetautomotivecompaniesget) | **GET** /api/Car/GetAutomotiveCompanies | |
 |[**apiCarGetDrivetrainsGet**](#apicargetdrivetrainsget) | **GET** /api/Car/GetDrivetrains | |
 |[**apiCarGetDummyDataGet**](#apicargetdummydataget) | **GET** /api/Car/GetDummyData | |
@@ -12,8 +13,8 @@ All URIs are relative to *http://localhost*
 |[**apiCarGetModelsGet**](#apicargetmodelsget) | **GET** /api/Car/GetModels | |
 |[**apiCarGetTrimsGet**](#apicargettrimsget) | **GET** /api/Car/GetTrims | |
 
-# **apiCarGeoSpatialQueryGet**
-> apiCarGeoSpatialQueryGet()
+# **apiCarGeoSpatialQueryPost**
+> Array<CarTO> apiCarGeoSpatialQueryPost()
 
 
 ### Example
@@ -30,7 +31,7 @@ const apiInstance = new CarApi(configuration);
 
 let geoSpatialQueryTO: GeoSpatialQueryTO; // (optional)
 
-const { status, data } = await apiInstance.apiCarGeoSpatialQueryGet(
+const { status, data } = await apiInstance.apiCarGeoSpatialQueryPost(
     geoSpatialQueryTO
 );
 ```
@@ -44,7 +45,7 @@ const { status, data } = await apiInstance.apiCarGeoSpatialQueryGet(
 
 ### Return type
 
-void (empty response body)
+**Array<CarTO>**
 
 ### Authorization
 
@@ -53,7 +54,50 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json, text/json, application/*+json
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **apiCarGetAllCarsGet**
+> Array<CarTO> apiCarGetAllCarsGet()
+
+
+### Example
+
+```typescript
+import {
+    CarApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new CarApi(configuration);
+
+const { status, data } = await apiInstance.apiCarGetAllCarsGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<CarTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

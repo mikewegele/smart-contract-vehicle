@@ -1,6 +1,8 @@
 import React from "react";
 import makeStyles from "../util/makeStyles.ts";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import DefaultButton from "./button/DefaultButton.tsx";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const useStyles = makeStyles(() => ({
     navLinks: {
@@ -16,47 +18,55 @@ const useStyles = makeStyles(() => ({
         fontWeight: 500,
         color: "#34495e",
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        "& span": {
-            cursor: "pointer",
-            position: "relative",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            transition: "background-color 0.3s ease, color 0.3s ease",
-            "&:hover": {
-                color: "#4c838b",
-                backgroundColor: "white",
-            },
-            "&::after": {
-                content: '""',
-                position: "absolute",
-                left: 0,
-                bottom: 0,
-                height: "2px",
-                width: 0,
-                backgroundColor: "#4c838b",
-                transition: "width 0.3s ease",
-            },
-            "&:hover::after": {
-                width: "100%",
-            },
-        },
+    },
+    button: {
+        color: "white",
+        backgroundColor: "#34495e",
     },
 }));
-
 
 interface Props {
     isLoggedIn: boolean;
 }
 
-const NavLinks: React.FC<Props> = ({isLoggedIn}) => {
-    const {classes} = useStyles();
+const NavLinks: React.FC<Props> = ({ isLoggedIn }) => {
+    const { classes } = useStyles();
     const navigate = useNavigate();
     return (
         <div className={classes.navLinks}>
-            <span onClick={() => navigate("/home")}>Home</span>
-            <span>About Us</span>
-            <span>Locations</span>
-            {isLoggedIn && <span onClick={() => navigate("/profile")}>Profile</span>}
+            <DefaultButton
+                className={classes.button}
+                onClick={() => navigate("/home")}
+            >
+                Home
+            </DefaultButton>
+            <DefaultButton className={classes.button}>About Us</DefaultButton>
+            <DefaultButton
+                className={classes.button}
+                onClick={() => navigate("/smart")}
+            >
+                Smart
+            </DefaultButton>
+            <DefaultButton className={classes.button}>Locations</DefaultButton>
+            {isLoggedIn && (
+                <DefaultButton
+                    className={classes.button}
+                    onClick={() => navigate("/profile")}
+                >
+                    Profile
+                </DefaultButton>
+            )}
+            {isLoggedIn && (
+                <DefaultButton
+                    endIcon={<LogoutIcon />}
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        navigate("/login");
+                    }}
+                >
+                    Logout
+                </DefaultButton>
+            )}
         </div>
     );
 };

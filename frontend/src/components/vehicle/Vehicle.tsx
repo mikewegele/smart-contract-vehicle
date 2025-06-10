@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
+import { useWeb3 } from "../../web3/Web3Provider.tsx";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -32,14 +33,38 @@ const Vehicle: React.FC<Props> = (props) => {
     const { image, model, pricePerMinute, seats, rangeKm } = props;
     const { classes } = useStyles();
 
+    const { account, web3, contract } = useWeb3();
+
     const [openDialog, setOpenDialog] = useState(false);
 
     const handleOpen = () => setOpenDialog(true);
     const handleClose = () => setOpenDialog(false);
-    const handleConfirm = () => {
-        setOpenDialog(false);
-        console.log(`Vehicle "${model}" has been reserved`);
-    };
+
+    const handleConfirm = useCallback(async () => {
+        try {
+            const carId = 1;
+            const numberOfDays = 2;
+            const pricePerDay = (pricePerMinute || 0) * 60 * 24;
+            const totalCostEther = 0.1; // oder: pricePerDay * numberOfDays in Ether
+            const totalCost = web3?.utils.toWei(
+                totalCostEther.toString(),
+                "ether"
+            );
+            if (!account || !contract) {
+                console.error("No account or contract loaded.");
+                return;
+            }
+            await contract.methods
+                .rentCar(carId, numberOfDays)
+                .send({ from: account, value: totalCost });
+
+            console.log("Car reserved!");
+        } catch (err) {
+            console.error("Error reserving car:", err);
+        } finally {
+            setOpenDialog(false);
+        }
+    }, [account, contract, pricePerMinute, web3]);
 
     return (
         <>

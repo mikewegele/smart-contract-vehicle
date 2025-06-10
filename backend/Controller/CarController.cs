@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
+using NetTopologySuite.Geometries;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
-using NetTopologySuite.Geometries;
-using Microsoft.OpenApi.Extensions;
-using AutoMapper;
 using SmartContractVehicle.Model;
-using Microsoft.EntityFrameworkCore;
+using SmartContractVehicle.Service;
 
 namespace SmartContractVehicle.Controller
 {
@@ -15,6 +16,23 @@ namespace SmartContractVehicle.Controller
     {
         private readonly AppDbContext _db = db;
         private readonly IMapper _mapper = mapper;
+
+        [HttpGet]
+        public ActionResult<IQueryable<CarTO>> GetAllCars()
+        {
+
+            var cars = _db.Cars
+                .Include(c => c.Trim)
+                .ThenInclude(t => t.Fuel)
+                .Include(c => c.Trim)
+                .ThenInclude(t => t.Drivetrain)
+                .Include(c => c.Trim)
+                .ThenInclude(t => t.Model)
+                .ThenInclude(m => m.Producer)
+                .Include(c => c.Owner)
+                .Select(c => _mapper.Map<CarTO>(c));
+            return Ok(cars);
+        }
 
         [HttpGet]
         public ActionResult<IQueryable<CarTO>> GetDummyData()
@@ -28,7 +46,7 @@ namespace SmartContractVehicle.Controller
                      DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
                      FueltypeName = FuelTypes.Electric.GetDisplayName(),
                      ModelName = "iX",
-                     TrimImagePath = "https://automag.de/app/uploads/2025/04/bmw-ix-xdrive40_47043.jpg",
+                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-ix.png",
                      TrimName = "M60",
                     CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
                     RemainingReach = 5555.5,
@@ -49,7 +67,7 @@ namespace SmartContractVehicle.Controller
                     Seats = 4,
                     TrimName = "I01",
                     RemainingReach = 250,
-                    TrimImagePath = "https://www.fett-wirtz.de//assets/components/phpthumbof/cache/i3-rendering.a175f4b33a701463542158cc33d89ecf.webp"
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-i3.png",
                 },
                 new() {
                     CarId = new Guid(),
@@ -63,9 +81,24 @@ namespace SmartContractVehicle.Controller
                     Seats = 4, 
                     PricePerMinute = .25,
                     RemainingReach = 230,
-                    TrimImagePath = "https://cdn.sanity.io/images/767s1cf5/production/81923a4526c2622bfd3463f7942c022472c868fc-1000x714.png?rect=0,94,1000,525&w=1200&h=630&fm=png",
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/fiat-500e-limousine.png",
                     TrimName = "La Prima 87 kW (118PS)"
-                }
+                },
+                new() {
+                    CarId = new Guid(),
+                    CompanyLogoPath = "",
+                    CompanyName = "Alexander Dennis",
+                    DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
+                    Colour = "Yellow",
+                    CurrentPosition = new Point(new Coordinate(13.396952, 52.421153)),
+                    FueltypeName = FuelTypes.Diesel.GetDisplayName(),
+                    ModelName = "ADL Enviro500",
+                    Seats = 80,
+                    PricePerMinute = 2.0,
+                    RemainingReach = 600,
+                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/alexander-dennis-enviro500.png",
+                    TrimName = "Alexander Dennis Enviro500"
+                },
             ];
             
             return Ok(cars);
@@ -96,19 +129,23 @@ namespace SmartContractVehicle.Controller
         */
 
         [HttpPost]
-        public async Task<IActionResult> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
+        public async Task<ActionResult<List<CarTO>>> GeoSpatialQueryAsync(GeoSpatialQueryTO query, CancellationToken token)
         {
-            if(!ModelState.IsValid)
-            {  return BadRequest(ModelState); }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var allowedGreaterCircleArea = GeometryService.CreateCircleFromPoint(query.UserLocation, query.MaxDistance);
+
+            // Use DB spatial filtering in degrees (approximate filtering)
             var cars = _db.Cars
                 .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
-                .Where(c => c.CurrentPosition.IsWithinDistance(query.UserLocation, query.MaxDistance));
+                .Where(c => allowedGreaterCircleArea.Covers(c.CurrentPosition));
+            // Rough conversion from meters to degrees
 
             if (query.AllowedManufactures is not null && query.AllowedManufactures.Length > 0)
             {
                 var allowedManufactures = query.AllowedManufactures.Select(m => m.Normalize()).Distinct();
-                cars = cars.Where(c =>  allowedManufactures.Any(ap => EF.Functions.ILike(c.Trim.Model.Producer.Name, ap)));
+                cars = cars.Where(c => allowedManufactures.Any(ap => EF.Functions.ILike(c.Trim.Model.Producer.Name, ap)));
             }
 
             if (query.AllowedModels is not null && query.AllowedModels.Length > 0)
@@ -126,28 +163,28 @@ namespace SmartContractVehicle.Controller
             if (query.AllowedFueltypes is not null && query.AllowedFueltypes.Length > 0)
             {
                 var AllowedFueltypes = query.AllowedFueltypes.Select(f => f.GetEnumFromDisplayName<FuelTypes>()).Aggregate((f1, f2) => f1 | f2);
-                cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id) );
+                cars = cars.Where(c => AllowedFueltypes.HasFlag((FuelTypes)c.Trim.Fuel.Id));
             }
 
             if (query.AllowedDrivetrains is not null && query.AllowedDrivetrains.Length > 0)
-            { 
+            {
                 var AllowedDrivetrains = query.AllowedDrivetrains.Select(f => f.GetEnumFromDisplayName<Drivetrains>());
                 cars = cars.Where(c => AllowedDrivetrains.Contains((Drivetrains)c.Trim.Drivetrain.Id));
             }
 
             if (query.MinRemainingReach is not null)
             {
-                cars = cars.Where(c => c.RemainingReach >=  query.MinRemainingReach);
+                cars = cars.Where(c => c.RemainingReach >= query.MinRemainingReach);
             }
 
             if (query.MinSeats is not null)
             {
-                cars = cars.Where(c => c.SeatNumbers >=  query.MinSeats);
+                cars = cars.Where(c => c.SeatNumbers >= query.MinSeats);
             }
 
             if (query.MaxSeats is not null)
             {
-                cars = cars.Where(c => c.SeatNumbers <=  query.MaxSeats);
+                cars = cars.Where(c => c.SeatNumbers <= query.MaxSeats);
             }
 
             if (query.MinPricePerMinute is not null)
@@ -160,10 +197,14 @@ namespace SmartContractVehicle.Controller
                 cars = cars.Where(c => c.PricePerMinute <= query.MaxPricePerMinute);
             }
 
-            var data = (await cars.ToArrayAsync(cancellationToken: token)).Select(c => _mapper.Map<CarTO>(c));
-            var count = data.Count();
-            return Ok(new { count, data });
+            var result = await cars.ToArrayAsync(token);
+
+            var data = result.Select(c => _mapper.Map<CarTO>(c)).ToList();
+
+
+            return Ok(data);
         }
+
 
 
         [HttpGet]

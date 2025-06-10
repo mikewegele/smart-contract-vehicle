@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Container from "../components/container/Container.tsx";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
-import { Box, Typography } from "@mui/material";
-import DefaultButton from "../components/button/DefaultButton.tsx";
+import { Alert, Box, Typography } from "@mui/material";
 import NavLinks from "../components/NavLinks.tsx";
 import makeStyles from "../util/makeStyles.ts";
+import { UserApi, type UserProfileUpdateTO } from "../api";
+import { useAppDispatch } from "../store/Store.ts";
+import { fetchUser } from "../store/reducer/user.ts";
+import useApiStates from "../util/useApiStates.ts";
+import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
+import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     textField: {
@@ -13,28 +18,71 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-const START_PROFILE = {
-    username: "Eyal",
-    email: "Eyal@gmail.com",
-    password: "123456",
-    address: "Street 123, Berlin",
-    walletId: "0xABCDEF1234567890",
-    userId: "user_001",
-};
-
 const ProfilePage: React.FC = () => {
     const { classes } = useStyles();
+    const dispatch = useAppDispatch();
+    const [error, setError] = useState<string | null>(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
-    const [profile, setProfile] = useState(START_PROFILE);
+    const { user } = useApiStates("user");
 
-    const handleChange = (field: string, value: string) => {
+    const [profile, setProfile] = useState<UserProfileUpdateTO>({
+        id: null,
+        name: null,
+        email: null,
+        currentPassword: null,
+        newPassword: null,
+        confirmNewPassword: null,
+    });
+
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (user.value) {
+            setProfile({
+                id: user.value.id ?? null,
+                name: user.value.name ?? null,
+                email: user.value.email ?? null,
+                currentPassword: null,
+                newPassword: null,
+                confirmNewPassword: null,
+            });
+        }
+    }, [user]);
+
+    const handleChange = (field: keyof UserProfileUpdateTO, value: string) => {
         setProfile((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSave = () => {
-        console.log("Saving profile:", profile);
-        //send profile to backend API
-    };
+    const handleSave = useCallback(async () => {
+        if (!profile) return;
+        if (
+            profile.newPassword &&
+            profile.newPassword !== profile.confirmNewPassword
+        ) {
+            setError("New password and confirmation do not match.");
+            return;
+        }
+        setError(null);
+        setSaveSuccess(false);
+        const response = await apiExecWithToken(UserApi, (api) =>
+            api.apiUserUpdateProfilePatch(profile)
+        );
+        if (!hasFailed(response)) {
+            setSaveSuccess(true);
+            dispatch(fetchUser());
+            setProfile((prev) => ({
+                ...prev,
+                currentPassword: null,
+                newPassword: null,
+                confirmNewPassword: null,
+            }));
+        } else {
+            setError(response.error.message);
+        }
+    }, [profile, dispatch]);
 
     return (
         <Container>
@@ -42,48 +90,64 @@ const ProfilePage: React.FC = () => {
                 Profile Settings
             </Typography>
 
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
+            {saveSuccess && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    Profile updated successfully!
+                </Alert>
+            )}
+
             <DefaultTextField
                 className={classes.textField}
-                label={"Username"}
-                type={"name"}
-                value={profile.username}
-                onChange={(e) => handleChange("username", e.target.value)}
+                label="Name"
+                type="text"
+                value={profile.name ?? ""}
+                onChange={(e) => handleChange("name", e.target.value)}
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label={"E-mail"}
+                label="E-mail"
                 type="email"
-                value={profile.email}
+                value={profile.email ?? ""}
                 onChange={(e) => handleChange("email", e.target.value)}
             />
 
+            <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+                Change Password
+            </Typography>
+
             <DefaultTextField
                 className={classes.textField}
-                label={"Password"}
+                label="Current Password"
                 type="password"
-                value={profile.password}
-                onChange={(e) => handleChange("password", e.target.value)}
+                value={profile.currentPassword ?? ""}
+                onChange={(e) =>
+                    handleChange("currentPassword", e.target.value)
+                }
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label="Address"
-                value={profile.address}
-                onChange={(e) => handleChange("address", e.target.value)}
+                label="New Password"
+                type="password"
+                value={profile.newPassword ?? ""}
+                onChange={(e) => handleChange("newPassword", e.target.value)}
             />
 
             <DefaultTextField
                 className={classes.textField}
-                label="Wallet ID"
-                value={profile.walletId}
-                disabled
-            />
-            <DefaultTextField
-                className={classes.textField}
-                label="User ID"
-                value={profile.userId}
-                disabled
+                label="Confirm New Password"
+                type="password"
+                value={profile.confirmNewPassword ?? ""}
+                onChange={(e) =>
+                    handleChange("confirmNewPassword", e.target.value)
+                }
             />
 
             <Box mt={3}>

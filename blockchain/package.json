@@ -1,0 +1,23 @@
+{
+  "name": "blockchain",
+  "version": "1.0.0",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "ganache": "ganache --port 7545",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --reset",
+    "copy-contracts": "cp -r ./build/contracts ../frontend/src",
+    "deploy-and-copy": "npm run compile && npm run migrate && npm run copy-contracts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "chai": "^5.2.0",
+    "ethereum-waffle": "^4.0.10",
+    "ethers": "^5.8.0",
+    "hardhat": "^2.24.2"
+  }
+}

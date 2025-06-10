@@ -67,3 +67,54 @@ export const apiExec = async <API extends BaseAPI, T>(
         }
     }
 };
+
+export const apiExecWithToken = async <API extends BaseAPI, T>(
+    API: new (config: Configuration) => API,
+    execute: (api: API) => Promise<AxiosResponse<T>>
+): Promise<ApiResponse<T>> => {
+    try {
+        const token = localStorage.getItem("token");
+        console.log(token);
+        const config = new Configuration({
+            baseOptions: {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                },
+            },
+        });
+        const response = await execute(new API(config));
+
+        if (Math.floor(response.status / 100) === 2) {
+            return {
+                data: response.data,
+                error: undefined,
+            };
+        } else {
+            return {
+                error: {
+                    message: response.statusText,
+                    code: response.status,
+                },
+                data: undefined,
+            };
+        }
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return {
+                error: {
+                    message: error.message,
+                    code: 0,
+                },
+                data: undefined,
+            };
+        } else {
+            return {
+                error: {
+                    message: "Unknown error occurred",
+                    code: 0,
+                },
+                data: undefined,
+            };
+        }
+    }
+};
