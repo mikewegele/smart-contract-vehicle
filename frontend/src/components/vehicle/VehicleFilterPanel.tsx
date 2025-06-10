@@ -57,7 +57,7 @@ const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
     }, [cars.value]);
 
     const maxPricePerMinutes = useMemo(() => {
-        if (!cars.value || cars.value.length === 0) return 10;
+        if (!cars.value || cars.value.length === 0) return 5;
         return Math.max(...cars.value.map((car) => car.pricePerMinute || 0));
     }, [cars.value]);
 
