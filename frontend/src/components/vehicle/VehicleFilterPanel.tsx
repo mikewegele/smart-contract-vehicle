@@ -1,19 +1,11 @@
-import {
-    Box,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Slider,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, Slider, TextField, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles";
 import React, { useEffect, useMemo, useState } from "react";
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
 import type { GeoSpatialQueryTO } from "../../api";
 import type { Position } from "../../util/location/useGeolocation.ts";
+import MultipleDropdown from "../select/MultipleDropdown.tsx";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -67,7 +59,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
         return Math.max(...cars.value.map((car) => car.pricePerMinute || 0));
     }, [cars.value]);
 
-    console.log(cars.fuelTypes);
+    console.log(cars.driveTrains);
 
     return (
         <Box className={classes.root}>
@@ -132,28 +124,14 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                 />
             </Box>
 
-            <FormControl fullWidth>
-                <InputLabel>Drivetrain</InputLabel>
-                <Select
-                    multiple
-                    value={filters.allowedDrivetrains ?? []}
-                    onChange={(e) =>
-                        setFilters({
-                            ...filters,
-                            allowedDrivetrains: e.target.value as string[],
-                        })
-                    }
-                    renderValue={(selected) =>
-                        (selected as string[]).join(", ")
-                    }
-                >
-                    {cars.fuelTypes.map((driver) => (
-                        <MenuItem key={driver} value={driver}>
-                            {driver}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <MultipleDropdown
+                label="Drivetrain"
+                options={cars.driveTrains}
+                value={filters.allowedDrivetrains ?? []}
+                onChange={(newValue) =>
+                    setFilters({ ...filters, allowedDrivetrains: newValue })
+                }
+            />
 
             <DefaultButton
                 variant="contained"

@@ -2384,7 +2384,7 @@ export const CarApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetDrivetrainsGet(withId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetDrivetrainsGet']?.[localVarOperationServerIndex]?.url;
@@ -2480,7 +2480,7 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
             return localVarFp.apiCarGetDrivetrainsGet(withId, options).then((request) => request(axios, basePath));
         },
         /**

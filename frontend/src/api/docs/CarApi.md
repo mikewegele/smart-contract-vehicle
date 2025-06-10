@@ -158,7 +158,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiCarGetDrivetrainsGet**
-> apiCarGetDrivetrainsGet()
+> Array<string> apiCarGetDrivetrainsGet()
 
 
 ### Example
@@ -188,7 +188,7 @@ const { status, data } = await apiInstance.apiCarGetDrivetrainsGet(
 
 ### Return type
 
-void (empty response body)
+**Array<string>**
 
 ### Authorization
 
@@ -197,7 +197,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

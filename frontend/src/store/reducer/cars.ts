@@ -7,6 +7,7 @@ import type { Position } from "../../util/location/useGeolocation.ts";
 interface State {
     value: CarTO[];
     fuelTypes: string[];
+    driveTrains: string[];
     error?: ApiError;
 }
 
@@ -30,21 +31,32 @@ const reduceSetFuelTypes = (
     draft.fuelTypes = action.payload;
 };
 
+const reduceSetDriveTrains = (
+    draft: Draft<State>,
+    action: PayloadAction<string[]>
+) => {
+    draft.error = undefined;
+    draft.driveTrains = action.payload;
+};
+
 const slice = createSlice({
     name: "Cars",
     initialState: {
         value: [],
         fuelTypes: [],
+        driveTrains: [],
     } as State,
     reducers: {
         SET_CARS: reduceSetCars,
         SET_ERROR: reduceCarError,
         SET_FUEL_TYPES: reduceSetFuelTypes,
+        ADD_DRIVE_TRAINS: reduceSetDriveTrains,
     },
 });
 
 const addCars = slice.actions["SET_CARS"];
 const addFuelTypes = slice.actions["SET_FUEL_TYPES"];
+const addAllDriveTrains = slice.actions["ADD_DRIVE_TRAINS"];
 const carError = slice.actions["SET_ERROR"];
 
 const fetchAllCars = () => {
@@ -69,6 +81,19 @@ const fetchAllFuelTypes = () => {
             dispatch(carError(response.error));
         } else {
             dispatch(addFuelTypes(response.data));
+        }
+    };
+};
+
+const fetchAllDriveTrains = () => {
+    return async (dispatch: RootDispatch): Promise<void> => {
+        const response = await apiExec(CarApi, (api) =>
+            api.apiCarGetDrivetrainsGet()
+        );
+        if (hasFailed(response)) {
+            dispatch(carError(response.error));
+        } else {
+            dispatch(addAllDriveTrains(response.data));
         }
     };
 };
@@ -107,4 +132,5 @@ export {
     fetchAllCars,
     fetchCarsByFilter,
     fetchAllFuelTypes,
+    fetchAllDriveTrains,
 };

@@ -6,6 +6,7 @@ import VehicleList from "../components/vehicle/VehicleList.tsx";
 import useApiStates from "../util/useApiStates.ts";
 import {
     fetchAllCars,
+    fetchAllDriveTrains,
     fetchAllFuelTypes,
     fetchCarsByFilter,
 } from "../store/reducer/cars.ts";
@@ -53,6 +54,7 @@ const DashboardPage: React.FC = () => {
     useEffect(() => {
         dispatch(fetchAllCars());
         dispatch(fetchAllFuelTypes());
+        dispatch(fetchAllDriveTrains());
     }, [dispatch]);
 
     const { position } = useGeolocation();
