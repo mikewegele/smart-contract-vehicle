@@ -22,14 +22,7 @@ const VehicleList: React.FC<Props> = (props) => {
     return (
         <div className={classes.container}>
             {vehicles.map((car) => (
-                <Vehicle
-                    key={car.carId}
-                    image={car.trimImagePath}
-                    seats={car.seats}
-                    model={car.modelName}
-                    pricePerMinute={car.pricePerMinute}
-                    rangeKm={car.remainingReach}
-                />
+                <Vehicle key={car.carId} vehicle={car} />
             ))}
         </div>
     );
