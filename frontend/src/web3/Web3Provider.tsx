@@ -10,7 +10,7 @@ import Web3 from "web3";
 import CarRentalContract from "../contracts/CarRental.json";
 import type { CarRental } from "../../types/CarRental";
 
-interface IWeb3Context {
+export interface IWeb3Context {
     web3: Web3 | null;
     account: string | null;
     contract: CarRental | null;
