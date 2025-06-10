@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
-import { useWeb3 } from "../../web3/Web3Provider.tsx";
 import type { CarTO } from "../../api";
+import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -31,13 +31,12 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
     vehicle: CarTO;
+    web3Context: IWeb3Context;
 }
 
 const Vehicle: React.FC<Props> = (props) => {
-    const { vehicle } = props;
+    const { vehicle, web3Context } = props;
     const { classes } = useStyles();
-
-    const { account, web3, contract } = useWeb3();
 
     const [openDialog, setOpenDialog] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -55,21 +54,21 @@ const Vehicle: React.FC<Props> = (props) => {
             const numberOfDays = 2;
             // const pricePerDay = (vehicle.pricePerMinute || 0) * 60 * 24;
             const totalCostEther = 0.1; // oder: pricePerDay * numberOfDays in Ether
-            const totalCost = web3?.utils.toWei(
+            const totalCost = web3Context.web3?.utils.toWei(
                 totalCostEther.toString(),
                 "ether"
             );
 
-            if (!account || !contract) {
+            if (!web3Context.account || !web3Context.contract) {
                 setFeedbackMsg("No account or contract loaded.");
                 setFeedbackSeverity("error");
                 setFeedbackOpen(true);
                 return;
             }
 
-            await contract.methods
+            await web3Context.contract.methods
                 .rentCar(carId, numberOfDays)
-                .send({ from: account, value: totalCost });
+                .send({ from: web3Context.account, value: totalCost });
 
             setFeedbackMsg("Car successfully reserved!");
             setFeedbackSeverity("success");
@@ -81,7 +80,7 @@ const Vehicle: React.FC<Props> = (props) => {
             setFeedbackOpen(true);
             setOpenDialog(false);
         }
-    }, [account, contract, vehicle.pricePerMinute, web3]);
+    }, [web3Context.account, web3Context.contract, web3Context.web3?.utils]);
 
     return (
         <>
