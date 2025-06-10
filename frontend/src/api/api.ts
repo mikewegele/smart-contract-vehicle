@@ -2228,11 +2228,10 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
         },
         /**
          * 
-         * @param {boolean} [withId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGetFueltypesGet: async (withId?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCarGetFueltypesGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/Car/GetFueltypes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2244,10 +2243,6 @@ export const CarApiAxiosParamCreator = function (configuration?: Configuration) 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-            if (withId !== undefined) {
-                localVarQueryParameter['WithId'] = withId;
-            }
 
 
     
@@ -2389,7 +2384,7 @@ export const CarApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetDrivetrainsGet(withId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetDrivetrainsGet']?.[localVarOperationServerIndex]?.url;
@@ -2408,12 +2403,11 @@ export const CarApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {boolean} [withId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetFueltypesGet(withId, options);
+        async apiCarGetFueltypesGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiCarGetFueltypesGet(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CarApi.apiCarGetFueltypesGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2486,7 +2480,7 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiCarGetDrivetrainsGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
             return localVarFp.apiCarGetDrivetrainsGet(withId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2499,12 +2493,11 @@ export const CarApiFactory = function (configuration?: Configuration, basePath?:
         },
         /**
          * 
-         * @param {boolean} [withId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.apiCarGetFueltypesGet(withId, options).then((request) => request(axios, basePath));
+        apiCarGetFueltypesGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
+            return localVarFp.apiCarGetFueltypesGet(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2591,13 +2584,12 @@ export class CarApi extends BaseAPI {
 
     /**
      * 
-     * @param {boolean} [withId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CarApi
      */
-    public apiCarGetFueltypesGet(withId?: boolean, options?: RawAxiosRequestConfig) {
-        return CarApiFp(this.configuration).apiCarGetFueltypesGet(withId, options).then((request) => request(this.axios, this.basePath));
+    public apiCarGetFueltypesGet(options?: RawAxiosRequestConfig) {
+        return CarApiFp(this.configuration).apiCarGetFueltypesGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

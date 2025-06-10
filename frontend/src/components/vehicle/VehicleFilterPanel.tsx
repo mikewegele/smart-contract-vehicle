@@ -1,17 +1,11 @@
-import {
-    Box,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    Slider,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Box, Slider, TextField, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
+import type { GeoSpatialQueryTO } from "../../api";
+import type { Position } from "../../util/location/useGeolocation.ts";
+import MultipleDropdown from "../select/MultipleDropdown.tsx";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -32,34 +26,28 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export interface FilterValues {
-    minSeats?: number;
-    maxSeats?: number;
-    minPrice?: number;
-    maxPrice?: number;
-    distance?: number;
-    drivetrain?: string;
-}
-
 interface Props {
-    onApply: (filters: FilterValues) => void;
+    onApply: (filters: GeoSpatialQueryTO) => void;
+    position: Position | null;
 }
 
-const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
+const VehicleFilterPanel: React.FC<Props> = (props) => {
+    const { onApply, position } = props;
+
     const { classes } = useStyles();
-    const [filters, setFilters] = useState<FilterValues>({});
+    const [filters, setFilters] = useState<GeoSpatialQueryTO>({});
+
+    useEffect(() => {
+        setFilters({
+            ...filters,
+            maxDistance: 3000,
+            userLocation: {
+                coordinates: [position?.longitude, position?.latitude],
+            },
+        });
+    }, [position]);
 
     const { cars } = useApiStates("cars");
-
-    const maxPossibleSeats = useMemo(() => {
-        if (!cars.value || cars.value.length === 0) return 10;
-        return Math.max(...cars.value.map((car) => car.seats || 0));
-    }, [cars.value]);
-
-    const maxPricePerMinutes = useMemo(() => {
-        if (!cars.value || cars.value.length === 0) return 10;
-        return Math.max(...cars.value.map((car) => car.pricePerMinute || 0));
-    }, [cars.value]);
 
     return (
         <Box className={classes.root}>
@@ -71,7 +59,7 @@ const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
                     className={classes.slider}
                     value={[
                         filters.minSeats ?? 1,
-                        filters.maxSeats ?? maxPossibleSeats,
+                        filters.maxSeats ?? cars.maxSeats,
                     ]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
@@ -85,18 +73,18 @@ const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
                     step={1}
                     marks
                     min={1}
-                    max={maxPossibleSeats}
+                    max={cars.maxSeats}
                 />
             </Box>
             <TextField
-                label="Max Distance (km)"
+                label="Max Distance (m)"
                 type="number"
                 inputProps={{ min: 0 }}
-                value={filters.distance ?? ""}
+                value={filters.maxDistance ?? ""}
                 onChange={(e) => {
                     const value = Number(e.target.value);
                     if (value >= 0 || e.target.value === "") {
-                        setFilters({ ...filters, distance: value });
+                        setFilters({ ...filters, maxDistance: value });
                     }
                 }}
             />
@@ -105,45 +93,33 @@ const VehicleFilterPanel: React.FC<Props> = ({ onApply }) => {
                 <Typography gutterBottom>Price per Minute (€)</Typography>
                 <Slider
                     className={classes.slider}
-                    value={[filters.minPrice ?? 0, filters.maxPrice ?? 1]}
+                    value={[
+                        filters.minPricePerMinute ?? 0,
+                        filters.maxPricePerMinute ?? cars.maxPricePerMinute,
+                    ]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
                         setFilters({
                             ...filters,
-                            minPrice: min,
-                            maxPrice: max,
+                            minPricePerMinute: min,
+                            maxPricePerMinute: max,
                         });
                     }}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={maxPricePerMinutes}
+                    max={cars.maxPricePerMinute}
                     step={0.01}
                 />
             </Box>
 
-            <FormControl fullWidth>
-                <InputLabel>Drivetrain</InputLabel>
-                <Select
-                    value={filters.drivetrain ?? ""}
-                    onChange={(e) =>
-                        setFilters({ ...filters, drivetrain: e.target.value })
-                    }
-                >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="Front-Wheel Drive (FWD)">
-                        Front-Wheel Drive (FWD)
-                    </MenuItem>
-                    <MenuItem value="Rear-Wheel Drive (RWD)">
-                        Rear-Wheel Drive (RWD)
-                    </MenuItem>
-                    <MenuItem value="All-Wheel Drive (AWD)">
-                        All-Wheel Drive (AWD)
-                    </MenuItem>
-                    <MenuItem value="Four-Wheel Drive (4WD)">
-                        Four-Wheel Drive (4WD)
-                    </MenuItem>
-                </Select>
-            </FormControl>
+            <MultipleDropdown
+                label="Drivetrain"
+                options={cars.driveTrains}
+                value={filters.allowedDrivetrains ?? []}
+                onChange={(newValue) =>
+                    setFilters({ ...filters, allowedDrivetrains: newValue })
+                }
+            />
 
             <DefaultButton
                 variant="contained"

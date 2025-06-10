@@ -18,7 +18,10 @@ const useStyles = makeStyles(() => ({
         fontWeight: 500,
         color: "#34495e",
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+        backdropFilter: "blur(5px)",
+        zIndex: 1000,
     },
+
     button: {
         color: "white",
         backgroundColor: "#34495e",

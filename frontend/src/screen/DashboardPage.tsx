@@ -4,14 +4,18 @@ import NavLinks from "../components/NavLinks.tsx";
 import SimpleMap from "../components/vehicle/VehicleMap.tsx";
 import VehicleList from "../components/vehicle/VehicleList.tsx";
 import useApiStates from "../util/useApiStates.ts";
-import { fetchAllCars, fetchCarsByFilter } from "../store/reducer/cars.ts";
+import {
+    fetchAllCars,
+    fetchAllDriveTrains,
+    fetchAllFuelTypes,
+    fetchCarsByFilter,
+} from "../store/reducer/cars.ts";
 import { useAppDispatch } from "../store/Store.ts";
-import VehicleFilterPanel, {
-    type FilterValues,
-} from "../components/vehicle/VehicleFilterPanel.tsx";
 import { Box } from "@mui/material";
 import { useGeolocation } from "../util/location/useGeolocation.ts";
 import makeStyles from "../util/makeStyles.ts";
+import VehicleFilterPanel from "../components/vehicle/VehicleFilterPanel.tsx";
+import type { GeoSpatialQueryTO } from "../api";
 
 const useStyles = makeStyles(() => ({
     mainContainer: {
@@ -49,12 +53,14 @@ const DashboardPage: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchAllCars());
+        dispatch(fetchAllFuelTypes());
+        dispatch(fetchAllDriveTrains());
     }, [dispatch]);
 
     const { position } = useGeolocation();
     const { cars } = useApiStates("cars");
 
-    const handleFilterApply = (filters: FilterValues) => {
+    const handleFilterApply = (filters: GeoSpatialQueryTO) => {
         dispatch(fetchCarsByFilter(filters, position));
         setAppliedFilters(true);
     };
@@ -65,7 +71,10 @@ const DashboardPage: React.FC = () => {
 
             <Box className={classes.mainContainer}>
                 <Box className={classes.filterBox}>
-                    <VehicleFilterPanel onApply={handleFilterApply} />
+                    <VehicleFilterPanel
+                        onApply={handleFilterApply}
+                        position={position}
+                    />
                 </Box>
 
                 <Box className={classes.mapWrapper}>
