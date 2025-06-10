@@ -3,6 +3,7 @@ import React, {
     type ReactNode,
     useContext,
     useEffect,
+    useRef,
     useState,
 } from "react";
 import Web3 from "web3";
@@ -24,7 +25,12 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
     const [account, setAccount] = useState<string | null>(null);
     const [contract, setContract] = useState<CarRental | null>(null);
 
+    const hasInitialized = useRef(false);
+
     useEffect(() => {
+        if (hasInitialized.current) return;
+        hasInitialized.current = true;
+
         async function init() {
             if (!(window as any).ethereum) {
                 // alert("Please install MetaMask!");
@@ -41,6 +47,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                 setWeb3(web3Instance);
 
                 const networkId = await web3Instance.eth.net.getId();
+                console.log("networkId", networkId);
                 const deployedNetwork = CarRentalContract.networks[networkId];
                 if (!deployedNetwork) {
                     // alert("Smart contract not deployed on the current network");
@@ -51,8 +58,8 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                     deployedNetwork.address
                 ) as unknown as CarRental;
                 setContract(contractInstance);
-            } catch {
-                // alert("Failed to connect to MetaMask");
+            } catch (error) {
+                console.error("MetaMask connection failed:", error);
             }
         }
 
