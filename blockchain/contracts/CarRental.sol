@@ -2,11 +2,6 @@
 pragma solidity ^0.8.19;
 
 contract SimpleCarRental {
-    address public owner;
-
-    constructor() {
-        owner = msg.sender;
-    }
 
     struct Car {
         uint256 id;
@@ -51,7 +46,4 @@ contract SimpleCarRental {
         return cars[carId];
     }
 
-    function withdraw() public {
-        payable(owner).transfer(address(this).balance);
-    }
 }

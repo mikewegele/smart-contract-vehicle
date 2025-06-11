@@ -47,7 +47,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
                 setWeb3(web3Instance);
 
                 const networkId = await web3Instance.eth.net.getId();
-                console.log("networkId", networkId);
                 const deployedNetwork = CarRentalContract.networks[networkId];
                 if (!deployedNetwork) {
                     // alert("Smart contract not deployed on the current network");
