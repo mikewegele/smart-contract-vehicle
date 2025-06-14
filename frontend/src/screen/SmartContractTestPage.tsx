@@ -43,7 +43,7 @@ const SmartContractTestPage: React.FC = () => {
         try {
             await contract?.methods
                 .addCar("Tesla Model 3", 1)
-                .send({ from: account });
+                .call({ from: account });
         } catch (error) {
             console.error("Error adding car:", error);
         }
