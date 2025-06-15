@@ -1,18 +1,42 @@
-﻿using var client = new HttpClient();
+﻿/*
+Remaining distance/Fuel Level
+Current Position
+Current Speed 
+CarStatus
+(Telemetry Data)*/
 
-try
+using Microsoft.AspNetCore.SignalR.Client;
+
+HubConnection connection;
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:53353/ChatHub")
+                .WithAutomaticReconnect()
+                .Build();
+
+            connection.Closed += async (error) =>
+            {
+                await Task.Delay(new Random().Next(0,5) * 1000);
+                await connection.StartAsync();
+            };
+        }
+
 {
-    var url = "https://contoso.com/";
-    Console.WriteLine($"Sende GET-Anfrage an {url} ...");
+                await connection.StartAsync();
+                messagesList.Items.Add("Connection started");
+                connectButton.IsEnabled = false;
+                sendButton.IsEnabled = true;
+            }
 
-    var response = await client.GetAsync(url);
-    response.EnsureSuccessStatusCode();
-
-    var content = await response.Content.ReadAsStringAsync();
-    Console.WriteLine("Antwort erhalten:");
-    Console.WriteLine(content[..Math.Min(500, content.Length)] + "...");
-}
-catch (HttpRequestException e)
+connection.Reconnecting += error =>
 {
-    Console.WriteLine($"Fehler bei der Anfrage: {e.Message}");
-}
+    Debug.Assert(connection.State == HubConnectionState.Reconnecting);
+
+    // Notify users the connection was lost and the client is reconnecting.
+    // Start queuing or dropping messages.
+
+    return Task.CompletedTask;
+};
