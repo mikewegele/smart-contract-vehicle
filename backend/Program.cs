@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SmartContractVehicle;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
@@ -55,6 +56,10 @@ builder.Services.AddControllers()
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// SignalR
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<ICarStateService, InMemoryCarStateService>();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -136,5 +141,6 @@ using (var scope = app.Services.CreateScope())
 
 }
 
+app.MapHub<CarInformationHub>("/CarInformationHub");
 
 app.Run();
