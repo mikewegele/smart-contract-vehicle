@@ -167,6 +167,16 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
+        public ActionResult<CarStatus> GetStatus(Guid carId)
+        {
+            var car = _db.Cars.Find(carId);
+            if(car == null)
+                return NotFound("Car not found");
+
+            return Ok(car.Status);
+        }
+
+        [HttpGet]
         public IActionResult GetAutomotiveCompanies(bool WithId)
         {
             var companies = _db.AutomotiveCompanies;
