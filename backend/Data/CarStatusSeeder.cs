@@ -1,34 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Attributes;
+using SmartContractVehicle.Model;
 
 namespace SmartContractVehicle.Data;
-public enum Drivetrains
+public enum CarStatuses
 {
-    [Display("Front-Wheel Drive (FWD)")]
-    FrontWheelDrive = 1,
+    [Display("Available")]
+    Available = 1,
 
-    [Display("Rear-Wheel Drive (RWD)")]
-    RearWheelDrive = 2,
+    [Display("Reserved")]
+    Reserved = 2,
 
-    [Display("All-Wheel Drive (AWD)")]
-    AllWheelDrive = 3,
+    [Display("In-Transit")]
+    InTransit = 3,
 
-    [Display("Four-Wheel Drive (4WD)")]
-    FourWheelDrive = 4
+    [Display("Pending")]
+    Pending = 4
 }
 
-public static class DrivetrainSeeder
+public static class CarStatusSeeder
 {
     public static void Seed(ModelBuilder modelBuilder)
     {
-        var drivetrains = Enum.GetValues<Data.Drivetrains>()
-            .Select(d => new Model.Drivetrain
+        var carstatus = Enum.GetValues<CarStatuses>()
+            .Select(d => new Model.CarStatus
             {
                 Id = (int)d,
                 Name = GetDisplayName(d)
             });
 
-        modelBuilder.Entity<Model.Drivetrain>().HasData(drivetrains);
+        modelBuilder.Entity<CarStatus>().HasData(carstatus);
     }
 
     private static string GetDisplayName(Enum value)

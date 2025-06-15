@@ -28,6 +28,10 @@ namespace SmartContractVehicle.Model
 
         public required double PricePerMinute { get; set; }
 
+        public virtual CarStatus Status { get; set; } = new() { Id = (int)Data.CarStatuses.Available, Name = "" };
+
+
+
     }
 }
 
