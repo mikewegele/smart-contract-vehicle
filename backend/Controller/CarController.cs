@@ -190,12 +190,12 @@ namespace SmartContractVehicle.Controller
         public IActionResult GetModels(string? ManufactureName, bool WithId)
         {
             IQueryable<VehicleModel> vehiclemodels = _db.VehicleModels;
-            
+
             if (!string.IsNullOrEmpty(ManufactureName) && !string.IsNullOrWhiteSpace(ManufactureName))
             {
                 vehiclemodels = vehiclemodels.Where(vm => EF.Functions.ILike(vm.Producer.Name.Trim(), ManufactureName.Trim()));
             }
-                
+
 
             IQueryable res = (WithId) ? vehiclemodels.Select(d => new { d.Name, d.Id }) : vehiclemodels.Select(d => new { d.Name });
 
@@ -212,12 +212,32 @@ namespace SmartContractVehicle.Controller
             {
                 vehicletrims = vehicletrims.Where(vt => EF.Functions.ILike(vt.Model.Name.Trim(), ModelName.Trim()));
             }
-                
+
 
             IQueryable res = (WithId) ?  vehicletrims.Select(d =>  new { d.Name, d.Id })  : vehicletrims.Select(d => new { d.Name });
 
             return Ok(res);
         }
 
+        [HttpGet]
+
+        public IActionResult ReserveCar(Guid carId)
+        
+        {
+            var car = _db.Cars.Find(carId);
+            if(car == null)
+                return NotFound("Car not found");
+            if (car.Status.Id == (int)Data.CarStatuses.Available)
+            //todo Reservierungs Objekt erzeugen
+            {
+                car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
+                _db.Cars.Update(car);
+                _db.SaveChanges();
+                return Ok();
+            }
+
+            else { return Conflict("Car is not available"); }
+            
+        }
     }
 }
