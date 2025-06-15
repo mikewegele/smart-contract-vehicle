@@ -26,6 +26,8 @@ public class CarApiMapper : Profile
             .ForMember(dest => dest.RemainingReach, opt => opt.MapFrom(src => src.RemainingReach))
             .ForMember(dest => dest.Colour, opt => opt.MapFrom(src => src.Colour))
             .ForMember(dest => dest.Seats, opt => opt.MapFrom(src => src.SeatNumbers))
-            .ForMember(dest => dest.PricePerMinute, opt => opt.MapFrom(src => src.PricePerMinute));
+            .ForMember(dest => dest.PricePerMinute, opt => opt.MapFrom(src => src.PricePerMinute))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+            
     }
 }

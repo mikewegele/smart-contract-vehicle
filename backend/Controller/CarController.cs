@@ -157,6 +157,16 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
+        public ActionResult<IQueryable<(int, string)>> GetCarStatus()
+        {
+            var carstatuses = _db.CarStatuses;
+
+            IQueryable res =  carstatuses.Select(d => new { d.Id, d.Name });
+
+            return Ok(res);
+        }
+
+        [HttpGet]
         public IActionResult GetAutomotiveCompanies(bool WithId)
         {
             var companies = _db.AutomotiveCompanies;
