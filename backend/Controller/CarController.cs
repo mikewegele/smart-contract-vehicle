@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
-using NetTopologySuite.Geometries;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
+using System.Threading.Tasks;
 
 namespace SmartContractVehicle.Controller
 {
@@ -21,89 +21,10 @@ namespace SmartContractVehicle.Controller
         public ActionResult<IQueryable<CarTO>> GetAllCars()
         {
 
-            var cars = _db.Cars
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Fuel)
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Drivetrain)
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Model)
-                .ThenInclude(m => m.Producer)
-                .Include(c => c.Owner)
-                .Select(c => _mapper.Map<CarTO>(c));
+            var cars = _db.Cars.Select(c => _mapper.Map<CarTO>(c));
+
             return Ok(cars);
         }
-
-        [HttpGet]
-        public ActionResult<IQueryable<CarTO>> GetDummyData()
-        {
-
-            IList<CarTO> cars = [
-                new() {
-                     CarId = new Guid(),
-                     CompanyLogoPath = "",
-                     CompanyName = "BMW",
-                     DrivetrainName = Drivetrains.AllWheelDrive.GetDisplayName(),
-                     FueltypeName = FuelTypes.Electric.GetDisplayName(),
-                     ModelName = "iX",
-                     TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-ix.png",
-                     TrimName = "M60",
-                    CurrentPosition = new Point(new Coordinate(11.576124, 48.137154)),
-                    RemainingReach = 5555.5,
-                    Colour = "black",
-                    Seats = 5,
-                    PricePerMinute = 1,
-                },
-                new() {
-                    CarId = new Guid(),
-                    CompanyLogoPath = "",
-                    CompanyName = "BMW",
-                    DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
-                    Colour = "Blue",
-                    CurrentPosition = new Point(new Coordinate(13.39, 52.515)),
-                    FueltypeName = FuelTypes.Electric.GetDisplayName(),
-                    ModelName = "i3",
-                    PricePerMinute = .35,
-                    Seats = 4,
-                    TrimName = "I01",
-                    RemainingReach = 250,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/bmw-i3.png",
-                },
-                new() {
-                    CarId = new Guid(),
-                    CompanyLogoPath = "",
-                    CompanyName = "Fiat",
-                    DrivetrainName = Drivetrains.FrontWheelDrive.GetDisplayName(),
-                    Colour = "White",
-                    CurrentPosition = new Point(new Coordinate (13.405, 52.52)),
-                    FueltypeName = FuelTypes.Electric.GetDisplayName(),
-                    ModelName = "500e Limousine",
-                    Seats = 4, 
-                    PricePerMinute = .25,
-                    RemainingReach = 230,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/fiat-500e-limousine.png",
-                    TrimName = "La Prima 87 kW (118PS)"
-                },
-                new() {
-                    CarId = new Guid(),
-                    CompanyLogoPath = "",
-                    CompanyName = "Alexander Dennis",
-                    DrivetrainName = Drivetrains.RearWheelDrive.GetDisplayName(),
-                    Colour = "Yellow",
-                    CurrentPosition = new Point(new Coordinate(13.396952, 52.421153)),
-                    FueltypeName = FuelTypes.Diesel.GetDisplayName(),
-                    ModelName = "ADL Enviro500",
-                    Seats = 80,
-                    PricePerMinute = 2.0,
-                    RemainingReach = 600,
-                    TrimImagePath = "https://mikewegele.github.io/smart-contract-vehicle/images/alexander-dennis-enviro500.png",
-                    TrimName = "Alexander Dennis Enviro500"
-                },
-            ];
-            
-            return Ok(cars);
-        }
-
 
         /** 
          * JSON Call Beispiel:
@@ -140,7 +61,6 @@ namespace SmartContractVehicle.Controller
             var cars = _db.Cars
                 .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
                 .Where(c => allowedGreaterCircleArea.Covers(c.CurrentPosition));
-            // Rough conversion from meters to degrees
 
             if (query.AllowedManufactures is not null && query.AllowedManufactures.Length > 0)
             {
@@ -208,16 +128,15 @@ namespace SmartContractVehicle.Controller
 
 
         [HttpGet]
-        public async Task<ActionResult<List<string>>> GetDrivetrains(bool WithId)
+        public ActionResult<IQueryable<DrivetrainTO>> GetDrivetrains()
         {
-            var result = await _db.Drivetrains
-                .Select(d => d.Name)
-                .ToListAsync();
-            return Ok(result);
+            var drivetrains = _db.Drivetrains;
+            IQueryable res = drivetrains.Select(d => _mapper.Map<DrivetrainTO>(d));
+            return Ok(res);
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<string>>> GetFueltypes()
+        public ActionResult<IQueryable<FuelTypeTO>> GetFueltypes()
         {
             var result = await _db.FuelTypes
                             .Select(d => d.Name)
@@ -226,34 +145,50 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
-        public IActionResult GetAutomotiveCompanies(bool WithId)
+        public ActionResult<IQueryable<CarStatusTO>> GetCarStatuses()
         {
-            var companies = _db.AutomotiveCompanies;
+            var carstatuses = _db.CarStatuses.Select(cs => _mapper.Map<CarStatusTO>(cs));
+            return Ok(carstatuses);
+        }
 
-            IQueryable res = (WithId) ? companies.Select(d => new { d.Name, d.Id }) : companies.Select(d => new { d.Name });
+        [HttpGet]
+        public ActionResult<CarStatusTO> GetStatus(Guid carId)
+        {
+            var car = _db.Cars.Find(carId);
+            if(car == null)
+                return NotFound("Car not found.");
+
+            return Ok(_mapper.Map<CarStatusTO>(car.Status));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AutomotiveCompanyTO>>> GetAutomotiveCompanies(CancellationToken ct)
+        {
+            var companies = await _db.AutomotiveCompanies.ToArrayAsync(ct);
+
+            IEnumerable<AutomotiveCompanyTO> res = companies.Select(_mapper.Map<AutomotiveCompanyTO>);
 
             return Ok(res);
         }
 
         [HttpGet]
-        public IActionResult GetModels(string? ManufactureName, bool WithId)
+        public async Task<ActionResult<IEnumerable<VehicleModelTO>>> GetModels(string? ManufactureName, CancellationToken ct)
         {
             IQueryable<VehicleModel> vehiclemodels = _db.VehicleModels;
-            
+
             if (!string.IsNullOrEmpty(ManufactureName) && !string.IsNullOrWhiteSpace(ManufactureName))
             {
                 vehiclemodels = vehiclemodels.Where(vm => EF.Functions.ILike(vm.Producer.Name.Trim(), ManufactureName.Trim()));
             }
-                
 
-            IQueryable res = (WithId) ? vehiclemodels.Select(d => new { d.Name, d.Id }) : vehiclemodels.Select(d => new { d.Name });
+            IEnumerable<VehicleModelTO> res = (await vehiclemodels.ToArrayAsync(ct)).Select(_mapper.Map<VehicleModelTO>);
 
             return Ok(res);
 
         }
 
         [HttpGet]
-        public IActionResult GetTrims(string? ModelName, bool WithId)
+        public async Task<IActionResult> GetTrims(string? ModelName, CancellationToken ct)
         {
             IQueryable<VehicleTrim> vehicletrims = _db.VehicleTrims;
 
@@ -261,12 +196,32 @@ namespace SmartContractVehicle.Controller
             {
                 vehicletrims = vehicletrims.Where(vt => EF.Functions.ILike(vt.Model.Name.Trim(), ModelName.Trim()));
             }
-                
 
-            IQueryable res = (WithId) ?  vehicletrims.Select(d =>  new { d.Name, d.Id })  : vehicletrims.Select(d => new { d.Name });
+
+            IEnumerable<VehicleTrimTO> res = (await vehicletrims.ToArrayAsync(ct)).Select(_mapper.Map<VehicleTrimTO>);
 
             return Ok(res);
         }
 
+        [HttpGet]
+
+        public ActionResult<CarTO> ReserveCar(Guid carId)
+
+        {
+            var car = _db.Cars.Find(carId);
+            if(car == null)
+                return NotFound("Car not found");
+            if (car.Status.Id == (int)Data.CarStatuses.Available)
+            //todo Reservierungs Objekt erzeugen
+            {
+                car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
+                _db.Cars.Update(car);
+                _db.SaveChanges();
+                return Ok(_mapper.Map<CarTO>(car));
+            }
+
+            else { return Conflict("Car is not available"); }
+
+        }
     }
 }

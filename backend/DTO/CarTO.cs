@@ -28,5 +28,6 @@ namespace SmartContractVehicle.DTO
         public required string Colour { get; set; }
         public required int Seats { get; set; }
         public required double PricePerMinute { get; set; }
+        public required int Status { get; set; }
     }
 }

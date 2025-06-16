@@ -16,13 +16,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 
     public DbSet<Model.Drivetrain> Drivetrains { get; set; }
 
+    public DbSet<Model.CarStatus> CarStatuses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         FuelTypeSeeder.Seed(modelBuilder);
         DrivetrainSeeder.Seed(modelBuilder);
+        CarStatusSeeder.Seed(modelBuilder);
     }
-
 
 }

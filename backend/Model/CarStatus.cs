@@ -1,6 +1,6 @@
-﻿namespace SmartContractVehicle.Model
+namespace SmartContractVehicle.Model
 {
-    public class Drivetrain
+    public class CarStatus
     {
         public int Id { get; set; }
         public required string Name { get; set; }

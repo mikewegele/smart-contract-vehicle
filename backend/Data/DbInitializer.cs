@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NetTopologySuite.Geometries;
 using SmartContractVehicle.Model;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SmartContractVehicle.Data
 {
@@ -29,7 +25,7 @@ namespace SmartContractVehicle.Data
             }
         }
 
-        public static (List<AutomotiveCompany> Companies, List<Car> Cars) SeedCars(User user, FuelType[] fuels, Drivetrain[] drivetrains)
+        public static (List<AutomotiveCompany> Companies, List<Car> Cars) SeedCars(User user, FuelType[] fuels, Drivetrain[] drivetrains, CarStatus available) 
         {
             var random = new Random();
             var geometryFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
@@ -105,7 +101,8 @@ namespace SmartContractVehicle.Data
                                 RemainingReach = Math.Round(random.NextDouble() * 400 + 100, 2),
                                 Colour = new[] { "Red", "Blue", "Black", "White", "Grey", "Orange", "Yellow", "Pearl", "Green" }[random.Next(9)],
                                 SeatNumbers = 4 + random.Next(3),
-                                PricePerMinute = Math.Round(random.NextDouble() * 0.5 + 0.1, 2)
+                                PricePerMinute = Math.Round(random.NextDouble() * 0.5 + 0.1, 2),
+                                Status = available
                             };
                             trim.Cars.Add(car);
                             cars.Add(car);
