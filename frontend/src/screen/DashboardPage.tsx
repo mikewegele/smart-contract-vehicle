@@ -15,9 +15,7 @@ import { Box } from "@mui/material";
 import { useGeolocation } from "../util/location/useGeolocation.ts";
 import makeStyles from "../util/makeStyles.ts";
 import VehicleFilterPanel from "../components/vehicle/VehicleFilterPanel.tsx";
-import { CarApi, type GeoSpatialQueryTO } from "../api";
-import { useWeb3 } from "../web3/Web3Provider.tsx";
-import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { type GeoSpatialQueryTO } from "../api";
 
 const useStyles = makeStyles(() => ({
     mainContainer: {
@@ -51,8 +49,6 @@ const DashboardPage: React.FC = () => {
     const { classes } = useStyles();
     const dispatch = useAppDispatch();
 
-    const { contract, account } = useWeb3();
-
     const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
 
     useEffect(() => {
@@ -60,32 +56,6 @@ const DashboardPage: React.FC = () => {
         dispatch(fetchAllFuelTypes());
         dispatch(fetchAllDriveTrains());
     }, [dispatch]);
-
-    useEffect(() => {
-        const initContractIfNeeded = async () => {
-            if (!contract || !account) return;
-
-            const alreadyInitialized = await contract.methods
-                .initialized()
-                .call();
-            if (alreadyInitialized) return;
-            const response = await apiExec(CarApi, (api) =>
-                api.apiCarGetAllCarsGet()
-            );
-            if (hasFailed(response)) return;
-            const carsFromBackend = response.data.slice(0, 100); // falls mehr als 100
-
-            const ids = carsFromBackend.map((car) => car.id);
-            const models = carsFromBackend.map((car) => car.model);
-            const prices = carsFromBackend.map((car) => car.pricePerDay);
-
-            await contract.methods
-                .initializeDefaultCars(ids, models, prices)
-                .send({ from: account });
-        };
-
-        initContractIfNeeded();
-    }, [contract, account]);
 
     const { position } = useGeolocation();
     const { cars } = useApiStates("cars");

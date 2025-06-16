@@ -12,9 +12,6 @@ import {
 } from "@mui/material";
 import DefaultButton from "../../button/DefaultButton.tsx";
 import type { CarTO } from "../../../api";
-import makeStyles from "../../../util/makeStyles.ts";
-
-const useStyles = makeStyles(() => ({}));
 
 interface Props {
     open: boolean;

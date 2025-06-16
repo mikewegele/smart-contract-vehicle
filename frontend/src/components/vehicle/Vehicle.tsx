@@ -11,6 +11,7 @@ import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
 import type { CarTO } from "../../api";
 import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
+import useApiStates from "../../util/useApiStates.ts";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -45,30 +46,36 @@ const Vehicle: React.FC<Props> = (props) => {
         "success" | "error"
     >("success");
 
+    const { user } = useApiStates("user");
+
     const handleOpen = () => setOpenDialog(true);
     const handleClose = () => setOpenDialog(false);
 
     const handleConfirm = useCallback(async () => {
         try {
-            const carId = 1;
-            const numberOfDays = 2;
-            // const pricePerDay = (vehicle.pricePerMinute || 0) * 60 * 24;
-            const totalCostEther = 0.1; // oder: pricePerDay * numberOfDays in Ether
-            const totalCost = web3Context.web3?.utils.toWei(
-                totalCostEther.toString(),
-                "ether"
-            );
-
-            if (!web3Context.account || !web3Context.contract) {
+            if (
+                !web3Context.web3 ||
+                !web3Context.account ||
+                !web3Context.contract ||
+                !user.value.id ||
+                !vehicle.pricePerMinute
+            ) {
                 setFeedbackMsg("No account or contract loaded.");
                 setFeedbackSeverity("error");
                 setFeedbackOpen(true);
                 return;
             }
 
-            await web3Context.contract.methods
-                .rentCar(carId, numberOfDays)
-                .send({ from: web3Context.account, value: totalCost });
+            const receipt = await web3Context.contract.methods
+                .rentCar(vehicle.carId, user.value.id)
+                .send({
+                    from: web3Context.account,
+                    value: web3Context.web3?.utils.toWei("0.01", "ether"),
+                });
+
+            const event = receipt.events.CarRented.returnValues;
+
+            console.log(event);
 
             setFeedbackMsg("Car successfully reserved!");
             setFeedbackSeverity("success");

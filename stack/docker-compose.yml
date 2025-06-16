@@ -14,19 +14,5 @@ services:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
 
-  ganache:
-    image: trufflesuite/ganache-cli:latest
-    container_name: ganache_local
-    ports:
-      - "7545:7545"
-    command:
-      [
-        "--port", "7545",
-        "--networkId", "5777",
-        "--accounts", "10",
-        "--defaultBalanceEther", "100"
-      ]
-    restart: unless-stopped
-
 volumes:
   pgdata:

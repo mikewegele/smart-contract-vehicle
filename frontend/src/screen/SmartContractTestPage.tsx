@@ -3,7 +3,6 @@ import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { Typography } from "@mui/material";
-import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const SmartContractTestPage: React.FC = () => {
     const { web3, account, contract } = useWeb3();
@@ -35,30 +34,10 @@ const SmartContractTestPage: React.FC = () => {
         fetchMessage();
     }, [web3, account, contract]);
 
-    const handleAddTestCar = async () => {
-        if (!web3 || !account) {
-            console.error("web3 is not initialized");
-            return;
-        }
-        try {
-            await contract?.methods
-                .addCar("Tesla Model 3", 1)
-                .call({ from: account });
-        } catch (error) {
-            console.error("Error adding car:", error);
-        }
-    };
-
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
             <Typography>{message}</Typography>
-            <DefaultButton
-                style={{ marginTop: "1rem" }}
-                onClick={handleAddTestCar}
-            >
-                Add Test Car
-            </DefaultButton>
         </Container>
     );
 };

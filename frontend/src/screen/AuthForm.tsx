@@ -6,7 +6,6 @@ import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { AuthApi } from "../api";
-import { jwtDecode } from "jwt-decode"; // <-- added
 
 interface LoginResponse {
     token: string;
@@ -148,18 +147,7 @@ const AuthForm: React.FC = () => {
                 const response = await apiExec(AuthApi, (api) =>
                     api.apiAuthLoginLoginPost(email, password)
                 );
-
                 if (!hasFailed(response)) {
-                    const data = response.data as unknown as LoginResponse;
-
-                    // Save token and user
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
-
-                    // Decode token (optional)
-                    const decoded = jwtDecode<DecodedToken>(data.token);
-                    console.log("Decoded JWT:", decoded);
-
                     navigate("/home");
                 } else {
                     setError("Failed to log in");

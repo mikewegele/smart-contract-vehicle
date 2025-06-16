@@ -21,73 +21,20 @@ export class CarRental extends Contract {
   );
   clone(): CarRental;
   methods: {
-    cars(
-      arg0: number | string
-    ): TransactionObject<{
-      id: string;
-      model: string;
-      pricePerDay: string;
-      isAvailable: boolean;
-      renter: string;
-      0: string;
-      1: string;
-      2: string;
-      3: boolean;
-      4: string;
-    }>;
-
-    nextCarId(): TransactionObject<string>;
-
-    owner(): TransactionObject<string>;
+    rentCar(carId: string, userId: string): TransactionObject<void>;
 
     helloWorld(): TransactionObject<string>;
-
-    addCar(
-      model: string,
-      pricePerDay: number | string
-    ): TransactionObject<void>;
-
-    rentCar(
-      carId: number | string,
-      numberOfDays: number | string
-    ): TransactionObject<void>;
-
-    returnCar(carId: number | string): TransactionObject<void>;
-
-    getCar(
-      carId: number | string
-    ): TransactionObject<{
-      id: string;
-      model: string;
-      pricePerDay: string;
-      isAvailable: boolean;
-      renter: string;
-    }>;
-
-    withdraw(): TransactionObject<void>;
   };
   events: {
-    CarAdded: ContractEvent<{
-      carId: string;
-      model: string;
-      pricePerDay: string;
-      0: string;
-      1: string;
-      2: string;
-    }>;
     CarRented: ContractEvent<{
       carId: string;
       renter: string;
-      daysRented: string;
+      userId: string;
+      timestamp: string;
       0: string;
       1: string;
       2: string;
-    }>;
-    CarReturned: ContractEvent<{
-      carId: string;
-      renter: string;
-      0: string;
-      1: string;
+      3: string;
     }>;
     allEvents: (
       options?: EventOptions,
