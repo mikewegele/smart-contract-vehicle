@@ -56,7 +56,7 @@ namespace SmartContractVehicle.Controller
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, user.Email),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Jti, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Name, user.Name)
             };
 
