@@ -2,6 +2,8 @@
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 
+namespace SmartContractVehicle.Mapper
+{
 public class CarApiMapper : Profile
 {
     public CarApiMapper()
@@ -29,5 +31,15 @@ public class CarApiMapper : Profile
             .ForMember(dest => dest.PricePerMinute, opt => opt.MapFrom(src => src.PricePerMinute))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
             
+            CreateMap<FuelType, FuelTypeTO>();
+            CreateMap<FuelTypeTO, FuelType>();
+
+            CreateMap<Drivetrain, DrivetrainTO>();
+            CreateMap<DrivetrainTO, Drivetrain>();
+
+            CreateMap<CarStatus, CarStatusTO>();
+            CreateMap<CarStatusTO, CarStatus>();
+
+        }
     }
 }

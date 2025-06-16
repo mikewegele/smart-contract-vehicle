@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
-using NetTopologySuite.Geometries;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
@@ -137,43 +136,40 @@ namespace SmartContractVehicle.Controller
 
 
         [HttpGet]
-        public IActionResult GetDrivetrains(bool WithId)
+        public ActionResult<IQueryable<DrivetrainTO>> GetDrivetrains()
         {
             var drivetrains = _db.Drivetrains;
 
-            IQueryable res = (WithId) ? drivetrains.Select(d => new { d.Name, d.Id }) : drivetrains.Select(d => new { d.Name });
+            IQueryable res = drivetrains.Select(d => _mapper.Map<DrivetrainTO>(d));
 
             return Ok(res);
         }
 
         [HttpGet]
-        public IActionResult GetFueltypes(bool WithId)
+        public ActionResult<IQueryable<FuelTypeTO>> GetFueltypes()
         {
             var fueltypes = _db.FuelTypes;
 
-            IQueryable res = (WithId) ? fueltypes.Select(d => new { d.Name, d.Id }) : fueltypes.Select(d => new { d.Name });
+            IQueryable res = fueltypes.Select(d => _mapper.Map<FuelTypeTO>(d));
 
             return Ok(res);
         }
 
         [HttpGet]
-        public ActionResult<IQueryable<(int, string)>> GetCarStatuses()
+        public ActionResult<IQueryable<CarStatusTO>> GetCarStatuses()
         {
-            var carstatuses = _db.CarStatuses;
-
-            IQueryable res =  carstatuses.Select(d => new { d.Id, d.Name });
-
-            return Ok(res);
+            var carstatuses = _db.CarStatuses.Select(cs => _mapper.Map<CarStatusTO>(cs));
+            return Ok(carstatuses);
         }
 
         [HttpGet]
-        public ActionResult<CarStatus> GetStatus(Guid carId)
+        public ActionResult<CarStatusTO> GetStatus(Guid carId)
         {
             var car = _db.Cars.Find(carId);
             if(car == null)
-                return NotFound("Car not found");
+                return NotFound("Car not found.");
 
-            return Ok(car.Status);
+            return Ok(_mapper.Map<CarStatusTO>(car.Status));
         }
 
         [HttpGet]
@@ -221,7 +217,7 @@ namespace SmartContractVehicle.Controller
 
         [HttpGet]
 
-        public IActionResult ReserveCar(Guid carId)
+        public ActionResult<CarTO> ReserveCar(Guid carId)
         
         {
             var car = _db.Cars.Find(carId);
@@ -233,7 +229,7 @@ namespace SmartContractVehicle.Controller
                 car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
                 _db.Cars.Update(car);
                 _db.SaveChanges();
-                return Ok();
+                return Ok(_mapper.Map<CarTO>(car));
             }
 
             else { return Conflict("Car is not available"); }

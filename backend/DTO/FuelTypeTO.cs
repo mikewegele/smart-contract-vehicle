@@ -1,9 +1,8 @@
-namespace SmartContractVehicle.Model
+﻿namespace SmartContractVehicle.DTO
 {
-    public class CarStatus
+    public class FuelTypeTO
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-
     }
 }
