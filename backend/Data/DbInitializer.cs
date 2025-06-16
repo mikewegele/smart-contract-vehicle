@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NetTopologySuite.Geometries;
 using SmartContractVehicle.Model;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SmartContractVehicle.Data
 {
