@@ -201,7 +201,7 @@ namespace SmartContractVehicle.Controller
             }
 
 
-            IEnumerable<VehicleTrimTO> res = (await vehicletrims.ToArrayAsync()).Select(_mapper.Map<VehicleTrimTO>);
+            IEnumerable<VehicleTrimTO> res = (await vehicletrims.ToArrayAsync(ct)).Select(_mapper.Map<VehicleTrimTO>);
 
             return Ok(res);
         }
