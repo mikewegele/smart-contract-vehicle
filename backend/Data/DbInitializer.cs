@@ -102,7 +102,6 @@ namespace SmartContractVehicle.Data
                                 Colour = new[] { "Red", "Blue", "Black", "White", "Grey", "Orange", "Yellow", "Pearl", "Green" }[random.Next(9)],
                                 SeatNumbers = 4 + random.Next(3),
                                 PricePerMinute = Math.Round(random.NextDouble() * 0.5 + 0.1, 2),
-                                Status = available
                             };
                             trim.Cars.Add(car);
                             cars.Add(car);

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using SmartContractVehicle.Data;
 
 namespace SmartContractVehicle.Model
 {
@@ -28,10 +29,26 @@ namespace SmartContractVehicle.Model
 
         public required double PricePerMinute { get; set; }
 
-        public virtual CarStatus Status { get; set; } = new() { Id = (int)Data.CarStatuses.Available, Name = "" };
+        public virtual CarStatus Status { get; private set; } = new() { Id = (int)CarStatuses.Available, Name = "" };
 
+        public DateTime? LastStatusChange { get; private set; }
 
-
+        public void SetStatus(CarStatus? status)
+        {
+            ArgumentNullException.ThrowIfNull(status);
+            
+            LastStatusChange = (status.Id != (int)CarStatuses.Available) ? DateTime.UtcNow : null; 
+            // WIP
+            Status = status;
+            switch ((CarStatuses)status.Id)
+            {
+                case CarStatuses.Available:
+                case CarStatuses.Reserved:
+                case CarStatuses.InTransit:
+                case CarStatuses.Pending:
+                    return;
+            }
+        }
     }
 }
 

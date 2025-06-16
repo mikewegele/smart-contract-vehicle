@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
@@ -6,7 +8,7 @@ using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace SmartContractVehicle.Controller
 {
@@ -125,8 +127,6 @@ namespace SmartContractVehicle.Controller
             return Ok(data);
         }
 
-
-
         [HttpGet]
         public ActionResult<IQueryable<DrivetrainTO>> GetDrivetrains()
         {
@@ -206,25 +206,50 @@ namespace SmartContractVehicle.Controller
             return Ok(res);
         }
 
-        [HttpGet]
-
-        public ActionResult<CarTO> ReserveCar(Guid carId)
-        
+        [Authorize, HttpPost]
+        public async Task<ActionResult<CarTO>> BlockCar(Guid carId, CancellationToken ct)
         {
             var car = _db.Cars.Find(carId);
-            if(car == null)
-                return NotFound("Car not found");
-            if (car.Status.Id == (int)Data.CarStatuses.Available)
-            //todo Reservierungs Objekt erzeugen
-            {
-                car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
-                _db.Cars.Update(car);
-                _db.SaveChanges();
-                return Ok(_mapper.Map<CarTO>(car));
-            }
 
-            else { return Conflict("Car is not available"); }
+            if (car is null) return NotFound("No car with this ID was found.");
+
+            if (car.Status.Id != (int)CarStatuses.Available)
+                return Conflict("This car is already in use.");
+
+            car.SetStatus(_db.CarStatuses.Find((int)CarStatuses.Pending));
+            _db.Cars.Update(car);
+            await _db.SaveChangesAsync(ct);
+            return Ok(_mapper.Map<CarTO>(car));
+        }
+
+        [Authorize, HttpGet]
+        public async Task <ActionResult<Reservation>> ReserveCar(Guid carId, string transactionId, CancellationToken ct)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(transactionId);
+            ArgumentException.ThrowIfNullOrEmpty(transactionId);
+
+            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
+
+            var user = _db.Users.Find(userId);
+            if (user is null) return NotFound("The user was not found.");
+
+            var car = _db.Cars.Find(carId);
+            if(car == null) return NotFound("Car not found.");
+
+            if (car.Status.Id != (int)CarStatuses.Available)
+                return Conflict("Car is not available.");
+
+
+            var reservation = new Reservation(car.Id, user.Id, car.PricePerMinute);
+            await _db.Reservations.AddAsync(reservation, ct);
             
+            car.SetStatus(_db.CarStatuses.Find((int)CarStatuses.Reserved));
+            _db.Cars.Update(car);
+            await _db.SaveChangesAsync(ct);
+
+
+            return Ok(reservation);
+
         }
     }
 }
