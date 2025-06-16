@@ -6,6 +6,7 @@ using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
+using System.Threading.Tasks;
 
 namespace SmartContractVehicle.Controller
 {
@@ -20,16 +21,8 @@ namespace SmartContractVehicle.Controller
         public ActionResult<IQueryable<CarTO>> GetAllCars()
         {
 
-            var cars = _db.Cars
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Fuel)
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Drivetrain)
-                .Include(c => c.Trim)
-                .ThenInclude(t => t.Model)
-                .ThenInclude(m => m.Producer)
-                .Include(c => c.Owner)
-                .Select(c => _mapper.Map<CarTO>(c));
+            var cars = _db.Cars.Select(c => _mapper.Map<CarTO>(c));
+
             return Ok(cars);
         }
 
@@ -68,8 +61,7 @@ namespace SmartContractVehicle.Controller
             var cars = _db.Cars
                 .OrderBy(c => c.CurrentPosition.Distance(query.UserLocation))
                 .Where(c => allowedGreaterCircleArea.Covers(c.CurrentPosition));
-            // Rough conversion from meters to degrees
-
+            
             if (query.AllowedManufactures is not null && query.AllowedManufactures.Length > 0)
             {
                 var allowedManufactures = query.AllowedManufactures.Select(m => m.Normalize()).Distinct();
@@ -173,17 +165,17 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
-        public IActionResult GetAutomotiveCompanies(bool WithId)
+        public async Task<ActionResult<IEnumerable<AutomotiveCompanyTO>>> GetAutomotiveCompanies(CancellationToken ct)
         {
-            var companies = _db.AutomotiveCompanies;
+            var companies = await _db.AutomotiveCompanies.ToArrayAsync(ct);
 
-            IQueryable res = (WithId) ? companies.Select(d => new { d.Name, d.Id }) : companies.Select(d => new { d.Name });
+            IEnumerable<AutomotiveCompanyTO> res = companies.Select(_mapper.Map<AutomotiveCompanyTO>);
 
             return Ok(res);
         }
 
         [HttpGet]
-        public IActionResult GetModels(string? ManufactureName, bool WithId)
+        public async Task<ActionResult<IEnumerable<VehicleModelTO>>> GetModels(string? ManufactureName, CancellationToken ct)
         {
             IQueryable<VehicleModel> vehiclemodels = _db.VehicleModels;
 
@@ -192,15 +184,14 @@ namespace SmartContractVehicle.Controller
                 vehiclemodels = vehiclemodels.Where(vm => EF.Functions.ILike(vm.Producer.Name.Trim(), ManufactureName.Trim()));
             }
 
-
-            IQueryable res = (WithId) ? vehiclemodels.Select(d => new { d.Name, d.Id }) : vehiclemodels.Select(d => new { d.Name });
+            IEnumerable<VehicleModelTO> res = (await vehiclemodels.ToArrayAsync(ct)).Select(_mapper.Map<VehicleModelTO>);
 
             return Ok(res);
 
         }
 
         [HttpGet]
-        public IActionResult GetTrims(string? ModelName, bool WithId)
+        public async Task<IActionResult> GetTrims(string? ModelName, CancellationToken ct)
         {
             IQueryable<VehicleTrim> vehicletrims = _db.VehicleTrims;
 
@@ -210,7 +201,7 @@ namespace SmartContractVehicle.Controller
             }
 
 
-            IQueryable res = (WithId) ?  vehicletrims.Select(d =>  new { d.Name, d.Id })  : vehicletrims.Select(d => new { d.Name });
+            IEnumerable<VehicleTrimTO> res = (await vehicletrims.ToArrayAsync()).Select(_mapper.Map<VehicleTrimTO>);
 
             return Ok(res);
         }
