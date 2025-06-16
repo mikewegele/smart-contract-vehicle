@@ -18,6 +18,7 @@ Name | Type | Description | Notes
 **colour** | **string** |  | [default to undefined]
 **seats** | **number** |  | [default to undefined]
 **pricePerMinute** | **number** |  | [default to undefined]
+**status** | **number** |  | [default to undefined]
 
 ## Example
 
@@ -38,6 +39,7 @@ const instance: CarTO = {
     colour,
     seats,
     pricePerMinute,
+    status,
 };
 ```
 

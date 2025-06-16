@@ -1,17 +1,8 @@
-import React, { useCallback, useState } from "react";
-import {
-    Alert,
-    Card,
-    CardContent,
-    CardMedia,
-    Snackbar,
-    Typography,
-} from "@mui/material";
+import React, { useCallback } from "react";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
-import type { CarTO } from "../../api";
-import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
-import useApiStates from "../../util/useApiStates.ts";
+import { type CarTO } from "../../api";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -32,62 +23,21 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
     vehicle: CarTO;
-    web3Context: IWeb3Context;
+    handleConfirm: (vehicle: CarTO) => void;
+    openDialog: boolean;
+    setOpenDialog: (open: boolean) => void;
 }
 
 const Vehicle: React.FC<Props> = (props) => {
-    const { vehicle, web3Context } = props;
+    const { vehicle, openDialog, setOpenDialog } = props;
     const { classes } = useStyles();
-
-    const [openDialog, setOpenDialog] = useState(false);
-    const [feedbackOpen, setFeedbackOpen] = useState(false);
-    const [feedbackMsg, setFeedbackMsg] = useState("");
-    const [feedbackSeverity, setFeedbackSeverity] = useState<
-        "success" | "error"
-    >("success");
-
-    const { user } = useApiStates("user");
 
     const handleOpen = () => setOpenDialog(true);
     const handleClose = () => setOpenDialog(false);
 
     const handleConfirm = useCallback(async () => {
-        try {
-            if (
-                !web3Context.web3 ||
-                !web3Context.account ||
-                !web3Context.contract ||
-                !user.value.id ||
-                !vehicle.pricePerMinute
-            ) {
-                setFeedbackMsg("No account or contract loaded.");
-                setFeedbackSeverity("error");
-                setFeedbackOpen(true);
-                return;
-            }
-
-            const receipt = await web3Context.contract.methods
-                .rentCar(vehicle.carId, user.value.id)
-                .send({
-                    from: web3Context.account,
-                    value: web3Context.web3?.utils.toWei("0.01", "ether"),
-                });
-
-            const event = receipt.events.CarRented.returnValues;
-
-            console.log(event);
-
-            setFeedbackMsg("Car successfully reserved!");
-            setFeedbackSeverity("success");
-        } catch (err) {
-            console.error("Error reserving car:", err);
-            setFeedbackMsg("Failed to reserve car.");
-            setFeedbackSeverity("error");
-        } finally {
-            setFeedbackOpen(true);
-            setOpenDialog(false);
-        }
-    }, [web3Context.account, web3Context.contract, web3Context.web3?.utils]);
+        props.handleConfirm(vehicle);
+    }, [vehicle]);
 
     return (
         <>
@@ -117,20 +67,6 @@ const Vehicle: React.FC<Props> = (props) => {
                 onConfirm={handleConfirm}
                 car={vehicle}
             />
-            <Snackbar
-                open={feedbackOpen}
-                autoHideDuration={4000}
-                onClose={() => setFeedbackOpen(false)}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert
-                    severity={feedbackSeverity}
-                    onClose={() => setFeedbackOpen(false)}
-                    variant="filled"
-                >
-                    {feedbackMsg}
-                </Alert>
-            </Snackbar>
         </>
     );
 };

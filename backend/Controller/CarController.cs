@@ -136,11 +136,15 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpGet]
-        public ActionResult<IQueryable<FuelTypeTO>> GetFueltypes()
+        public async Task<ActionResult<List<FuelTypeTO>>> GetFueltypes()
         {
             var result = await _db.FuelTypes
-                            .Select(d => d.Name)
-                            .ToListAsync();
+                                  .Select(d => new FuelTypeTO
+                                  {
+                                      Name = d.Name
+                                  })
+                                  .ToListAsync();
+
             return Ok(result);
         }
 

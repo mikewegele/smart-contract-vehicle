@@ -5,7 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**id** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
+**models** | **Array&lt;string&gt;** |  | [default to undefined]
 **imagePath** | **string** |  | [optional] [default to undefined]
 
 ## Example
@@ -14,7 +16,9 @@ Name | Type | Description | Notes
 import { AutomotiveCompanyTO } from './api';
 
 const instance: AutomotiveCompanyTO = {
+    id,
     name,
+    models,
     imagePath,
 };
 ```

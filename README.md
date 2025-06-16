@@ -1,10 +1,12 @@
 # Decentralized Carsharing Platform
 
-This project is a **web-based carsharing platform** that uses **crypto wallets** and **smart contracts** to manage vehicle reservations, access, and payments transparently and securely.
+This project is a **web-based carsharing platform** that uses **crypto wallets** and **smart contracts** to manage
+vehicle reservations, access, and payments transparently and securely.
 
 # Project Setup
 
-This project consists of a **backend** built with **ASP.NET Core** and **PostgreSQL**, and a **frontend** built with **React**.
+This project consists of a **backend** built with **ASP.NET Core** and **PostgreSQL**, and a **frontend** built with *
+*React**.
 
 ## Prerequisites
 
@@ -15,82 +17,99 @@ Ensure you have the following installed before proceeding:
 - [PostgreSQL](https://www.postgresql.org/) (version 12 or higher)
 
 ### Optional (if you're using Visual Studio):
+
 - [Visual Studio](https://visualstudio.microsoft.com/) with the **.NET Core Development** workload.
 - **PostgreSQL Extension** in Visual Studio for easier database management.
+-
 
 ---
 
-## First Terminal: Database Setup (PostgreSQL Database)
- 
-1. Navigate to the `stack` directory:
+## Running the Project Components
 
-    ```bash
-    cd stack/
-    ```
+This project uses multiple scripts to manage the database, backend, blockchain, and frontend.
 
-2. Run the  `docker-compose.yml` :
+### Important scripts overview
 
-    ```bash
-    docker-compose up -d
-    ```
+- **`npm run drop-all-tables`**  
+  Removes all tables from the database. Use with caution, as this deletes all data.
 
-   This will start a PostgreSQL container and make it available at `localhost:5432`.
+- **`npm run database`**  
+  Starts the PostgreSQL database using Docker Compose. This should be running before starting the backend.
 
-## Second Terminal: Backend Setup (ASP.NET Core)
+- **`npm run backend`**  
+  Starts the backend server built with ASP.NET Core. It handles communication with the database and provides the API for
+  the frontend.
 
-1. Navigate to the `backend` directory:
+- **`npm run smart-contract`**  
+  Starts the local blockchain environment (Ganache) for smart contract development and testing.
 
-    ```bash
-    cd backend/
-    ```
-
-2. Install the required dependencies and build the project:
-
-    ```bash
-    dotnet restore
-    dotnet build
-    ```
-
-3. Create and apply the database migrations:
-
-    ```bash
-    dotnet ef migrations add InitialCreate
-    dotnet ef database update
-    ```
-
-   This will create the required database schema based on your `DbContext`.
-
-4. Start the backend API:
-
-    ```bash
-    dotnet run
-    ```
-
-   The API should now be running on `http://localhost:5147` by default (you can check the port in the terminal output).
+- **`npm run frontend`**  
+  Builds and runs the React frontend, deploys smart contracts, generates TypeScript types, and serves the app in your
+  browser.
 
 ---
 
-## Third Terminal: Frontend Setup (React)
+## Recommended start sequence
 
-1. Navigate to the `frontend` directory:
+Open separate terminal windows/tabs and run these commands in order:
 
-    ```bash
-    cd frontend/
-    ```
+1. **Start the database:**
+   ```bash
+   npm run database
+   ```
 
-2. Install the dependencies:
+2. **Start the backend:**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm run backend
+   ```
+3. **Start the blockchain environment:**
 
-3. Run the frontend application:
+   ```bash
+   npm run smart-contract
+   ```
+4. **Start the frontend:**
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run frontend
+   ```
 
-   The React app should now be running on `http://localhost:5173` by default.
+Make sure Docker is running and the database is accessible before starting the backend. Running the commands in separate
+terminals allows all services to operate concurrently.
+
+---
+
+## Detailed manual setup (if you prefer manual steps)
+
+### Database Setup (PostgreSQL with Docker)
+
+   ```bash
+   cd stack/
+   docker-compose up -d
+   ```
+
+### Backend Setup (ASP.NET Core)
+
+   ```bash
+   cd backend/
+   dotnet restore
+   dotnet build
+   dotnet ef migrations add InitialCreate
+   dotnet ef database update
+   dotnet run
+   ```
+
+Backend will be available on `http://localhost:5147`.
+
+### Frontend Setup (React)
+
+   ```bash
+   cd frontend/
+   npm install
+   npm run dev
+   ```
+
+Frontend will be available on `http://localhost:5173`.
 
 ---
 
@@ -107,6 +126,7 @@ Ensure you have the following installed before proceeding:
 ## Architecture
 
 This project uses a **hybrid architecture**:
+
 - Smart contracts handle payments, rights, and on-chain reservation logic.
 - Off-chain backend handles user logic, geolocation, timers, and sensitive data.
 - Web frontend provides the interface for searching, reserving, and accessing vehicles.
