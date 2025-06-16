@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "backend": "/bin/bash run_backend.sh",
-    "frontend": "cd blockchain && npm run deploy-and-copy && cd .. && cd ./frontend && npm run dev"
+    "frontend": "cd blockchain && npm run deploy-and-copy && cd .. && cd ./frontend && npm run typechain && npm run dev"
   },
   "keywords": [],
   "author": "",
