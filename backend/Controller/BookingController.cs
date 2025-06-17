@@ -68,7 +68,7 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> UnlockCar(Reservation userReservation, CancellationToken ct)
+        public async Task<ActionResult> UnlockCar(ReservationTO userReservation, CancellationToken ct)
         {
             // First we get the user that tries to unlock the car
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
