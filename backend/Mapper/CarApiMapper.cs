@@ -54,9 +54,6 @@ namespace SmartContractVehicle.Mapper
 
             CreateMap<AutomotiveCompany, AutomotiveCompanyTO>()
                 .ForMember(dst => dst.Models, opt => opt.MapFrom(src => src.Models.Select(m => m.Id)));
-
-            CreateMap<Reservation, ReservationTO>();
-            CreateMap<ReservationTO, Reservation>();
         }
     }
 }
