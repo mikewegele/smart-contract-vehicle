@@ -9,10 +9,12 @@ import MultipleDropdown from "../select/MultipleDropdown.tsx";
 
 const useStyles = makeStyles(() => ({
     root: {
-        backgroundColor: "#f5f5f5",
+        background: "rgba(245, 245, 245, 0.7)",
         borderRadius: "12px",
         padding: "16px",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(255, 255, 255, 0.6)",
         display: "flex",
         flexDirection: "column",
         gap: "16px",
@@ -23,6 +25,28 @@ const useStyles = makeStyles(() => ({
     },
     slider: {
         color: "#00796b",
+        "& .MuiSlider-rail": {
+            opacity: 0.3,
+            backgroundColor: "rgba(0, 121, 107, 0.3)",
+            backdropFilter: "blur(8px)",
+            borderRadius: 4,
+        },
+        "& .MuiSlider-track": {
+            backgroundColor: "rgba(0, 121, 107, 0.7)",
+            borderRadius: 4,
+            backdropFilter: "blur(8px)",
+        },
+        "& .MuiSlider-thumb": {
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            border: "2px solid rgba(0, 121, 107, 0.9)",
+            boxShadow: "0 0 8px rgba(0, 121, 107, 0.6)",
+            "&:hover, &.Mui-focusVisible": {
+                boxShadow: "0 0 12px rgba(0, 121, 107, 0.9)",
+            },
+            "&.Mui-active": {
+                boxShadow: "0 0 16px rgba(0, 121, 107, 1)",
+            },
+        },
     },
 }));
 

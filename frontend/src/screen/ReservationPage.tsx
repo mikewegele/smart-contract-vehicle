@@ -9,7 +9,7 @@ import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     timerText: {
-        margin: "16px 0",
+        marginTop: "16px",
         fontWeight: "bold",
         fontSize: "1.2rem",
     },
@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     expiredMessage: {
         color: "#d32f2f",
         fontWeight: "bold",
-        marginTop: 20,
+        marginTop: "20px",
     },
 }));
 
@@ -30,6 +30,12 @@ const ReservationPage: React.FC = () => {
     const [expired, setExpired] = useState(false);
 
     const reservedCar = cars.cars.reservedCar;
+
+    const handleCancel = async () => {
+        if (!reservedCar) return;
+        // await apiExec(CarApi, (api) => api.apiCarCancelReservation(reservedCar.carId));
+        setExpired(true);
+    };
 
     useEffect(() => {
         if (!reservedCar || expired) return;
@@ -46,20 +52,14 @@ const ReservationPage: React.FC = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [reservedCar, expired]);
-
-    const handleCancel = async () => {
-        if (!reservedCar) return;
-        // await apiExec(CarApi, (api) => api.apiCarCancelReservation(reservedCar.carId));
-        setExpired(true);
-    };
+    }, [reservedCar, expired, handleCancel]);
 
     if (!reservedCar || expired) {
         return (
             <Container>
                 <NavLinks isLoggedIn={true} />
                 <Typography className={classes.expiredMessage} variant="h6">
-                    Reservierung wurde abgebrochen oder ist abgelaufen.
+                    Reservation was canceled or has expired.
                 </Typography>
             </Container>
         );
@@ -72,7 +72,7 @@ const ReservationPage: React.FC = () => {
         <Container>
             <NavLinks isLoggedIn={true} />
             <Typography className={classes.timerText} variant="h6">
-                Reservierung läuft ab in {minutes}:
+                Reservation expires in {minutes}:
                 {seconds.toString().padStart(2, "0")}
             </Typography>
             <VehicleMap vehicles={[reservedCar]} />
@@ -81,7 +81,7 @@ const ReservationPage: React.FC = () => {
                 variant="outlined"
                 buttonClassName={classes.button}
             >
-                Reservierung manuell abbrechen
+                Cancel reservation manually
             </DefaultButton>
         </Container>
     );
