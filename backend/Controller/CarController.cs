@@ -17,14 +17,16 @@ namespace SmartContractVehicle.Controller
         private readonly AppDbContext _db = db;
         private readonly IMapper _mapper = mapper;
 
-        [HttpGet]
-        public ActionResult<IQueryable<CarTO>> GetAllCars()
-        {
+    [HttpGet]
+    public ActionResult<IEnumerable<CarTO>> GetAllCars()
+    {
+         var cars = _db.Cars
+             .Include(c => c.Trim)
+             .ToList();
 
-            var cars = _db.Cars.Select(c => _mapper.Map<CarTO>(c));
-
-            return Ok(cars);
-        }
+         var carTOs = _mapper.Map<List<CarTO>>(cars);
+         return Ok(carTOs);
+    }
 
         /** 
          * JSON Call Beispiel:
@@ -216,7 +218,6 @@ namespace SmartContractVehicle.Controller
             if(car == null)
                 return NotFound("Car not found");
             if (car.Status.Id == (int)Data.CarStatuses.Available)
-            //todo Reservierungs Objekt erzeugen
             {
                 car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
                 _db.Cars.Update(car);

@@ -1,8 +1,21 @@
-import React, { useCallback } from "react";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import React, { useCallback, useState } from "react";
+import {
+    Alert,
+    Card,
+    CardContent,
+    CardMedia,
+    Snackbar,
+    Typography,
+} from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
-import { type CarTO } from "../../api";
+import { CarApi, type CarTO } from "../../api";
+import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
+import useApiStates from "../../util/useApiStates.ts";
+import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
+import { useAppDispatch } from "../../store/Store.ts";
+import { setReservedCar } from "../../store/reducer/cars.ts";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -23,21 +36,87 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
     vehicle: CarTO;
-    handleConfirm: (vehicle: CarTO) => void;
-    openDialog: boolean;
-    setOpenDialog: (open: boolean) => void;
+    web3Context: IWeb3Context;
 }
 
 const Vehicle: React.FC<Props> = (props) => {
-    const { vehicle, openDialog, setOpenDialog } = props;
+    const { vehicle, web3Context } = props;
     const { classes } = useStyles();
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [feedbackMsg, setFeedbackMsg] = useState("");
+    const [feedbackSeverity, setFeedbackSeverity] = useState<
+        "success" | "error"
+    >("success");
+
+    const { user } = useApiStates("user");
+
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
     const handleOpen = () => setOpenDialog(true);
     const handleClose = () => setOpenDialog(false);
 
+    const reservationHasFailed = useCallback(() => {
+        setFeedbackMsg("Failed to reserve car.");
+        setFeedbackSeverity("error");
+    }, []);
+
     const handleConfirm = useCallback(async () => {
-        props.handleConfirm(vehicle);
-    }, [vehicle]);
+        const response = await apiExec(CarApi, (api) =>
+            api.apiCarReserveCarGet(vehicle.carId)
+        );
+
+        if (hasFailed(response)) {
+            reservationHasFailed();
+            return;
+        }
+
+        if (
+            !web3Context.web3 ||
+            !web3Context.account ||
+            !web3Context.contract ||
+            !user.value.id ||
+            !vehicle.pricePerMinute
+        ) {
+            setFeedbackMsg("No account or contract loaded.");
+            setFeedbackSeverity("error");
+            setFeedbackOpen(true);
+            return;
+        }
+
+        const receipt = await web3Context.contract.methods
+            .rentCar(vehicle.carId, user.value.id)
+            .send({
+                from: web3Context.account,
+                value: web3Context.web3.utils.toWei("0.01", "ether"),
+            })
+            .catch(() => {
+                reservationHasFailed();
+                return;
+            });
+
+        if (receipt) {
+            const event = receipt.events.CarRented.returnValues;
+            const transactionHash = receipt.transactionHash;
+            console.log(transactionHash);
+            dispatch(setReservedCar(vehicle));
+            navigate(`/reservation/${vehicle.carId}`);
+            setFeedbackMsg("Car successfully reserved!");
+            setFeedbackSeverity("success");
+        }
+
+        setFeedbackOpen(true);
+        setOpenDialog(false);
+    }, [
+        web3Context.web3,
+        web3Context.account,
+        web3Context.contract,
+        user.value.id,
+        vehicle,
+        reservationHasFailed,
+    ]);
 
     return (
         <>
@@ -67,6 +146,20 @@ const Vehicle: React.FC<Props> = (props) => {
                 onConfirm={handleConfirm}
                 car={vehicle}
             />
+            <Snackbar
+                open={feedbackOpen}
+                autoHideDuration={4000}
+                onClose={() => setFeedbackOpen(false)}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert
+                    severity={feedbackSeverity}
+                    onClose={() => setFeedbackOpen(false)}
+                    variant="filled"
+                >
+                    {feedbackMsg}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

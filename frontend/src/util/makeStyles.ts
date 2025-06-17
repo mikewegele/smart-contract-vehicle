@@ -51,10 +51,14 @@ const makeStyles = <
             classes[key] = className;
         }
 
+        function classNames(...classes: (string | undefined | false | null)[]) {
+            return classes.filter(Boolean).join(" ");
+        }
+
         const cx = (...classNames: (string | undefined | false)[]) =>
             classNames.filter(Boolean).join(" ");
 
-        return { classes, cx };
+        return { classes, cx, classNames };
     };
 };
 

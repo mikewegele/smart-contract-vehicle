@@ -11,6 +11,7 @@ import ProfilePage from "../screen/ProfilePage.tsx";
 import SmartContractTestPage from "../screen/SmartContractTestPage.tsx";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
+import ReservationPage from "../screen/ReservationPage.tsx";
 
 const isLoggedIn = () => {
     return Boolean(localStorage.getItem("token"));
@@ -47,6 +48,10 @@ const Layout: React.FC = () => {
                 <Route
                     path="/profile"
                     element={<ProtectedRoute element={<ProfilePage />} />}
+                />
+                <Route
+                    path="/reservation/:carId"
+                    element={<ProtectedRoute element={<ReservationPage />} />}
                 />
             </Routes>
         </Router>

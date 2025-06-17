@@ -79,7 +79,6 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
             <TextField
                 label="Max Distance (m)"
                 type="number"
-                inputProps={{ min: 0 }}
                 value={filters.maxDistance ?? ""}
                 onChange={(e) => {
                     const value = Number(e.target.value);

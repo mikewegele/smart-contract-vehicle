@@ -1,6 +1,6 @@
 import React from "react";
+import type { ButtonProps } from "@mui/material";
 import { Button } from "@mui/material";
-import type { ButtonProps } from "@mui/material"
 import makeStyles from "../../util/makeStyles.ts";
 
 const useStyles = makeStyles(() => ({
@@ -18,12 +18,18 @@ const useStyles = makeStyles(() => ({
 }));
 
 type Props = ButtonProps & {
+    buttonClassName?: string;
     children: React.ReactNode;
 };
 
 const DefaultButton: React.FC<Props> = (props) => {
-    const { classes } = useStyles();
-    return <Button className={classes.button} {...props} />;
+    const { classes, classNames } = useStyles();
+    return (
+        <Button
+            className={classNames(classes.button, props.buttonClassName)}
+            {...props}
+        />
+    );
 };
 
 export default DefaultButton;
