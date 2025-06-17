@@ -12,6 +12,27 @@ import {
 } from "@mui/material";
 import DefaultButton from "../../button/DefaultButton.tsx";
 import type { CarTO } from "../../../api";
+import makeStyles from "../../../util/makeStyles.ts";
+
+const useStyles = makeStyles(() => ({
+    paper: {
+        background: "rgba(255, 255, 255, 0.75)",
+        backdropFilter: "blur(20px)",
+        borderRadius: 20,
+        border: "1.5px solid rgba(255, 255, 255, 0.9)",
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.06)",
+    },
+    dialogTitle: {
+        fontWeight: 600,
+        fontSize: "1.8rem",
+        letterSpacing: "0.03em",
+    },
+    questionText: {
+        fontWeight: 500,
+        fontSize: "1.2rem",
+        marginTop: "1.5rem",
+    },
+}));
 
 interface Props {
     open: boolean;
@@ -26,9 +47,19 @@ const ReservationDialog: React.FC<Props> = ({
     onConfirm,
     car,
 }) => {
+    const { classes } = useStyles();
+
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Reserve Vehicle</DialogTitle>
+        <Dialog
+            classes={{ paper: classes.paper }}
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+        >
+            <DialogTitle className={classes.dialogTitle}>
+                Reserve Vehicle
+            </DialogTitle>
             <DialogContent>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                     {car.companyLogoPath && (
@@ -88,7 +119,11 @@ const ReservationDialog: React.FC<Props> = ({
                     )}
                 </Grid>
 
-                <Typography variant="body1" mt={3}>
+                <Typography
+                    className={classes.questionText}
+                    variant="body1"
+                    mt={3}
+                >
                     Do you want to reserve this vehicle?
                 </Typography>
             </DialogContent>
