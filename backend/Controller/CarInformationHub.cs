@@ -2,7 +2,7 @@
 using SmartContractVehicle.DTO;
 using System.Collections.Concurrent;
 
-namespace SmartContractVehicle
+namespace SmartContractVehicle.Controller
 {
     public class CarInformationHub : Hub
     {

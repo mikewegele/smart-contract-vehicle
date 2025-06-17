@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SmartContractVehicle;
+using SmartContractVehicle.Controller;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
