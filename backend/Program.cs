@@ -104,7 +104,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<UserService>();
 
 // Hosted Services
-builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars will get reset
+builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
 
 
 var app = builder.Build();

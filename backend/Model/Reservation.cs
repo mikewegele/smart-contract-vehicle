@@ -54,7 +54,7 @@ public class Reservation
         car.SetStatus(db.CarStatuses.Find((int)CarStatuses.Pending), this);
 
         ReservedCarId = car.Id;
-
+        Price = car.PricePerMinute / 2 * _reservationTime.TotalMinutes;
         BlockageTimeUTC = DateTime.UtcNow;
 
         return this;
