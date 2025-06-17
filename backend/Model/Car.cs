@@ -31,22 +31,25 @@ namespace SmartContractVehicle.Model
 
         public virtual CarStatus Status { get; private set; } = new() { Id = (int)CarStatuses.Available, Name = "" };
 
-        public DateTime? LastStatusChange { get; private set; }
+        public DateTime LastStatusChange { get; private set; }
 
-        public void SetStatus(CarStatus? status)
+        public Car SetStatus(CarStatus? status)
         {
             ArgumentNullException.ThrowIfNull(status);
-            
-            LastStatusChange = (status.Id != (int)CarStatuses.Available) ? DateTime.UtcNow : null; 
-            // WIP
+
+            LastStatusChange = DateTime.UtcNow;
+            // TODO Logic for the different Status do we have to mind specific transits in Status?
             Status = status;
-            switch ((CarStatuses)status.Id)
+            return this;
+        }
+
+        public TimeSpan RideTime {
+            get 
             {
-                case CarStatuses.Available:
-                case CarStatuses.Reserved:
-                case CarStatuses.InTransit:
-                case CarStatuses.Pending:
-                    return;
+                if ((CarStatuses)Status.Id != CarStatuses.InTransit)
+                    return TimeSpan.Zero;
+                else
+                    return DateTime.UtcNow - LastStatusChange;
             }
         }
     }
