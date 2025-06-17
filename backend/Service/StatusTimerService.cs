@@ -31,15 +31,14 @@ namespace SmartContractVehicle.Service
 
             while (!ct.IsCancellationRequested)
             {
-                Task<List<Reservation>> invalid = db.Cars
-                .Where(c =>
-                    ((c.Status == statusPending && DateTime.UtcNow - c.LastStatusChange > Reservation._blockageTime) ||
-                     (c.Status == statusReserved && DateTime.UtcNow - c.LastStatusChange > Reservation._reservationTime))
-                    && c.ActiveReservation != null)
-                .Select(c => c.ActiveReservation!)
-                .ToListAsync(CancellationToken.None);
-                
-                (await invalid).ForEach(r => r.CancleReservation(db));
+                var invalid = db.Cars
+                    .Where(c =>
+                        ((c.Status == statusPending && DateTime.UtcNow - c.LastStatusChange > Reservation._blockageTime) ||
+                         (c.Status == statusReserved && DateTime.UtcNow - c.LastStatusChange > Reservation._reservationTime))
+                        && c.ActiveReservation != null)
+                    .ToListAsync(ct);
+
+                (await invalid).ForEach(c => c.ActiveReservation?.CancleReservation(db));
 
                 await db.SaveChangesAsync(CancellationToken.None); // we finish the last update before ending the loop
 

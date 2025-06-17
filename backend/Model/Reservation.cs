@@ -42,7 +42,7 @@ public class Reservation
     public bool ReservationCompleted { get; private set; } = false;
     public bool ReservationCancelled { get; private set; } = false;
 
-    private Reservation() { }
+    public Reservation() { }
     
     public Reservation(string rentor) 
     {
