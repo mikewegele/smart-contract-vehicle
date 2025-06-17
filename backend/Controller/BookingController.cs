@@ -22,59 +22,49 @@ namespace SmartContractVehicle.Controller
         /// <param name="ct">A CancellationToken if the Request is cancelled.</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<CarTO>> BlockCar(Guid carId, CancellationToken ct)
-        {
+        public async Task<ActionResult<ReservationTO>> BlockCar(Guid carId, CancellationToken ct)
+        {   
+            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
+            var user = _db.Users.Find(userId);
+            if (user is null) return NotFound("The user was not found.");
+
             var car = _db.Cars.Find(carId);
             if (car is null) return NotFound("No car with this ID was found.");
 
             if (car.Status.Id != (int)CarStatuses.Available)
                 return Conflict("This car is already in use.");
 
-            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
-
-            var user = _db.Users.Find(userId);
-            if (user is null) return NotFound("The user was not found.");
-
-            car.SetStatus(_db.CarStatuses.Find((int)CarStatuses.Pending));
-
             var reservation = new Reservation(userId);
-
 
             reservation.BlockCar(db, car);
 
+            _db.Add(reservation);
+
             await _db.SaveChangesAsync(ct);
-            return Ok(_mapper.Map<CarTO>(car));
+            return Ok(_mapper.Map<ReservationTO>(reservation));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Reservation>> ReserveCar(Guid carId, string transactionId, CancellationToken ct)
+        public async Task<ActionResult<ReservationTO>> ReserveCar(ReservationTO reservation, CancellationToken ct)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(transactionId);
-            ArgumentException.ThrowIfNullOrEmpty(transactionId);
 
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
 
             var user = _db.Users.Find(userId);
             if (user is null) return NotFound("The user was not found.");
 
-            var car = _db.Cars.Find(carId);
-            if (car == null) return NotFound("Car not found.");
+            var dbReservation = _db.Reservations.Find(reservation.Id);
+            if (dbReservation is null) return NotFound("Reserveration unknown.");
 
-            if (car.Status.Id != (int)CarStatuses.Available)
-                return Conflict("Car is not available.");
+            // TODO Check transaction Id on the blockchain if the transaction is non valid, cancle the reservation
+            var transacId = reservation.BlockchainTransactionId;
 
-            // TODO Check transaction Id on the blockchain
+            dbReservation.BlockchainTransactionId = transacId;
 
-            var reservation = new Reservation(car.Id, user.Id, car.PricePerMinute, transactionId);
-            await _db.Reservations.AddAsync(reservation, ct);
-
-            car.SetStatus(_db.CarStatuses.Find((int)CarStatuses.Reserved));
-            _db.Cars.Update(car);
+            dbReservation.ReserveCar(db);
+            
             await _db.SaveChangesAsync(ct);
-
-
             return Ok(reservation);
-
         }
 
         [HttpPost]
@@ -86,12 +76,13 @@ namespace SmartContractVehicle.Controller
             if (loggedInUser is null) return NotFound("The user was not found.");
 
             // Then we check if the reservation the user provided is valid
-            var databaseReservation = _db.Reservations.Find(userReservation.Id);
-            if (databaseReservation == null) return NotFound("This reservation is not saved in the system.");
+            var dBReservation = _db.Reservations.Find(userReservation.Id);
+            if (dBReservation == null) return NotFound("This reservation is not saved in the system.");
 
-            if (databaseReservation.RentorId != loggedInUser.Id) return Conflict("You must provide a reservation of your own.");
+            if (dBReservation.ReservationCancelled || dBReservation.ReservationCompleted)
+                return BadRequest("This Reservation was either cancelled or already completed. Please try again.");
 
-
+            if (dBReservation.RentorId != loggedInUser.Id) return BadRequest("You must provide a reservation of your own.");
 
             return Ok();
         }

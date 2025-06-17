@@ -23,9 +23,6 @@ namespace SmartContractVehicle.Service
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            var statusAvailable = db.CarStatuses.Find((int)CarStatuses.Available);
-            if (statusAvailable is null) throw new NullReferenceException(nameof(statusAvailable));
-
             var statusPending = db.CarStatuses.Find((int)CarStatuses.Pending);
             if (statusPending is null) throw new NullReferenceException(nameof(statusPending));
 
@@ -34,14 +31,16 @@ namespace SmartContractVehicle.Service
 
             while (!ct.IsCancellationRequested)
             {
-                Task invalid =  db.Cars
-                    .Where(c => 
-                        (c.Status == statusPending && DateTime.UtcNow.Subtract(c.LastStatusChange.Value) > Reservation._blockageTime ) ||
-                        (c.Status == statusReserved && DateTime.UtcNow.Subtract(c.LastStatusChange.Value) > Reservation._reservationTime )
-                        )
-                    .ForEachAsync(o => o.SetStatus(statusAvailable), CancellationToken.None);
+                Task<List<Reservation>> invalid = db.Cars
+                .Where(c =>
+                    ((c.Status == statusPending && DateTime.UtcNow - c.LastStatusChange > Reservation._blockageTime) ||
+                     (c.Status == statusReserved && DateTime.UtcNow - c.LastStatusChange > Reservation._reservationTime))
+                    && c.ActiveReservation != null)
+                .Select(c => c.ActiveReservation!)
+                .ToListAsync(CancellationToken.None);
+                
+                (await invalid).ForEach(r => r.CancleReservation(db));
 
-                await invalid;
                 await db.SaveChangesAsync(CancellationToken.None); // we finish the last update before ending the loop
 
                 await Task.Delay(_intervall, ct);

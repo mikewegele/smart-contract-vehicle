@@ -5,7 +5,7 @@ namespace SmartContractVehicle.Model;
 public class Reservation
 {
     public static readonly TimeSpan _reservationTime = TimeSpan.FromMinutes(15);
-    public static readonly TimeSpan _blockageTime = TimeSpan.FromSeconds(5);
+    public static readonly TimeSpan _blockageTime = TimeSpan.FromMinutes(4);
 
     public Guid Id { get; private set; } = Guid.NewGuid();
 
@@ -14,7 +14,12 @@ public class Reservation
 
     public double Price { get; private set; }
 
-    public bool ReservationValid => ReservationTimeUTC != null && DateTime.UtcNow.Subtract(ReservationTimeUTC.Value) < _reservationTime;
+    public bool ReservationActive => 
+        !ReservationCompleted &&
+        !ReservationCancelled && 
+        ReservationTimeUTC != null &&
+        DateTime.UtcNow.Subtract(ReservationTimeUTC.Value) < _reservationTime;
+
     public DateTime? ReservationTimeUTC { get; private set; }
     
     public bool BlockageActive => BlockageTimeUTC != null && DateTime.UtcNow.Subtract(BlockageTimeUTC.Value) < _blockageTime;
@@ -46,7 +51,7 @@ public class Reservation
 
     public Reservation BlockCar(AppDbContext db, Car car)
     {
-        car.SetStatus(db.CarStatuses.Find());
+        car.SetStatus(db.CarStatuses.Find((int)CarStatuses.Pending), this);
 
         ReservedCarId = car.Id;
 
@@ -60,16 +65,37 @@ public class Reservation
         var car = db.Cars.Find(ReservedCarId);
         if (car is null) throw new NullReferenceException($"{nameof(car)}, The car wasn't found in the Database.");
 
-        car.SetStatus(db.CarStatuses.Find((int)CarStatuses.Reserved));
+        car.SetStatus(db.CarStatuses.Find((int)CarStatuses.Reserved), this);
 
         ReservationTimeUTC = DateTime.UtcNow;
 
         return this;
     }
 
-    public Reservation FinalizeReservation(bool sucess)
+    public Reservation CancleReservation(AppDbContext db)
     {
+        var car = db.Cars.Find(ReservedCarId);
+        if (car is null) throw new NullReferenceException($"{nameof(car)}, The car wasn't found in the Database.");
+
+        car.SetStatus(db.CarStatuses.Find((int)CarStatuses.Available), this);
+
+        ReservationCancelled = true;
+        ReservationCompleted = false;
 
         return this;
     }
+
+    public Reservation CompleteReservation(AppDbContext db)
+    {
+        var car = db.Cars.Find(ReservedCarId);
+        if (car is null) throw new NullReferenceException($"{nameof(car)}, The car wasn't found in the Database.");
+
+        car.SetStatus(db.CarStatuses.Find((int)CarStatuses.InTransit), this);
+
+        ReservationCancelled = false;
+        ReservationCompleted = true;
+
+        return this;
+    }
+
 }
