@@ -8,7 +8,7 @@ const useStyles = makeStyles(() => ({
         minHeight: "100%",
         height: "auto",
         background: "linear-gradient(135deg, #e0f7fa, #4c838b)",
-        paddingTop: "4rem",
+        paddingTop: "6rem",
     },
     center: {
         alignItems: "center",

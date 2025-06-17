@@ -13,8 +13,20 @@ import DefaultButton from "../components/button/DefaultButton.tsx";
 
 const useStyles = makeStyles(() => ({
     textField: {
-        width: "400px",
-        margin: "10px !important",
+        width: "40%",
+        margin: "10px 0 !important",
+        "& .MuiInputBase-root": {
+            background: "rgba(255, 255, 255, 0.5)",
+            borderRadius: 8,
+            backdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.7)",
+        },
+        "& .MuiInputBase-input": {
+            color: "#34495e",
+        },
+        "& label": {
+            color: "#00796b",
+        },
     },
 }));
 

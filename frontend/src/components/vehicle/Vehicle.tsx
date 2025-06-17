@@ -21,16 +21,26 @@ const useStyles = makeStyles(() => ({
     card: {
         maxWidth: "300px",
         borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         margin: "16px",
         cursor: "pointer",
+        background: "rgba(255, 255, 255, 0.4)",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+        backdropFilter: "blur(12px)",
+        border: "1px solid rgba(255, 255, 255, 0.6)",
+        transition: "box-shadow 0.3s ease",
+        "&:hover": {
+            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.18)",
+        },
     },
     media: {
         height: 180,
         objectFit: "cover",
+        borderTopLeftRadius: "16px",
+        borderTopRightRadius: "16px",
     },
     content: {
         paddingBottom: "16px !important",
+        color: "#34495e",
     },
 }));
 
