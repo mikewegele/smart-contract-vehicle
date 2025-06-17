@@ -79,10 +79,16 @@ namespace SmartContractVehicle.Controller
             var dBReservation = _db.Reservations.Find(userReservation.Id);
             if (dBReservation == null) return NotFound("This reservation is not saved in the system.");
 
+            // Check that this is still a valid Reservation
             if (dBReservation.ReservationCancelled || dBReservation.ReservationCompleted)
                 return BadRequest("This Reservation was either cancelled or already completed. Please try again.");
 
+            // Check that the person that reserved is the same as the one requesting the opening
             if (dBReservation.RentorId != loggedInUser.Id) return BadRequest("You must provide a reservation of your own.");
+
+            // Send Notifcation to the car to open
+
+            // Create new Ride Object and share it with the user, we later can use this to save ride info etc
 
             return Ok();
         }
