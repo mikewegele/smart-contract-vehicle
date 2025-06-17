@@ -86,9 +86,9 @@ namespace SmartContractVehicle.Controller
             // Check that the person that reserved is the same as the one requesting the opening
             if (dBReservation.RentorId != loggedInUser.Id) return BadRequest("You must provide a reservation of your own.");
 
-            // Send Notifcation to the car to open
+            // TODO Send Notifcation to the car to open
 
-            // Create new Ride Object and share it with the user, we later can use this to save ride info etc
+            // TODO Create new Ride Object and share it with the user, we later can use this to save ride info etc
 
             return Ok();
         }

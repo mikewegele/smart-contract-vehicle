@@ -5,7 +5,8 @@ using SmartContractVehicle.Model;
 namespace SmartContractVehicle.Service
 {
     /// <summary>
-    /// This Service periodically (every 5 seconds) checks the database for Cars that are blocked or reserved and are over their timeout span (reserved for longer than 15 Minutes or blocked for more than 30 seconds)
+    /// This Service periodically (every 5 seconds) checks the database for Cars that are blocked or reserved and are over their timeout span
+    /// The correct timespans are taken from Models.Reservation _reservationTime and _blockageTime
     /// </summary>
     public class StatusTimerService : BackgroundService
     {
@@ -15,7 +16,6 @@ namespace SmartContractVehicle.Service
         public StatusTimerService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
-            
         }
 
         protected override async Task ExecuteAsync(CancellationToken ct)
