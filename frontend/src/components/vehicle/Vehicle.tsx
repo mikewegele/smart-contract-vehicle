@@ -12,10 +12,10 @@ import ReservationDialog from "./reservation/ReservationDialog.tsx";
 import { BookingApi, type CarTO } from "../../api";
 import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
 import useApiStates from "../../util/useApiStates.ts";
-import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
 import { useAppDispatch } from "../../store/Store.ts";
 import { setReservedCar } from "../../store/reducer/cars.ts";
 import { useNavigate } from "react-router-dom";
+import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -73,61 +73,71 @@ const Vehicle: React.FC<Props> = (props) => {
         setFeedbackSeverity("error");
     }, []);
 
-    const handleConfirm = useCallback(async () => {
-        const userId = user.value.id;
-        if (!userId) {
-            reservationHasFailed();
-            return;
-        }
-        const responseBlock = await apiExec(BookingApi, (api) =>
-            api.apiBookingBlockCarPost(vehicle.carId)
-        );
-        if (hasFailed(responseBlock)) {
-            reservationHasFailed();
-            return;
-        }
+    const blockCar = async (carId: string) => {
         const response = await apiExec(BookingApi, (api) =>
-            api.apiBookingReserveCarPost({
-                reservedCarId: vehicle.carId,
-                rentorId: userId,
-            })
+            api.apiBookingBlockCarPost(carId)
         );
-        if (hasFailed(response)) {
-            reservationHasFailed();
-            return;
-        }
+        return !hasFailed(response);
+    };
 
+    const rentCarOnChain = async (carId: string, userId: string) => {
         if (
             !web3Context.web3 ||
             !web3Context.account ||
             !web3Context.contract ||
             !vehicle.pricePerMinute
         ) {
-            reservationHasFailed();
-            return;
+            return null;
         }
 
-        const receipt = await web3Context.contract.methods
-            .rentCar(vehicle.carId, user.value.id)
-            .send({
-                from: web3Context.account,
-                value: web3Context.web3.utils.toWei("0.01", "ether"),
+        try {
+            return await web3Context.contract.methods
+                .rentCar(carId, userId)
+                .send({
+                    from: web3Context.account,
+                    value: web3Context.web3.utils.toWei("0.01", "ether"),
+                });
+        } catch {
+            return null;
+        }
+    };
+
+    const reserveCarInBackend = async (
+        carId: string,
+        userId: string,
+        txHash: string
+    ) => {
+        const response = await apiExec(BookingApi, (api) =>
+            api.apiBookingReserveCarPost({
+                reservedCarId: carId,
+                rentorId: userId,
+                blockchainTransactionId: txHash,
             })
-            .catch(() => {
-                reservationHasFailed();
-                return;
-            });
+        );
+        return !hasFailed(response);
+    };
 
-        if (receipt) {
-            const event = receipt.events.CarRented.returnValues;
-            const transactionHash = receipt.transactionHash;
-            console.log(transactionHash);
-            dispatch(setReservedCar(vehicle));
-            navigate(`/reservation/${vehicle.carId}`);
-            setFeedbackMsg("Car successfully reserved!");
-            setFeedbackSeverity("success");
-        }
+    const handleConfirm = useCallback(async () => {
+        const userId = user.value.id;
+        if (!userId) return reservationHasFailed();
 
+        const blockSuccess = await blockCar(vehicle.carId);
+        if (!blockSuccess) return reservationHasFailed();
+
+        const receipt = await rentCarOnChain(vehicle.carId, userId);
+        if (!receipt) return reservationHasFailed();
+
+        const reserveSuccess = await reserveCarInBackend(
+            vehicle.carId,
+            userId,
+            receipt.transactionHash
+        );
+        if (!reserveSuccess) return reservationHasFailed();
+
+        dispatch(setReservedCar(vehicle));
+        navigate(`/reservation/${vehicle.carId}`);
+        setFeedbackMsg("Car successfully reserved!");
+        setFeedbackSeverity("success");
         setFeedbackOpen(true);
         setOpenDialog(false);
     }, [
