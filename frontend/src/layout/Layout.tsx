@@ -12,8 +12,6 @@ import SmartContractTestPage from "../screen/SmartContractTestPage.tsx";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
 import ReservationPage from "../screen/ReservationPage.tsx";
-import useApiStates from "../util/useApiStates.ts";
-import type { CarTO } from "../api";
 
 const isLoggedIn = () => {
     return Boolean(localStorage.getItem("token"));
@@ -25,26 +23,12 @@ const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({
     return isLoggedIn() ? element : <Navigate to="/login" replace />;
 };
 
-const ReservationProtectedRoute: React.FC<{
-    element: React.ReactElement;
-    reservedCar?: CarTO;
-}> = ({ element, reservedCar }) => {
-    if (!isLoggedIn()) {
-        return <Navigate to="/login" replace />;
-    }
-
-    return reservedCar ? element : <Navigate to="/home" replace />;
-};
-
 const Layout: React.FC = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         dispatch(fetchUser());
     }, [dispatch]);
-
-    const cars = useApiStates("cars");
-    const reservedCar = cars.cars?.reservedCar;
 
     return (
         <Router>
@@ -67,12 +51,7 @@ const Layout: React.FC = () => {
                 />
                 <Route
                     path="/reservation/:carId"
-                    element={
-                        <ReservationProtectedRoute
-                            reservedCar={reservedCar}
-                            element={<ReservationPage />}
-                        />
-                    }
+                    element={<ProtectedRoute element={<ReservationPage />} />}
                 />
             </Routes>
         </Router>

@@ -2,17 +2,25 @@ import { type RootState, useAppSelector } from "../store/Store";
 
 type AllowedStoreNames = keyof RootState;
 
-type UniqueStoreNames<K extends AllowedStoreNames> = K;
+type NoDuplicates<
+    T extends readonly any[],
+    Seen extends any[] = [],
+> = T extends [infer First, ...infer Rest]
+    ? First extends Seen[number]
+        ? never
+        : NoDuplicates<Rest, [...Seen, First]>
+    : T;
 
-const useApiStates = <K extends AllowedStoreNames>(
-    ...storeNames: [UniqueStoreNames<K>, UniqueStoreNames<K>] | [UniqueStoreNames<K>]
-): { [P in K]: RootState[P] } => {
+const useApiStates = <K extends AllowedStoreNames, T extends readonly K[]>(
+    ...storeNames: NoDuplicates<T> extends never ? never : T
+): { [P in T[number]]: RootState[P] } => {
     const selector = useAppSelector;
-
-    const result = {} as { [P in K]: RootState[P] };
+    const result = {} as { [P in T[number]]: RootState[P] };
 
     storeNames.forEach((name) => {
-        result[name] = selector((state) => state[name]) as RootState[typeof name];
+        result[name] = selector(
+            (state) => state[name]
+        ) as RootState[typeof name];
     });
 
     return result;

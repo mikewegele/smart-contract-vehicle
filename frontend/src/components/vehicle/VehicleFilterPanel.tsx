@@ -137,7 +137,9 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
 
             <MultipleDropdown
                 label="Drivetrain"
-                options={cars.driveTrains}
+                options={cars.driveTrains.map(
+                    (driveTrain) => driveTrain.name ?? ""
+                )}
                 value={filters.allowedDrivetrains ?? []}
                 onChange={(newValue) =>
                     setFilters({ ...filters, allowedDrivetrains: newValue })

@@ -1,17 +1,22 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
 import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
-import { CarApi, type CarTO, type GeoSpatialQueryTO } from "../../api";
+import {
+    CarApi,
+    type CarTO,
+    type DrivetrainTO,
+    type FuelTypeTO,
+    type GeoSpatialQueryTO,
+} from "../../api";
 import type { Position } from "../../util/location/useGeolocation.ts";
 
 interface State {
     value: CarTO[];
     maxSeats: number;
     maxPricePerMinute: number;
-    fuelTypes: string[];
-    driveTrains: string[];
+    fuelTypes: FuelTypeTO[];
+    driveTrains: DrivetrainTO[];
     error?: ApiError;
-    reservedCar?: CarTO;
 }
 
 const reduceCarError = (
@@ -24,7 +29,6 @@ const reduceCarError = (
 const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
     draft.error = undefined;
     draft.value = action.payload;
-
     const seatCounts = action.payload.map((car) => car.seats);
     draft.maxSeats =
         seatCounts.length > 0 ? Math.max(...seatCounts) : draft.maxSeats;
@@ -40,7 +44,7 @@ const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
 
 const reduceSetFuelTypes = (
     draft: Draft<State>,
-    action: PayloadAction<string[]>
+    action: PayloadAction<FuelTypeTO[]>
 ) => {
     draft.error = undefined;
     draft.fuelTypes = action.payload;
@@ -48,18 +52,10 @@ const reduceSetFuelTypes = (
 
 const reduceSetDriveTrains = (
     draft: Draft<State>,
-    action: PayloadAction<string[]>
+    action: PayloadAction<DrivetrainTO[]>
 ) => {
     draft.error = undefined;
     draft.driveTrains = action.payload;
-};
-
-const reduceSetReservedCar = (
-    draft: Draft<State>,
-    action: PayloadAction<CarTO>
-) => {
-    draft.error = undefined;
-    draft.reservedCar = action.payload;
 };
 
 const slice = createSlice({
@@ -76,7 +72,6 @@ const slice = createSlice({
         SET_ERROR: reduceCarError,
         SET_FUEL_TYPES: reduceSetFuelTypes,
         ADD_DRIVE_TRAINS: reduceSetDriveTrains,
-        SET_RESERVED_CAR: reduceSetReservedCar,
     },
 });
 
@@ -84,7 +79,6 @@ const addCars = slice.actions["SET_CARS"];
 const addFuelTypes = slice.actions["SET_FUEL_TYPES"];
 const addAllDriveTrains = slice.actions["ADD_DRIVE_TRAINS"];
 const carError = slice.actions["SET_ERROR"];
-const setReservedCar = slice.actions["SET_RESERVED_CAR"];
 
 const fetchAllCars = () => {
     return async (dispatch: RootDispatch): Promise<void> => {
@@ -160,5 +154,4 @@ export {
     fetchCarsByFilter,
     fetchAllFuelTypes,
     fetchAllDriveTrains,
-    setReservedCar,
 };

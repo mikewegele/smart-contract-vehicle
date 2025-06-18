@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartContractVehicle.Controller
 {
@@ -42,6 +43,14 @@ namespace SmartContractVehicle.Controller
 
             await _db.SaveChangesAsync(ct);
             return Ok(_mapper.Map<ReservationTO>(reservation));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ReservationTO>>> GetAllReservations(CancellationToken ct)
+        {
+            var reservations = await _db.Reservations.ToListAsync(ct);
+            var reservationDTOs = _mapper.Map<IEnumerable<ReservationTO>>(reservations);
+            return Ok(reservationDTOs);
         }
 
         [HttpPost]

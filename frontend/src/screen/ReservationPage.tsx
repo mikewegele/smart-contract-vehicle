@@ -1,11 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
-import useApiStates from "../util/useApiStates.ts";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import VehicleMap from "../components/vehicle/VehicleMap.tsx";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import Typography from "@mui/material/Typography";
 import makeStyles from "../util/makeStyles.ts";
 import DefaultButton from "../components/button/DefaultButton.tsx";
+import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { BookingApi } from "../api";
+import { useParams } from "react-router-dom";
+import { useAppDispatch } from "../store/Store.ts";
+import { fetchAllCars } from "../store/reducer/cars.ts";
+import { fetchAllReservations } from "../store/reducer/reservation.ts";
+import useApiStates from "../util/useApiStates.ts";
 
 const useStyles = makeStyles(() => ({
     timerText: {
@@ -26,13 +32,51 @@ const useStyles = makeStyles(() => ({
 const ReservationPage: React.FC = () => {
     const { classes } = useStyles();
 
-    const cars = useApiStates("cars");
-    const user = useApiStates("user");
+    const { carId } = useParams();
 
-    const [timeLeft, setTimeLeft] = useState(15 * 60);
+    const { cars, user, reservation } = useApiStates(
+        "cars",
+        "user",
+        "reservation"
+    );
+
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchAllCars());
+        dispatch(fetchAllReservations());
+    }, [dispatch]);
+
     const [expired, setExpired] = useState(false);
 
-    const reservedCar = cars.cars.reservedCar;
+    const reservationCarObject = useMemo(() => {
+        return reservation.value.find(
+            (reservation) => reservation.reservedCarId === carId
+        );
+    }, [carId, reservation.value]);
+
+    const initialTimeLeft = useMemo(() => {
+        const blockingTimeUTC = reservationCarObject?.blockageTimeUTC;
+        const blockageTime = blockingTimeUTC ? new Date(blockingTimeUTC) : null;
+        const expiryTime = blockageTime
+            ? new Date(blockageTime.getTime() + 15 * 60 * 1000)
+            : null;
+        const now = new Date();
+        return expiryTime
+            ? Math.max(
+                  0,
+                  Math.floor((expiryTime.getTime() - now.getTime()) / 1000)
+              )
+            : 0;
+    }, [reservationCarObject?.blockageTimeUTC]);
+
+    const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
+
+    const reservedCar = useMemo(() => {
+        return reservationCarObject
+            ? cars.value.find((car) => car.carId === carId)
+            : undefined;
+    }, [carId, cars.value, reservationCarObject]);
 
     const handleCancel = useCallback(async () => {
         if (!reservedCar) return;
@@ -40,9 +84,24 @@ const ReservationPage: React.FC = () => {
         setExpired(true);
     }, [reservedCar]);
 
-    const handleDrive = useCallback(async () => {
-        // drive
-    }, []);
+    const handleUnlock = useCallback(async () => {
+        const reservedCarId = reservedCar?.carId;
+        const userId = user.value.id;
+        if (!reservedCarId || !userId) {
+            return;
+        }
+        const response = await apiExec(BookingApi, (api) =>
+            api.apiBookingUnlockCarPost({
+                reservedCarId: reservedCarId,
+                rentorId: userId,
+            })
+        );
+        if (hasFailed(response)) {
+            // error
+        } else {
+            // drive
+        }
+    }, [reservedCar?.carId, user.value.id]);
 
     useEffect(() => {
         if (!reservedCar || expired) return;
@@ -91,7 +150,7 @@ const ReservationPage: React.FC = () => {
                 Cancel reservation manually
             </DefaultButton>
             <DefaultButton
-                onClick={handleDrive}
+                onClick={handleUnlock}
                 variant="outlined"
                 buttonClassName={classes.button}
             >

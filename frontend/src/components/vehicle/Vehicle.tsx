@@ -13,9 +13,8 @@ import { BookingApi, type CarTO } from "../../api";
 import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
 import useApiStates from "../../util/useApiStates.ts";
 import { useAppDispatch } from "../../store/Store.ts";
-import { setReservedCar } from "../../store/reducer/cars.ts";
 import { useNavigate } from "react-router-dom";
-import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
+import { apiExecWithToken, hasFailed } from "../../util/ApiUtils.ts";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -74,10 +73,9 @@ const Vehicle: React.FC<Props> = (props) => {
     }, []);
 
     const blockCar = async (carId: string) => {
-        const response = await apiExec(BookingApi, (api) =>
+        return await apiExecWithToken(BookingApi, (api) =>
             api.apiBookingBlockCarPost(carId)
         );
-        return !hasFailed(response);
     };
 
     const rentCarOnChain = async (carId: string, userId: string) => {
@@ -105,13 +103,15 @@ const Vehicle: React.FC<Props> = (props) => {
     const reserveCarInBackend = async (
         carId: string,
         userId: string,
-        txHash: string
+        txHash: string,
+        reservationId: string
     ) => {
-        const response = await apiExec(BookingApi, (api) =>
+        const response = await apiExecWithToken(BookingApi, (api) =>
             api.apiBookingReserveCarPost({
                 reservedCarId: carId,
                 rentorId: userId,
                 blockchainTransactionId: txHash,
+                id: reservationId,
             })
         );
         return !hasFailed(response);
@@ -119,22 +119,31 @@ const Vehicle: React.FC<Props> = (props) => {
 
     const handleConfirm = useCallback(async () => {
         const userId = user.value.id;
-        if (!userId) return reservationHasFailed();
+        if (!userId) {
+            return reservationHasFailed();
+        }
 
-        const blockSuccess = await blockCar(vehicle.carId);
-        if (!blockSuccess) return reservationHasFailed();
-
+        const blockResponse = await blockCar(vehicle.carId);
+        if (hasFailed(blockResponse)) {
+            return reservationHasFailed();
+        }
         const receipt = await rentCarOnChain(vehicle.carId, userId);
-        if (!receipt) return reservationHasFailed();
-
+        if (!receipt) {
+            return reservationHasFailed();
+        }
+        const reservationId = blockResponse.data.id;
+        if (!reservationId) {
+            return reservationHasFailed();
+        }
         const reserveSuccess = await reserveCarInBackend(
             vehicle.carId,
             userId,
-            receipt.transactionHash
+            receipt.transactionHash,
+            reservationId
         );
-        if (!reserveSuccess) return reservationHasFailed();
-
-        dispatch(setReservedCar(vehicle));
+        if (!reserveSuccess) {
+            return reservationHasFailed();
+        }
         navigate(`/reservation/${vehicle.carId}`);
         setFeedbackMsg("Car successfully reserved!");
         setFeedbackSeverity("success");
@@ -157,11 +166,13 @@ const Vehicle: React.FC<Props> = (props) => {
                 <CardMedia
                     component="img"
                     image={vehicle.trimImagePath || ""}
-                    alt={vehicle.modelName || ""}
+                    alt={`${vehicle.companyName} ${vehicle.modelName || ""}`}
                     className={classes.media}
                 />
                 <CardContent className={classes.content}>
-                    <Typography variant="h6">{vehicle.modelName}</Typography>
+                    <Typography variant="h6">
+                        {vehicle.companyName} {vehicle.modelName}
+                    </Typography>
                     <Typography variant="body2" color="textSecondary">
                         {vehicle.pricePerMinute} € / Minute
                     </Typography>
