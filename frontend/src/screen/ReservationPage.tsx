@@ -48,13 +48,13 @@ const ReservationPage: React.FC = () => {
         if (!reservedCarId || !userId) {
             return;
         }
-        const reponse = await apiExec(BookingApi, (api) =>
+        const response = await apiExec(BookingApi, (api) =>
             api.apiBookingUnlockCarPost({
                 reservedCarId: reservedCarId,
                 rentorId: userId,
             })
         );
-        if (hasFailed(reponse)) {
+        if (hasFailed(response)) {
             // error
         } else {
             // drive
