@@ -64,11 +64,13 @@ const ReservationPage: React.FC = () => {
         const now = new Date();
         return expiryTime
             ? Math.max(
-                  0,
+                  1,
                   Math.floor((expiryTime.getTime() - now.getTime()) / 1000)
               )
-            : 0;
+            : 1;
     }, [reservationCarObject?.blockageTimeUTC]);
+
+    console.log(initialTimeLeft);
 
     const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
 
@@ -110,7 +112,6 @@ const ReservationPage: React.FC = () => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    handleCancel();
                     return 0;
                 }
                 return prev - 1;
@@ -118,7 +119,7 @@ const ReservationPage: React.FC = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [reservedCar, expired, handleCancel]);
+    }, [reservedCar, expired]);
 
     if (!reservedCar || expired) {
         return (
