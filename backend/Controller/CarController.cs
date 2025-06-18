@@ -205,25 +205,5 @@ namespace SmartContractVehicle.Controller
 
             return Ok(res);
         }
-
-        [HttpGet]
-
-        public ActionResult<CarTO> ReserveCar(Guid carId)
-
-        {
-            var car = _db.Cars.Find(carId);
-            if(car == null)
-                return NotFound("Car not found");
-            if (car.Status.Id == (int)Data.CarStatuses.Available)
-            {
-                car.Status = _db.CarStatuses.Find((int)CarStatuses.Reserved);
-                _db.Cars.Update(car);
-                _db.SaveChanges();
-                return Ok(_mapper.Map<CarTO>(car));
-            }
-
-            else { return Conflict("Car is not available"); }
-
-        }
     }
 }
