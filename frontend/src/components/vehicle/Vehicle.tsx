@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
-import { CarApi, type CarTO } from "../../api";
+import { BookingApi, type CarTO } from "../../api";
 import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
 import useApiStates from "../../util/useApiStates.ts";
 import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
@@ -74,10 +74,24 @@ const Vehicle: React.FC<Props> = (props) => {
     }, []);
 
     const handleConfirm = useCallback(async () => {
-        const response = await apiExec(CarApi, (api) =>
-            api.apiCarReserveCarGet(vehicle.carId)
+        const userId = user.value.id;
+        if (!userId) {
+            reservationHasFailed();
+            return;
+        }
+        const responseBlock = await apiExec(BookingApi, (api) =>
+            api.apiBookingBlockCarPost(vehicle.carId)
         );
-
+        if (hasFailed(responseBlock)) {
+            reservationHasFailed();
+            return;
+        }
+        const response = await apiExec(BookingApi, (api) =>
+            api.apiBookingReserveCarPost({
+                reservedCarId: vehicle.carId,
+                rentorId: userId,
+            })
+        );
         if (hasFailed(response)) {
             reservationHasFailed();
             return;
@@ -87,12 +101,9 @@ const Vehicle: React.FC<Props> = (props) => {
             !web3Context.web3 ||
             !web3Context.account ||
             !web3Context.contract ||
-            !user.value.id ||
             !vehicle.pricePerMinute
         ) {
-            setFeedbackMsg("No account or contract loaded.");
-            setFeedbackSeverity("error");
-            setFeedbackOpen(true);
+            reservationHasFailed();
             return;
         }
 
