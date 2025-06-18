@@ -44,7 +44,7 @@ const Layout: React.FC = () => {
     }, [dispatch]);
 
     const cars = useApiStates("cars");
-    const reservedCar = cars.cars?.reservedCar; // optional chaining für Sicherheit
+    const reservedCar = cars.cars?.reservedCar;
 
     return (
         <Router>

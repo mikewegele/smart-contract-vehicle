@@ -148,6 +148,8 @@ const AuthForm: React.FC = () => {
                     api.apiAuthLoginLoginPost(email, password)
                 );
                 if (!hasFailed(response)) {
+                    const data = response.data as unknown as LoginResponse;
+                    localStorage.setItem("token", data.token);
                     navigate("/home");
                 } else {
                     setError("Failed to log in");
@@ -161,8 +163,6 @@ const AuthForm: React.FC = () => {
                     const data = response.data as unknown as LoginResponse;
 
                     localStorage.setItem("token", data.token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
-
                     navigate("/home");
                 } else {
                     setError("Failed to register");
