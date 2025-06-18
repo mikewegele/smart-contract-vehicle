@@ -6,7 +6,6 @@ using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
-using System.Threading.Tasks;
 
 namespace SmartContractVehicle.Controller
 {
@@ -127,8 +126,6 @@ namespace SmartContractVehicle.Controller
             return Ok(data);
         }
 
-
-
         [HttpGet]
         public ActionResult<IQueryable<DrivetrainTO>> GetDrivetrains()
         {
@@ -161,7 +158,7 @@ namespace SmartContractVehicle.Controller
         public ActionResult<CarStatusTO> GetStatus(Guid carId)
         {
             var car = _db.Cars.Find(carId);
-            if(car == null)
+            if (car == null)
                 return NotFound("Car not found.");
 
             return Ok(_mapper.Map<CarStatusTO>(car.Status));
