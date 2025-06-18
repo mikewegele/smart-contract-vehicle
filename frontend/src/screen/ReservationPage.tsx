@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useApiStates from "../util/useApiStates.ts";
 import VehicleMap from "../components/vehicle/VehicleMap.tsx";
 import Container from "../components/container/Container.tsx";
@@ -6,6 +6,8 @@ import NavLinks from "../components/NavLinks.tsx";
 import Typography from "@mui/material/Typography";
 import makeStyles from "../util/makeStyles.ts";
 import DefaultButton from "../components/button/DefaultButton.tsx";
+import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { BookingApi } from "../api";
 
 const useStyles = makeStyles(() => ({
     timerText: {
@@ -25,7 +27,10 @@ const useStyles = makeStyles(() => ({
 
 const ReservationPage: React.FC = () => {
     const { classes } = useStyles();
+
     const cars = useApiStates("cars");
+    const user = useApiStates("user");
+
     const [timeLeft, setTimeLeft] = useState(15 * 60);
     const [expired, setExpired] = useState(false);
 
@@ -36,6 +41,25 @@ const ReservationPage: React.FC = () => {
         // await apiExec(CarApi, (api) => api.apiCarCancelReservation(reservedCar.carId));
         setExpired(true);
     };
+
+    const handleUnlock = useCallback(async () => {
+        const reservedCarId = cars.cars.reservedCar?.carId;
+        const userId = user.user.value.id;
+        if (!reservedCarId || !userId) {
+            return;
+        }
+        const reponse = await apiExec(BookingApi, (api) =>
+            api.apiBookingUnlockCarPost({
+                reservedCarId: reservedCarId,
+                rentorId: userId,
+            })
+        );
+        if (hasFailed(reponse)) {
+            // error
+        } else {
+            // drive
+        }
+    }, [cars.cars.reservedCar?.carId, user.user.value.id]);
 
     useEffect(() => {
         if (!reservedCar || expired) return;
@@ -82,6 +106,13 @@ const ReservationPage: React.FC = () => {
                 buttonClassName={classes.button}
             >
                 Cancel reservation manually
+            </DefaultButton>
+            <DefaultButton
+                onClick={handleUnlock}
+                variant="outlined"
+                buttonClassName={classes.button}
+            >
+                Unlock Car
             </DefaultButton>
         </Container>
     );
