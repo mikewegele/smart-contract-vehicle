@@ -6,8 +6,6 @@ import NavLinks from "../components/NavLinks.tsx";
 import Typography from "@mui/material/Typography";
 import makeStyles from "../util/makeStyles.ts";
 import DefaultButton from "../components/button/DefaultButton.tsx";
-import { apiExec, hasFailed } from "../util/ApiUtils.ts";
-import { BookingApi } from "../api";
 
 const useStyles = makeStyles(() => ({
     timerText: {
@@ -36,30 +34,15 @@ const ReservationPage: React.FC = () => {
 
     const reservedCar = cars.cars.reservedCar;
 
-    const handleCancel = async () => {
+    const handleCancel = useCallback(async () => {
         if (!reservedCar) return;
         // await apiExec(CarApi, (api) => api.apiCarCancelReservation(reservedCar.carId));
         setExpired(true);
-    };
+    }, [reservedCar]);
 
-    const handleUnlock = useCallback(async () => {
-        const reservedCarId = cars.cars.reservedCar?.carId;
-        const userId = user.user.value.id;
-        if (!reservedCarId || !userId) {
-            return;
-        }
-        const response = await apiExec(BookingApi, (api) =>
-            api.apiBookingUnlockCarPost({
-                reservedCarId: reservedCarId,
-                rentorId: userId,
-            })
-        );
-        if (hasFailed(response)) {
-            // error
-        } else {
-            // drive
-        }
-    }, [cars.cars.reservedCar?.carId, user.user.value.id]);
+    const handleDrive = useCallback(async () => {
+        // drive
+    }, []);
 
     useEffect(() => {
         if (!reservedCar || expired) return;
@@ -108,11 +91,11 @@ const ReservationPage: React.FC = () => {
                 Cancel reservation manually
             </DefaultButton>
             <DefaultButton
-                onClick={handleUnlock}
+                onClick={handleDrive}
                 variant="outlined"
                 buttonClassName={classes.button}
             >
-                Unlock Car
+                Drive Car
             </DefaultButton>
         </Container>
     );
