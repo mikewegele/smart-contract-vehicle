@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     Alert,
     Card,
@@ -16,7 +16,6 @@ import { apiExec, hasFailed } from "../../util/ApiUtils.ts";
 import { useAppDispatch } from "../../store/Store.ts";
 import { setReservedCar } from "../../store/reducer/cars.ts";
 import { useNavigate } from "react-router-dom";
-import { fetchUser } from "../../store/reducer/user.ts";
 
 const useStyles = makeStyles(() => ({
     card: {
@@ -65,10 +64,6 @@ const Vehicle: React.FC<Props> = (props) => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        dispatch(fetchUser());
-    }, [dispatch]);
 
     const handleOpen = () => setOpenDialog(true);
     const handleClose = () => setOpenDialog(false);
@@ -131,6 +126,8 @@ const Vehicle: React.FC<Props> = (props) => {
         user.value.id,
         vehicle,
         reservationHasFailed,
+        dispatch,
+        navigate,
     ]);
 
     return (
