@@ -88,7 +88,7 @@ namespace SmartContractVehicle.Data
 
                         for (int c = 0; c < 5; c++) // 5 Autos pro Trim
                         {
-                            var car = new Car
+                            var car = new Car(available)
                             {
                                 Id = Guid.NewGuid(),
                                 VIN = $"VIN{Guid.NewGuid().ToString().Substring(0, 13)}",
