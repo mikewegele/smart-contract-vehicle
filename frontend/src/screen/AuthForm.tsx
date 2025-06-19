@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import makeStyles from "../util/makeStyles.ts";
 import { apiExec, hasFailed } from "../util/ApiUtils.ts";
 import { useNavigate } from "react-router-dom";
 import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { AuthApi } from "../api";
+import { makeStyles } from "tss-react/mui";
 
 interface LoginResponse {
     token: string;
@@ -20,16 +20,7 @@ interface LoginResponse {
     };
 }
 
-interface DecodedToken {
-    sub: string;
-    name: string;
-    exp: number;
-    iss: string;
-    aud: string;
-    jti: string;
-}
-
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     container: {
         display: "flex",
         flexDirection: "column",

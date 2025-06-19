@@ -1,7 +1,7 @@
 import React from "react";
-import makeStyles from "../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     mainTitle: {
         textAlign: "center",
         fontSize: "3rem",

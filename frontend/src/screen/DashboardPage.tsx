@@ -13,11 +13,11 @@ import {
 import { useAppDispatch } from "../store/Store.ts";
 import { Box } from "@mui/material";
 import { useGeolocation } from "../util/location/useGeolocation.ts";
-import makeStyles from "../util/makeStyles.ts";
 import VehicleFilterPanel from "../components/vehicle/VehicleFilterPanel.tsx";
 import { type GeoSpatialQueryTO } from "../api";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     mainContainer: {
         display: "flex",
         flexDirection: "row",

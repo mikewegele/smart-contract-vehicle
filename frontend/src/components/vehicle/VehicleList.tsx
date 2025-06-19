@@ -1,10 +1,10 @@
 import React from "react";
 import Vehicle from "./Vehicle";
-import makeStyles from "../../util/makeStyles.ts";
 import type { CarTO } from "../../api";
 import { useWeb3 } from "../../web3/Web3Provider.tsx";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     container: {
         display: "flex",
         flexWrap: "wrap",

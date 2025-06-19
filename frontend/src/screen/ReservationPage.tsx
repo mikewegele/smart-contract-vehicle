@@ -3,7 +3,6 @@ import VehicleMap from "../components/vehicle/VehicleMap.tsx";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import Typography from "@mui/material/Typography";
-import makeStyles from "../util/makeStyles.ts";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { apiExec, hasFailed } from "../util/ApiUtils.ts";
 import { BookingApi } from "../api";
@@ -12,12 +11,33 @@ import { useAppDispatch } from "../store/Store.ts";
 import { fetchAllCars } from "../store/reducer/cars.ts";
 import { fetchAllReservations } from "../store/reducer/reservation.ts";
 import useApiStates from "../util/useApiStates.ts";
+import { Box } from "@mui/material";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
-    timerText: {
+const useStyles = makeStyles()(() => ({
+    box: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "16px",
         marginTop: "16px",
+    },
+    timerText: {
+        marginBottom: "16px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
         fontWeight: "bold",
         fontSize: "1.2rem",
+        background: "rgba(255, 255, 255, 0.75)",
+        borderRadius: "12px",
+        padding: "16px 24px",
+        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.1)",
+        backdropFilter: "blur(8px)",
+        border: "1px solid rgba(255, 255, 255, 0.3)",
+        color: "#34495e",
+        textAlign: "center",
     },
     button: {
         width: "400px",
@@ -47,32 +67,52 @@ const ReservationPage: React.FC = () => {
         dispatch(fetchAllReservations());
     }, [dispatch]);
 
-    const [expired, setExpired] = useState(false);
-
     const reservationCarObject = useMemo(() => {
         return reservation.value.find(
             (reservation) => reservation.reservedCarId === carId
         );
     }, [carId, reservation.value]);
 
-    const initialTimeLeft = useMemo(() => {
-        const blockingTimeUTC = reservationCarObject?.blockageTimeUTC;
-        const blockageTime = blockingTimeUTC ? new Date(blockingTimeUTC) : null;
-        const expiryTime = blockageTime
-            ? new Date(blockageTime.getTime() + 15 * 60 * 1000)
-            : null;
+    const RESERVATION_TIMEOUT_MINUTES = 15;
+
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [expired, setExpired] = useState(false);
+
+    useEffect(() => {
+        if (!reservationCarObject?.blockageTimeUTC) return;
+
+        const blockageTime = new Date(reservationCarObject.blockageTimeUTC);
         const now = new Date();
-        return expiryTime
-            ? Math.max(
-                  1,
-                  Math.floor((expiryTime.getTime() - now.getTime()) / 1000)
-              )
-            : 1;
+
+        const elapsedMs = now.getTime() - blockageTime.getTime();
+        const elapsedSeconds = Math.floor(elapsedMs / 1000);
+        const totalTimeoutSeconds = RESERVATION_TIMEOUT_MINUTES * 60;
+        const remaining = totalTimeoutSeconds - elapsedSeconds;
+
+        const initialTimeLeft = Math.max(remaining, 0);
+        setTimeLeft(initialTimeLeft);
+
+        if (initialTimeLeft === 0) {
+            setExpired(true);
+        }
     }, [reservationCarObject?.blockageTimeUTC]);
 
-    console.log(initialTimeLeft);
+    useEffect(() => {
+        if (timeLeft === null || timeLeft <= 0) return;
 
-    const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
+        const interval = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev === null || prev <= 1) {
+                    clearInterval(interval);
+                    setExpired(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timeLeft]);
 
     const reservedCar = useMemo(() => {
         return reservationCarObject
@@ -105,22 +145,6 @@ const ReservationPage: React.FC = () => {
         }
     }, [reservedCar?.carId, user.value.id]);
 
-    useEffect(() => {
-        if (!reservedCar || expired) return;
-
-        const interval = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [reservedCar, expired]);
-
     if (!reservedCar || expired) {
         return (
             <Container>
@@ -138,25 +162,29 @@ const ReservationPage: React.FC = () => {
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
-            <Typography className={classes.timerText} variant="h6">
-                Reservation expires in {minutes}:
-                {seconds.toString().padStart(2, "0")}
-            </Typography>
+            <Box className={classes.box}>
+                <Typography className={classes.timerText} variant="h6">
+                    Reservation expires in {minutes}:
+                    {seconds.toString().padStart(2, "0")}
+                </Typography>
+            </Box>
             <VehicleMap vehicles={[reservedCar]} />
-            <DefaultButton
-                onClick={handleCancel}
-                variant="outlined"
-                buttonClassName={classes.button}
-            >
-                Cancel reservation manually
-            </DefaultButton>
-            <DefaultButton
-                onClick={handleUnlock}
-                variant="outlined"
-                buttonClassName={classes.button}
-            >
-                Drive Car
-            </DefaultButton>
+            <Box className={classes.box}>
+                <DefaultButton
+                    onClick={handleCancel}
+                    variant="outlined"
+                    buttonClassName={classes.button}
+                >
+                    Cancel reservation manually
+                </DefaultButton>
+                <DefaultButton
+                    onClick={handleUnlock}
+                    variant="outlined"
+                    buttonClassName={classes.button}
+                >
+                    Drive Car
+                </DefaultButton>
+            </Box>
         </Container>
     );
 };

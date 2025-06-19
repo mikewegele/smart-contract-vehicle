@@ -1,10 +1,10 @@
 import React from "react";
-import makeStyles from "../util/makeStyles.ts";
 import { useNavigate } from "react-router-dom";
 import DefaultButton from "./button/DefaultButton.tsx";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     navLinks: {
         position: "fixed",
         top: 0,

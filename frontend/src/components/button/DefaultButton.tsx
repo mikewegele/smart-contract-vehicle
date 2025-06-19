@@ -1,13 +1,13 @@
 import React from "react";
 import type { ButtonProps } from "@mui/material";
 import { Button } from "@mui/material";
-import makeStyles from "../../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     button: {
         padding: "0.75rem",
-        background: "rgba(0, 121, 107, 0.35) !important",
-        color: "white !important",
+        background: "rgba(0, 121, 107, 0.35)",
+        color: "white",
         fontWeight: "bold",
         borderRadius: "16px",
         backdropFilter: "blur(12px)",
@@ -19,14 +19,14 @@ const useStyles = makeStyles(() => ({
         userSelect: "none",
 
         "&:hover": {
-            background: "rgba(0, 121, 107, 0.5) !important",
+            background: "rgba(0, 121, 107, 0.5)",
             boxShadow:
                 "inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 14px rgba(0,0,0,0.2)",
             transform: "translateY(-2px)",
         },
 
         "&:active": {
-            background: "rgba(0, 121, 107, 0.25) !important",
+            background: "rgba(0, 121, 107, 0.25)",
             boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
             transform: "translateY(1px)",
         },
@@ -39,10 +39,10 @@ type Props = ButtonProps & {
 };
 
 const DefaultButton: React.FC<Props> = (props) => {
-    const { classes, classNames } = useStyles();
+    const { classes, cx } = useStyles();
     return (
         <Button
-            className={classNames(classes.button, props.buttonClassName)}
+            className={cx(classes.button, props.buttonClassName)}
             {...props}
         />
     );

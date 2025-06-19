@@ -7,7 +7,6 @@ import {
     Snackbar,
     Typography,
 } from "@mui/material";
-import makeStyles from "../../util/makeStyles.ts";
 import ReservationDialog from "./reservation/ReservationDialog.tsx";
 import { BookingApi, type CarTO } from "../../api";
 import type { IWeb3Context } from "../../web3/Web3Provider.tsx";
@@ -15,8 +14,9 @@ import useApiStates from "../../util/useApiStates.ts";
 import { useAppDispatch } from "../../store/Store.ts";
 import { useNavigate } from "react-router-dom";
 import { apiExecWithToken, hasFailed } from "../../util/ApiUtils.ts";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     card: {
         maxWidth: "300px",
         borderRadius: "16px",

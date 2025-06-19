@@ -5,6 +5,8 @@ using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
 using Microsoft.EntityFrameworkCore;
+using Nethereum.Web3;
+using Nethereum.RPC.Eth.DTOs;
 
 namespace SmartContractVehicle.Controller
 {
@@ -56,22 +58,36 @@ namespace SmartContractVehicle.Controller
         [HttpPost]
         public async Task<ActionResult<ReservationTO>> ReserveCar(ReservationTO reservation, CancellationToken ct)
         {
-
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
-
             var user = _db.Users.Find(userId);
-            if (user is null) return NotFound("The user was not found.");
+            if (user is null) return NotFound("User not found.");
 
             var dbReservation = _db.Reservations.Find(reservation.Id);
-            if (dbReservation is null) return NotFound("Reserveration unknown.");
+            if (dbReservation is null) return NotFound("Reservation not found.");
 
-            // TODO Check transaction Id on the blockchain if the transaction is non valid, cancle the reservation
             var transacId = reservation.BlockchainTransactionId;
 
-            dbReservation.BlockchainTransactionId = transacId;
+            var rpcUrl = "http://127.0.0.1:7545";
+            var web3 = new Web3(rpcUrl);
 
-            dbReservation.ReserveCar(db);
-            
+            Transaction tx = null;
+            try
+            {
+                tx = await web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(transacId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error fetching transaction: " + ex.Message);
+            }
+
+            if (tx == null)
+            {
+                return BadRequest("Transaction not found or invalid.");
+            }
+
+            dbReservation.BlockchainTransactionId = transacId;
+            dbReservation.ReserveCar(_db);
+
             await _db.SaveChangesAsync(ct);
             return Ok(reservation);
         }

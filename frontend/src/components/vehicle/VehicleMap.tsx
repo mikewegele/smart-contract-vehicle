@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L, { type LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import makeStyles from "../../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -24,7 +24,7 @@ const createVehicleIcon = (imageUrl: string) =>
         className: "vehicle-marker-icon",
     });
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     outerWrapper: {
         display: "flex",
         justifyContent: "center",

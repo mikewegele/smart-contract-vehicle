@@ -1,13 +1,14 @@
-import { Box, Slider, TextField, Typography } from "@mui/material";
-import makeStyles from "../../util/makeStyles";
+import { Box, Collapse, Slider, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
 import type { GeoSpatialQueryTO } from "../../api";
 import type { Position } from "../../util/location/useGeolocation.ts";
 import MultipleDropdown from "../select/MultipleDropdown.tsx";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     root: {
         background: "rgba(245, 245, 245, 0.7)",
         borderRadius: "12px",
@@ -20,8 +21,31 @@ const useStyles = makeStyles(() => ({
         gap: "16px",
     },
     sliderContainer: {
-        paddingLeft: "8px",
-        paddingRight: "8px",
+        padding: "8px",
+    },
+    advanced: {
+        color: "#34495e",
+        background: "rgba(255, 255, 255, 0.25)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        borderRadius: "16px",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        marginTop: "12px",
+        textAlign: "center",
+        alignItems: "center",
+        border: "none",
+        "&:hover": {
+            background: "rgba(255, 255, 255, 0.25)",
+            boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 14px rgba(0,0,0,0.2)",
+            transform: "translateY(-2px)",
+        },
+
+        "&:active": {
+            background: "rgba(255, 255, 255, 0.25)",
+            boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
+            transform: "translateY(1px)",
+        },
     },
     slider: {
         color: "#00796b",
@@ -80,6 +104,8 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
     }, [position]);
 
     const { cars } = useApiStates("cars");
+
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     return (
         <Box className={classes.root}>
@@ -153,6 +179,53 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     setFilters({ ...filters, allowedDrivetrains: newValue })
                 }
             />
+            <DefaultButton
+                buttonClassName={classes.advanced}
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                endIcon={
+                    <ExpandMoreIcon
+                        style={{
+                            transform: showAdvanced
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                            transition: "transform 0.3s",
+                        }}
+                    />
+                }
+            >
+                Advanced Options
+            </DefaultButton>
+
+            <Collapse in={showAdvanced} timeout="auto" unmountOnExit>
+                <MultipleDropdown
+                    label="Fuel Type"
+                    options={cars.fuelTypes.map((f) => f.name ?? "")}
+                    value={filters.allowedFueltypes ?? []}
+                    onChange={(newVal) =>
+                        setFilters({ ...filters, allowedFueltypes: newVal })
+                    }
+                />
+
+                <Box className={classes.sliderContainer}>
+                    <Typography gutterBottom>
+                        Min Remaining Reach (km)
+                    </Typography>
+                    <Slider
+                        className={classes.slider}
+                        value={filters.minRemainingReach ?? 0}
+                        onChange={(_, newVal) =>
+                            setFilters({
+                                ...filters,
+                                minRemainingReach: newVal as number,
+                            })
+                        }
+                        valueLabelDisplay="auto"
+                        min={0}
+                        max={600}
+                        step={10}
+                    />
+                </Box>
+            </Collapse>
 
             <DefaultButton
                 variant="contained"

@@ -1,10 +1,18 @@
-import React, {useEffect, useState} from "react";
-import {useCookies} from "react-cookie";
-import {Box, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography,} from "@mui/material";
-import makeStyles from "../../util/makeStyles";
+import React, { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import {
+    Box,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Stack,
+    Typography,
+} from "@mui/material";
+import { makeStyles } from "tss-react/mui";
 import DefaultButton from "../button/DefaultButton.tsx";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     root: {
         textAlign: "center",
         marginTop: "24px",
@@ -33,8 +41,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const UserCookieManager: React.FC = () => {
-
-    const {classes} = useStyles();
+    const { classes } = useStyles();
     const [cookies, setCookie] = useCookies(["user"]);
     const [open, setOpen] = useState(false);
 
@@ -57,22 +64,23 @@ const UserCookieManager: React.FC = () => {
 
     return (
         <Box className={classes.root}>
-            <Dialog
-                open={open}
-                onClose={() => {
-                }}
-                disableEscapeKeyDown
-            >
+            <Dialog open={open} onClose={() => {}} disableEscapeKeyDown>
                 <DialogTitle className={classes.dialogTitle}>
                     Cookie not set
                 </DialogTitle>
                 <DialogContent className={classes.dialogContent}>
                     <Typography variant="body1">
-                        No user cookie was found. Would you like to set one to improve the user experience?
+                        No user cookie was found. Would you like to set one to
+                        improve the user experience?
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Stack direction="row" spacing={2} paddingRight="16px" paddingBottom="8px">
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        paddingRight="16px"
+                        paddingBottom="8px"
+                    >
                         <DefaultButton
                             onClick={handleSetCookie}
                             variant="contained"

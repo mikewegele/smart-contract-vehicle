@@ -30,6 +30,7 @@
     "react-leaflet": "^5.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
+    "tss-react": "^4.9.18",
     "web3": "^4.16.0"
   },
   "devDependencies": {

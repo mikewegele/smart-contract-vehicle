@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import DefaultButton from "../../button/DefaultButton.tsx";
 import type { CarTO } from "../../../api";
-import makeStyles from "../../../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     paper: {
         background: "rgba(255, 255, 255, 0.75)",
         backdropFilter: "blur(20px)",

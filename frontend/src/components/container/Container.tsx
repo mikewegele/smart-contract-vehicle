@@ -1,7 +1,7 @@
 import React, { type PropsWithChildren } from "react";
-import makeStyles from "../../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     container: {
         display: "flex",
         flexDirection: "column",
