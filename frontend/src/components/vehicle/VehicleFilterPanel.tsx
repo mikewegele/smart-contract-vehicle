@@ -37,14 +37,22 @@ const useStyles = makeStyles(() => ({
             backdropFilter: "blur(8px)",
         },
         "& .MuiSlider-thumb": {
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            border: "2px solid rgba(0, 121, 107, 0.9)",
-            boxShadow: "0 0 8px rgba(0, 121, 107, 0.6)",
+            width: "28px",
+            height: "20px",
+            borderRadius: "6px",
             "&:hover, &.Mui-focusVisible": {
-                boxShadow: "0 0 12px rgba(0, 121, 107, 0.9)",
+                boxShadow:
+                    "inset 0 0 3px rgba(255, 255, 255, 0.4), 0 0 10px rgba(0, 121, 107, 0.6)",
             },
             "&.Mui-active": {
-                boxShadow: "0 0 16px rgba(0, 121, 107, 1)",
+                backgroundColor: "rgba(255, 255, 255, 0.02)",
+                backdropFilter: "blur(1px)",
+                boxShadow: `
+            inset 0 0 4px rgba(255, 255, 255, 0.3),
+            0 0 12px rgba(0, 121, 107, 0.6),
+            0 0 2px rgba(255, 255, 255, 0.2)
+        `,
+                border: "1px solid rgba(255, 255, 255, 0.3)",
             },
         },
     },
