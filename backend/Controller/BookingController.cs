@@ -68,7 +68,7 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult> UnlockCar(ReservationTO userReservation, CancellationToken ct)
+        public async Task<ActionResult> StartRide(ReservationTO userReservation, CancellationToken ct)
         {
             // First we get the user that tries to unlock the car
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
@@ -88,7 +88,39 @@ namespace SmartContractVehicle.Controller
 
             // TODO Send Notifcation to the car to open
 
-            // TODO Create new Ride Object and share it with the user, we later can use this to save ride info etc
+            // TODO Create new Booking / Ride Object and share it with the user, we later can use this to save ride info etc
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public ActionResult EndRideProcedureInit()
+        {
+            // TODO Check if car is stationary (and empty)
+            
+
+            // TODO Try to lock car 
+
+
+            return Ok(); // bzw.: inkl RideLedger/Booking object
+        }
+
+        // Für unsere Buchung müssen wir speichern:
+        // StartOrt, StartZeit, User, Fahrzeug, Preis p. Minute, EndZeit, EndOrt, TransactionIdBlockchain, (dynamisch Fahrtdauer & Preis berechnen) fahrtpreis => ppm * (endzeit - startzeit);
+
+        [HttpPost]
+        public ActionResult EndRideProcedureFinalize() // in: RideTO userRide inkl. TransaktionsId
+        {
+            // DB Query dbRide = db.Find(userRide.Id)
+
+            // dbRide.EndRide(); 
+            // EndRide : Funktion aus ride / booking objekt
+              
+            // TODO Check if ride is paid for (blockchain)
+
+            // Finalize Booking object // Endzeit, End Ort, 
+            // Auto Verfügbar machen
+            // Telemtriedaten updaten etc.
 
             return Ok();
         }

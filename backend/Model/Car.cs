@@ -36,6 +36,9 @@ namespace SmartContractVehicle.Model
         
         public virtual Reservation? ActiveReservation { get; private set; }
 
+        // public Car SetStatus(CarStatus? newStatus, Booking booking);
+
+        // TODO Anpassen für Buchungen/Fahrten
         public Car SetStatus(CarStatus? newStatus, Reservation reservation)
         {
             ArgumentNullException.ThrowIfNull(newStatus, nameof(newStatus));
