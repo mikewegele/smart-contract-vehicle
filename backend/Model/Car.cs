@@ -29,7 +29,8 @@ namespace SmartContractVehicle.Model
 
         public required double PricePerMinute { get; set; }
 
-        public virtual CarStatus Status { get; private set; } = new() { Id = (int)CarStatuses.Available, Name = "" };
+        public int StatusId { get; set; }
+        public virtual CarStatus Status { get; set; } = null!;
 
         public DateTime LastStatusChange { get; private set; } = DateTime.UtcNow;
         public TimeSpan RideTime => (CarStatuses)Status.Id != CarStatuses.InTransit ? TimeSpan.Zero : DateTime.UtcNow - LastStatusChange;

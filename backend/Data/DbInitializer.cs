@@ -94,6 +94,7 @@ namespace SmartContractVehicle.Data
                                 VIN = $"VIN{Guid.NewGuid().ToString().Substring(0, 13)}",
                                 Owner = user,
                                 Trim = trim,
+                                StatusId = available.Id,
                                 CurrentPosition = geometryFactory.CreatePoint(new Coordinate(
                                     13.2 + random.NextDouble() * 0.4, // longitude (E)
                                     52.3 + random.NextDouble() * 0.3  // latitude (N)

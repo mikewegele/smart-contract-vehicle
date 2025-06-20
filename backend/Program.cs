@@ -158,7 +158,7 @@ using (var scope = app.Services.CreateScope())
     {
         var fuels = context.FuelTypes.ToArray();
         var drivetrains = context.Drivetrains.ToArray();
-        var available = context.CarStatuses.Find((int)CarStatuses.Available) ?? throw new Exception("The car status \"available\" was not found in the database. It is strictly required.");
+        var available = context.CarStatuses.AsNoTracking().FirstOrDefault(cs => cs.Id == (int)CarStatuses.Available)  ?? throw new Exception("The car status \"available\" was not found in the database. It is strictly required.");
         var (companies, cars) = DbInitializer.SeedCars(user, fuels, drivetrains, available);
 
         var tac = context.AutomotiveCompanies.AddRangeAsync(companies);
