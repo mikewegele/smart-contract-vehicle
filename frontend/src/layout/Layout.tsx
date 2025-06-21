@@ -12,6 +12,7 @@ import SmartContractTestPage from "../screen/SmartContractTestPage.tsx";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
 import ReservationPage from "../screen/ReservationPage.tsx";
+import DrivingPage from "../screen/DrivingPage.tsx";
 
 const isLoggedIn = () => {
     return Boolean(localStorage.getItem("token"));
@@ -52,6 +53,10 @@ const Layout: React.FC = () => {
                 <Route
                     path="/reservation/:carId"
                     element={<ProtectedRoute element={<ReservationPage />} />}
+                />
+                <Route
+                    path="/driving"
+                    element={<ProtectedRoute element={<DrivingPage />} />}
                 />
             </Routes>
         </Router>

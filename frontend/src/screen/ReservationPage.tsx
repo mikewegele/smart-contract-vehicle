@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import DefaultButton from "../components/button/DefaultButton.tsx";
 import { apiExec, hasFailed } from "../util/ApiUtils.ts";
 import { BookingApi } from "../api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchAllCars } from "../store/reducer/cars.ts";
 import { fetchAllReservations } from "../store/reducer/reservation.ts";
@@ -59,6 +59,8 @@ const ReservationPage: React.FC = () => {
         "user",
         "reservation"
     );
+
+    const navigate = useNavigate();
 
     const dispatch = useAppDispatch();
 
@@ -141,9 +143,9 @@ const ReservationPage: React.FC = () => {
         if (hasFailed(response)) {
             // error
         } else {
-            // drive
+            navigate("/driving");
         }
-    }, [reservedCar?.carId, user.value.id]);
+    }, [navigate, reservedCar?.carId, user.value.id]);
 
     if (!reservedCar || expired) {
         return (
