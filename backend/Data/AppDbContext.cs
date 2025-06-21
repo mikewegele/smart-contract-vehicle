@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Drivetrain> Drivetrains { get; set; }
     public DbSet<CarStatus> CarStatuses { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<Booking> Bookings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

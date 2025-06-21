@@ -89,6 +89,9 @@ namespace SmartContractVehicle.Controller
             // TODO Send Notifcation to the car to open
 
             // TODO Create new Booking / Ride Object and share it with the user, we later can use this to save ride info etc
+            var booking = new Booking(userId);
+            _db.Add(booking);
+            await _db.SaveChangesAsync(ct);
 
             return Ok();
         }
