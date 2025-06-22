@@ -4,7 +4,7 @@ import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import Typography from "@mui/material/Typography";
 import DefaultButton from "../components/button/DefaultButton.tsx";
-import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
 import { BookingApi } from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "../store/Store.ts";
@@ -134,7 +134,7 @@ const ReservationPage: React.FC = () => {
         if (!reservedCarId || !userId) {
             return;
         }
-        const response = await apiExec(BookingApi, (api) =>
+        const response = await apiExecWithToken(BookingApi, (api) =>
             api.apiBookingUnlockCarPost({
                 reservedCarId: reservedCarId,
                 rentorId: userId,

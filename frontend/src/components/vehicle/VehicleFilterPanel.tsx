@@ -115,10 +115,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                 <Typography gutterBottom>Seats</Typography>
                 <Slider
                     className={classes.slider}
-                    value={[
-                        filters.minSeats ?? 1,
-                        filters.maxSeats ?? cars.maxSeats,
-                    ]}
+                    value={[filters.minSeats ?? 1, filters.maxSeats ?? 6]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
                         setFilters({
@@ -131,7 +128,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     step={1}
                     marks
                     min={1}
-                    max={cars.maxSeats}
+                    max={6}
                 />
             </Box>
             <TextField
@@ -152,7 +149,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     className={classes.slider}
                     value={[
                         filters.minPricePerMinute ?? 0,
-                        filters.maxPricePerMinute ?? cars.maxPricePerMinute,
+                        filters.maxPricePerMinute ?? 1,
                     ]}
                     onChange={(_, newVal) => {
                         const [min, max] = newVal as number[];
@@ -164,7 +161,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                     }}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={cars.maxPricePerMinute}
+                    max={1}
                     step={0.01}
                 />
             </Box>

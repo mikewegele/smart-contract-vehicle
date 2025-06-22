@@ -33,7 +33,6 @@ const useStyles = makeStyles()(() => ({
     },
     mapWrapper: {
         width: "80%",
-        maxWidth: "1000px",
         height: "500px",
         borderRadius: "12px",
         overflow: "hidden",
@@ -49,10 +48,11 @@ const DEFAULT_IMAGE =
 
 interface Props {
     vehicles: CarTO[];
+    clickOnConfirm?: (vehicle: CarTO) => Promise<void>;
 }
 
 const VehicleMap: React.FC<Props> = (props) => {
-    const { vehicles } = props;
+    const { vehicles, clickOnConfirm } = props;
 
     const { classes } = useStyles();
 
@@ -118,8 +118,14 @@ const VehicleMap: React.FC<Props> = (props) => {
                             )}
                         >
                             <Popup maxWidth={200}>
-                                <div style={{ textAlign: "center" }}>
-                                    <strong>{vehicle.modelName}</strong>
+                                <div
+                                    style={{ textAlign: "center" }}
+                                    onClick={() => clickOnConfirm(vehicle)}
+                                >
+                                    <strong>
+                                        {vehicle.companyName}{" "}
+                                        {vehicle.modelName}
+                                    </strong>
                                     <br />
                                     <img
                                         src={

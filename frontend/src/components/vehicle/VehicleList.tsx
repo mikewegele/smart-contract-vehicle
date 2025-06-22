@@ -1,7 +1,6 @@
 import React from "react";
 import Vehicle from "./Vehicle";
 import type { CarTO } from "../../api";
-import { useWeb3 } from "../../web3/Web3Provider.tsx";
 import { makeStyles } from "tss-react/mui";
 
 const useStyles = makeStyles()(() => ({
@@ -13,12 +12,11 @@ const useStyles = makeStyles()(() => ({
 
 interface Props {
     vehicles: CarTO[];
+    clickOnConfirm: (vehicle: CarTO) => Promise<void>;
 }
 
 const VehicleList: React.FC<Props> = (props) => {
-    const { vehicles } = props;
-
-    const web3Context = useWeb3();
+    const { vehicles, clickOnConfirm } = props;
 
     const { classes } = useStyles();
 
@@ -28,7 +26,7 @@ const VehicleList: React.FC<Props> = (props) => {
                 <Vehicle
                     key={car.carId}
                     vehicle={car}
-                    web3Context={web3Context}
+                    clickOnConfirm={clickOnConfirm}
                 />
             ))}
         </div>
