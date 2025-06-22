@@ -8,6 +8,9 @@ public class Booking
     public Guid Id { get; private set; } = Guid.NewGuid();
     public Guid ReservationId { get; set; }  // FK to Reservation
     public Reservation Reservation { get; set; }
+    public Guid ReservedCarId { get; private set; }
+    public Car Car { get; set;  }
+    public Guid CarId { get; private set; }
 
     public string RentorId { get; private set; }
     public User User { get; set; }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
+using SmartContractVehicle.Services;
 
 namespace SmartContractVehicle.Controller
 {
@@ -14,6 +16,8 @@ namespace SmartContractVehicle.Controller
     {
         private readonly AppDbContext _db = db;
         private readonly IMapper _mapper = mapper;
+
+        private readonly CarStatusService carstatusservice;
 
         /// <summary>
         /// This function will block the car from getting reserved by any one but the one who blocked it
@@ -97,12 +101,28 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpPost]
-        public ActionResult EndRideProcedureInit()
+        public async Task<ActionResult<BookingTO>> EndRideProcedureInit(Guid bookingId, CancellationToken ct)
         {
             // TODO Check if car is stationary (and empty)
-            
+            var booking = await _db.Bookings
+                .Include(b => b.Car)
+                .Include(b => b.Reservation)
+                .Include(b => b.User)
+                .FirstOrDefaultAsync(b => b.Id == bookingId, ct);
+
+            if (booking == null)
+                return NotFound("The booking could not be found");
+
+            if (booking.IsCompleted)
+                return BadRequest("The booking is already completed");
+                
+            if (!await carstatusservice.IsCarReadyToEndRideAsync(booking.CarId))
+                return BadRequest("Car is not stationary or still occupied.");
+
 
             // TODO Try to lock car 
+
+            var lockcar = await carstatusservice.TryLockCarAsync(booking.CarId); // TryLockCarAsync still needs to be implemented in CarStatusService.cs
 
 
             return Ok(); // bzw.: inkl RideLedger/Booking object
