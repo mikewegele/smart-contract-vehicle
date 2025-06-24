@@ -55,7 +55,7 @@ const Layout: React.FC = () => {
                     element={<ProtectedRoute element={<ReservationPage />} />}
                 />
                 <Route
-                    path="/driving"
+                    path="/driving/:carId"
                     element={<ProtectedRoute element={<DrivingPage />} />}
                 />
             </Routes>

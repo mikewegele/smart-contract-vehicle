@@ -144,7 +144,7 @@ const ReservationPage: React.FC = () => {
         if (hasFailed(response)) {
             // error
         } else {
-            navigate("/driving");
+            navigate(`/driving/${vehicle.carId}`);
         }
     }, [navigate, reservedCar?.carId, user.value.id]);
 

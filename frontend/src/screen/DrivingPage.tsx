@@ -3,6 +3,10 @@ import { Box, Grid, LinearProgress, Typography } from "@mui/material";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import { makeStyles } from "tss-react/mui";
+import { useParams } from "react-router-dom";
+import useApiStates from "../util/useApiStates.ts";
+import { useAppDispatch } from "../store/Store.ts";
+import { fetchAllCars } from "../store/reducer/cars.ts";
 
 const useStyles = makeStyles()(() => ({
     glassBox: {
@@ -37,23 +41,42 @@ const stopTimes = [0.3, 5, 10.5, 14, 19.5, 24, 26, 29, 30.5, 35, 38];
 const DrivingPage: React.FC = () => {
     const { classes } = useStyles();
 
+    const { carId } = useParams();
+
+    const { cars } = useApiStates("cars");
+
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchAllCars());
+    }, [dispatch]);
+
+    const car = cars.value.find((car) => car.carId === carId);
+
     const [speed, setSpeed] = useState(0);
     const [battery, setBattery] = useState(78);
-    const [odometer, setOdometer] = useState(21532);
+    const [remainingReach, setRemainingReach] = useState<number | undefined>(
+        undefined
+    );
     const [temperature, setTemperature] = useState(27);
     const [currentTime, setCurrentTime] = useState(0);
     const [lastMoveTime, setLastMoveTime] = useState<number | null>(null);
     const maxSpeed = 30;
 
     useEffect(() => {
+        if (car) {
+            setRemainingReach(car.remainingReach);
+        }
+    }, [car]);
+
+    useEffect(() => {
         const interval = setInterval(() => {
             setBattery((b) => Math.max(0, b - Math.random() * 0.2));
-            setOdometer((o) => o + Math.random() * 0.05);
             setTemperature((t) => t + (Math.random() * 0.5 - 0.25));
         }, 1500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [speed]);
 
     useEffect(() => {
         const threshold = 0.3;
@@ -72,9 +95,14 @@ const DrivingPage: React.FC = () => {
                 const accel = 10; // km/h per second
                 const newSpeed = Math.min(maxSpeed, timeSinceMove * accel);
                 setSpeed(Math.round(newSpeed));
+                setRemainingReach((r) =>
+                    r !== undefined
+                        ? Math.max(0, r - (newSpeed / 3600) * 4)
+                        : undefined
+                );
             }
         }
-    }, [currentTime]);
+    }, [currentTime, lastMoveTime]);
 
     return (
         <Container>
@@ -82,7 +110,7 @@ const DrivingPage: React.FC = () => {
 
             <Box className={classes.glassBox}>
                 <video
-                    src="videos/driving.mp4"
+                    src="/videos/driving.mp4"
                     autoPlay
                     muted
                     loop
@@ -112,9 +140,13 @@ const DrivingPage: React.FC = () => {
                     </Typography>
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <Typography className={classes.label}>Odometer</Typography>
+                    <Typography className={classes.label}>
+                        Remaining Reach
+                    </Typography>
                     <Typography className={classes.value}>
-                        {odometer.toFixed(1)} km
+                        {remainingReach !== undefined
+                            ? `${remainingReach.toFixed(1)} km`
+                            : "Loading..."}
                     </Typography>
                 </Grid>
                 <Grid item xs={6} md={3}>
