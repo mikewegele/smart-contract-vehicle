@@ -21,6 +21,7 @@ import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { useNavigate } from "react-router-dom";
 import ReservationDialog from "../components/vehicle/reservation/ReservationDialog.tsx";
 import { addLog } from "../store/reducer/logs.ts";
+import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -91,6 +92,7 @@ const DashboardPage: React.FC = () => {
     const reservationHasFailed = useCallback(() => {
         setFeedbackMsg("Failed to reserve car.");
         setFeedbackSeverity("error");
+        setFeedbackOpen(true);
     }, []);
 
     const blockCar = async (carId: string) => {
@@ -144,7 +146,6 @@ const DashboardPage: React.FC = () => {
             if (!userId) {
                 return reservationHasFailed();
             }
-
             const blockResponse = await blockCar(vehicle.carId);
             if (hasFailed(blockResponse)) {
                 return reservationHasFailed();
@@ -153,7 +154,6 @@ const DashboardPage: React.FC = () => {
             if (!receipt) {
                 return reservationHasFailed();
             }
-
             const reservationId = blockResponse.data.id;
             dispatch(addLog(receipt.transactionHash));
             if (!reservationId) {
@@ -214,6 +214,12 @@ const DashboardPage: React.FC = () => {
                     car={currentVehicle}
                 />
             )}
+            <FeedbackSnackbar
+                open={feedbackOpen}
+                message={feedbackMsg}
+                severity={feedbackSeverity}
+                onClose={() => setFeedbackOpen(false)}
+            />
         </Container>
     );
 };
