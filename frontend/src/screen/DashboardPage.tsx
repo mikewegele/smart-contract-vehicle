@@ -19,6 +19,8 @@ import { makeStyles } from "tss-react/mui";
 import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
 import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { useNavigate } from "react-router-dom";
+import ReservationDialog from "../components/vehicle/reservation/ReservationDialog.tsx";
+import { addLog } from "../store/reducer/logs.ts";
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -58,6 +60,15 @@ const DashboardPage: React.FC = () => {
     const [feedbackSeverity, setFeedbackSeverity] = useState<
         "success" | "error"
     >("success");
+    const [openDialog, setOpenDialog] = useState(false);
+    const [currentVehicle, setCurrentVehicle] = useState<CarTO | null>(null);
+
+    const handleOpen = useCallback((vehicle: CarTO) => {
+        setOpenDialog(true);
+        setCurrentVehicle(vehicle);
+    }, []);
+
+    const handleClose = () => setOpenDialog(false);
 
     const web3Context = useWeb3();
 
@@ -142,7 +153,9 @@ const DashboardPage: React.FC = () => {
             if (!receipt) {
                 return reservationHasFailed();
             }
+
             const reservationId = blockResponse.data.id;
+            dispatch(addLog(receipt.transactionHash));
             if (!reservationId) {
                 return reservationHasFailed();
             }
@@ -176,7 +189,7 @@ const DashboardPage: React.FC = () => {
                     <Box className={classes.mapBox}>
                         <SimpleMap
                             vehicles={cars.value}
-                            clickOnConfirm={clickOnConfirm}
+                            openDialog={handleOpen}
                         />
                     </Box>
                 </Box>
@@ -189,8 +202,17 @@ const DashboardPage: React.FC = () => {
                     <VehicleList
                         vehicles={cars.value}
                         clickOnConfirm={clickOnConfirm}
+                        handleOpen={handleOpen}
                     />
                 </Box>
+            )}
+            {currentVehicle && (
+                <ReservationDialog
+                    open={openDialog}
+                    onClose={handleClose}
+                    onConfirm={() => clickOnConfirm(currentVehicle)}
+                    car={currentVehicle}
+                />
             )}
         </Container>
     );

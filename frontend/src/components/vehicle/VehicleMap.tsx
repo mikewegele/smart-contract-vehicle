@@ -48,11 +48,11 @@ const DEFAULT_IMAGE =
 
 interface Props {
     vehicles: CarTO[];
-    clickOnConfirm?: (vehicle: CarTO) => Promise<void>;
+    openDialog?: (vehicle: CarTO) => void;
 }
 
 const VehicleMap: React.FC<Props> = (props) => {
-    const { vehicles, clickOnConfirm } = props;
+    const { vehicles, openDialog } = props;
 
     const { classes } = useStyles();
 
@@ -119,8 +119,11 @@ const VehicleMap: React.FC<Props> = (props) => {
                         >
                             <Popup maxWidth={200}>
                                 <div
-                                    style={{ textAlign: "center" }}
-                                    onClick={() => clickOnConfirm(vehicle)}
+                                    style={{
+                                        textAlign: "center",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => openDialog(vehicle)}
                                 >
                                     <strong>
                                         {vehicle.companyName}{" "}

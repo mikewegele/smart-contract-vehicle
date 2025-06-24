@@ -1,6 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
-import ReservationDialog from "./reservation/ReservationDialog.tsx";
 import { type CarTO } from "../../api";
 import { makeStyles } from "tss-react/mui";
 
@@ -34,25 +33,16 @@ const useStyles = makeStyles()(() => ({
 interface Props {
     vehicle: CarTO;
     clickOnConfirm: (vehicle: CarTO) => Promise<void>;
+    handleOpen: (vehicle: CarTO) => void;
 }
 
 const Vehicle: React.FC<Props> = (props) => {
-    const { vehicle, clickOnConfirm } = props;
+    const { vehicle, handleOpen } = props;
     const { classes } = useStyles();
-
-    const [openDialog, setOpenDialog] = useState(false);
-
-    const handleOpen = () => setOpenDialog(true);
-    const handleClose = () => setOpenDialog(false);
-
-    const handleConfirm = useCallback(async () => {
-        clickOnConfirm(vehicle);
-        setOpenDialog(false);
-    }, [clickOnConfirm, vehicle]);
 
     return (
         <>
-            <Card className={classes.card} onClick={handleOpen}>
+            <Card className={classes.card} onClick={() => handleOpen(vehicle)}>
                 <CardMedia
                     component="img"
                     image={vehicle.trimImagePath || ""}
@@ -74,12 +64,6 @@ const Vehicle: React.FC<Props> = (props) => {
                     </Typography>
                 </CardContent>
             </Card>
-            <ReservationDialog
-                open={openDialog}
-                onClose={handleClose}
-                onConfirm={handleConfirm}
-                car={vehicle}
-            />
         </>
     );
 };

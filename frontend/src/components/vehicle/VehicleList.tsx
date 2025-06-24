@@ -13,10 +13,11 @@ const useStyles = makeStyles()(() => ({
 interface Props {
     vehicles: CarTO[];
     clickOnConfirm: (vehicle: CarTO) => Promise<void>;
+    handleOpen: (vehicle: CarTO) => void;
 }
 
 const VehicleList: React.FC<Props> = (props) => {
-    const { vehicles, clickOnConfirm } = props;
+    const { vehicles, clickOnConfirm, handleOpen } = props;
 
     const { classes } = useStyles();
 
@@ -26,6 +27,7 @@ const VehicleList: React.FC<Props> = (props) => {
                 <Vehicle
                     key={car.carId}
                     vehicle={car}
+                    handleOpen={handleOpen}
                     clickOnConfirm={clickOnConfirm}
                 />
             ))}
