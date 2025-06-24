@@ -34,7 +34,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 type Props = ButtonProps & {
-    buttonClassName?: string;
+    buttonclassname?: string;
     children: React.ReactNode;
 };
 
@@ -42,7 +42,7 @@ const DefaultButton: React.FC<Props> = (props) => {
     const { classes, cx } = useStyles();
     return (
         <Button
-            className={cx(classes.button, props.buttonClassName)}
+            className={cx(classes.button, props.buttonclassname)}
             {...props}
         />
     );

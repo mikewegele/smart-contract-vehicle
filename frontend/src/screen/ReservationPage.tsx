@@ -138,6 +138,7 @@ const ReservationPage: React.FC = () => {
             api.apiBookingUnlockCarPost({
                 reservedCarId: reservedCarId,
                 rentorId: userId,
+                id: reservationCarObject?.id,
             })
         );
         if (hasFailed(response)) {
@@ -175,14 +176,14 @@ const ReservationPage: React.FC = () => {
                 <DefaultButton
                     onClick={handleCancel}
                     variant="outlined"
-                    buttonClassName={classes.button}
+                    buttonclassname={classes.button}
                 >
                     Cancel reservation manually
                 </DefaultButton>
                 <DefaultButton
                     onClick={handleUnlock}
                     variant="outlined"
-                    buttonClassName={classes.button}
+                    buttonclassname={classes.button}
                 >
                     Drive Car
                 </DefaultButton>

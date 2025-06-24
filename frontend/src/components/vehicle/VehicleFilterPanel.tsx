@@ -177,7 +177,7 @@ const VehicleFilterPanel: React.FC<Props> = (props) => {
                 }
             />
             <DefaultButton
-                buttonClassName={classes.advanced}
+                buttonclassname={classes.advanced}
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 endIcon={
                     <ExpandMoreIcon
