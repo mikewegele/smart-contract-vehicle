@@ -13,6 +13,9 @@ import { fetchAllReservations } from "../store/reducer/reservation.ts";
 import useApiStates from "../util/useApiStates.ts";
 import { Box } from "@mui/material";
 import { makeStyles } from "tss-react/mui";
+import { useWeb3 } from "../web3/Web3Provider.tsx";
+import { addLog } from "../store/reducer/logs.ts";
+import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
 
 const useStyles = makeStyles()(() => ({
     box: {
@@ -54,11 +57,19 @@ const ReservationPage: React.FC = () => {
 
     const { carId } = useParams();
 
+    const web3 = useWeb3();
+
     const { cars, user, reservation } = useApiStates(
         "cars",
         "user",
         "reservation"
     );
+
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [feedbackMsg, setFeedbackMsg] = useState("");
+    const [feedbackSeverity, setFeedbackSeverity] = useState<
+        "success" | "error"
+    >("success");
 
     const navigate = useNavigate();
 
@@ -123,10 +134,44 @@ const ReservationPage: React.FC = () => {
     }, [carId, cars.value, reservationCarObject]);
 
     const handleCancel = useCallback(async () => {
-        if (!reservedCar) return;
-        // await apiExec(CarApi, (api) => api.apiCarCancelReservation(reservedCar.carId));
+        if (!reservedCar) {
+            return;
+        }
+        if (
+            !web3.web3 ||
+            !web3.account ||
+            !web3.contract ||
+            !reservedCar ||
+            !user.value.id ||
+            !reservedCar.carId
+        ) {
+            return null;
+        }
+        try {
+            const receipt = await web3.contract.methods
+                .cancelReservation(reservedCar.carId, user.value.id)
+                .send({
+                    from: web3.account,
+                });
+            dispatch(
+                addLog({
+                    name: "Cancel Reservation in Blockchain",
+                    message: `Cancelled Car: ${reservedCar.carId}`,
+                    id: receipt.transactionHash,
+                })
+            );
+        } catch {
+            return null;
+        }
         setExpired(true);
-    }, [reservedCar]);
+    }, [
+        dispatch,
+        reservedCar,
+        user.value.id,
+        web3.account,
+        web3.contract,
+        web3.web3,
+    ]);
 
     const handleUnlock = useCallback(async () => {
         const reservedCarId = reservedCar?.carId;
@@ -142,9 +187,10 @@ const ReservationPage: React.FC = () => {
             })
         );
         if (hasFailed(response)) {
-            // error
+            setFeedbackSeverity("success");
+            setFeedbackMsg("Failed to unlock the car");
         } else {
-            navigate(`/driving/${vehicle.carId}`);
+            navigate(`/driving/${reservedCarId}`);
         }
     }, [navigate, reservedCar?.carId, user.value.id]);
 
@@ -188,6 +234,12 @@ const ReservationPage: React.FC = () => {
                     Drive Car
                 </DefaultButton>
             </Box>
+            <FeedbackSnackbar
+                open={feedbackOpen}
+                message={feedbackMsg}
+                severity={feedbackSeverity}
+                onClose={() => setFeedbackOpen(false)}
+            />
         </Container>
     );
 };

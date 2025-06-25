@@ -6,6 +6,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
+import If from "../helper/If.tsx";
 
 const useStyles = makeStyles()(() => ({
     container: {
@@ -157,9 +158,15 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                         currentLogs.length > 0 ? (
                             currentLogs.map((log, index) => (
                                 <div key={index} className={classes.logItem}>
-                                    {typeof log === "string"
-                                        ? log
-                                        : JSON.stringify(log)}
+                                    <If condition={log.name !== undefined}>
+                                        <div>{log.name}</div>
+                                    </If>
+                                    <If condition={log.id !== undefined}>
+                                        <div>{log.id}</div>
+                                    </If>
+                                    <If condition={log.message !== undefined}>
+                                        <div>{log.message}</div>
+                                    </If>
                                 </div>
                             ))
                         ) : (

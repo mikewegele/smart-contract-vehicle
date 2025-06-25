@@ -155,7 +155,13 @@ const DashboardPage: React.FC = () => {
                 return reservationHasFailed();
             }
             const reservationId = blockResponse.data.id;
-            dispatch(addLog(receipt.transactionHash));
+            dispatch(
+                addLog({
+                    name: "Reserve Car",
+                    message: `Reserve car: ${reservationId} in Blockchain`,
+                    id: receipt.transactionHash,
+                })
+            );
             if (!reservationId) {
                 return reservationHasFailed();
             }
@@ -176,7 +182,6 @@ const DashboardPage: React.FC = () => {
     return (
         <Container>
             <NavLinks isLoggedIn={true} />
-
             <Box className={classes.mainContainer}>
                 <Box className={classes.filterBox}>
                     <VehicleFilterPanel
@@ -196,7 +201,6 @@ const DashboardPage: React.FC = () => {
 
                 <Box className={classes.rightBox}></Box>
             </Box>
-
             {appliedFilters && (
                 <Box mt={4}>
                     <VehicleList
@@ -220,6 +224,7 @@ const DashboardPage: React.FC = () => {
                 severity={feedbackSeverity}
                 onClose={() => setFeedbackOpen(false)}
             />
+            ;
         </Container>
     );
 };

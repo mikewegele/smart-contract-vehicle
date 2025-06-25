@@ -1,8 +1,14 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import { type ApiError } from "../../util/ApiUtils.ts";
 
+export interface Log {
+    id?: string;
+    name?: string;
+    message?: string;
+}
+
 interface State {
-    value: string[];
+    value: Log[];
     error?: ApiError;
 }
 
@@ -13,7 +19,7 @@ const reduceLogsError = (
     draft.error = action.payload;
 };
 
-const reduceAddLog = (draft: Draft<State>, action: PayloadAction<string>) => {
+const reduceAddLog = (draft: Draft<State>, action: PayloadAction<Log>) => {
     draft.error = undefined;
     draft.value.push(action.payload);
 };

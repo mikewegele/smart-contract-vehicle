@@ -23,10 +23,22 @@ export class CarRental extends Contract {
   methods: {
     rentCar(carId: string, userId: string): TransactionObject<void>;
 
+    cancelReservation(carId: string, userId: string): TransactionObject<void>;
+
     helloWorld(): TransactionObject<string>;
   };
   events: {
     CarRented: ContractEvent<{
+      carId: string;
+      renter: string;
+      userId: string;
+      timestamp: string;
+      0: string;
+      1: string;
+      2: string;
+      3: string;
+    }>;
+    CarReservationCancelled: ContractEvent<{
       carId: string;
       renter: string;
       userId: string;
