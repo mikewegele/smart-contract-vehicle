@@ -173,7 +173,7 @@ const ReservationPage: React.FC = () => {
         web3.web3,
     ]);
 
-    const handleDrive = useCallback(async () => {
+    const handleDrive = useCallback(async (): Promise<true | null> => {
         if (
             !reservedCar ||
             !web3.web3 ||
@@ -199,6 +199,7 @@ const ReservationPage: React.FC = () => {
                     id: receipt.transactionHash,
                 })
             );
+            return true;
         } catch {
             return null;
         }
@@ -229,6 +230,7 @@ const ReservationPage: React.FC = () => {
             setFeedbackMsg("Failed to unlock the car");
         } else {
             const driveResult = await handleDrive();
+            console.log(driveResult);
             if (!driveResult) {
                 setFeedbackSeverity("error");
                 setFeedbackMsg("Failed to drive the car on chain");
