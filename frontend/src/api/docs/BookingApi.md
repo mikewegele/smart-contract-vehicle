@@ -5,11 +5,9 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**apiBookingBlockCarPost**](#apibookingblockcarpost) | **POST** /api/Booking/BlockCar | |
-|[**apiBookingEndRideProcedureFinalizePost**](#apibookingendrideprocedurefinalizepost) | **POST** /api/Booking/EndRideProcedureFinalize | |
-|[**apiBookingEndRideProcedureInitPost**](#apibookingendrideprocedureinitpost) | **POST** /api/Booking/EndRideProcedureInit | |
 |[**apiBookingGetAllReservationsGet**](#apibookinggetallreservationsget) | **GET** /api/Booking/GetAllReservations | |
 |[**apiBookingReserveCarPost**](#apibookingreservecarpost) | **POST** /api/Booking/ReserveCar | |
-|[**apiBookingStartRidePost**](#apibookingstartridepost) | **POST** /api/Booking/StartRide | |
+|[**apiBookingUnlockCarPost**](#apibookingunlockcarpost) | **POST** /api/Booking/UnlockCar | |
 
 # **apiBookingBlockCarPost**
 > ReservationTO apiBookingBlockCarPost()
@@ -43,99 +41,6 @@ const { status, data } = await apiInstance.apiBookingBlockCarPost(
 ### Return type
 
 **ReservationTO**
-
-### Authorization
-
-[Bearer](../README.md#Bearer)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: text/plain, application/json, text/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **apiBookingEndRideProcedureFinalizePost**
-> apiBookingEndRideProcedureFinalizePost()
-
-
-### Example
-
-```typescript
-import {
-    BookingApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new BookingApi(configuration);
-
-const { status, data } = await apiInstance.apiBookingEndRideProcedureFinalizePost();
-```
-
-### Parameters
-This endpoint does not have any parameters.
-
-
-### Return type
-
-void (empty response body)
-
-### Authorization
-
-[Bearer](../README.md#Bearer)
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **apiBookingEndRideProcedureInitPost**
-> BookingTO apiBookingEndRideProcedureInitPost()
-
-
-### Example
-
-```typescript
-import {
-    BookingApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new BookingApi(configuration);
-
-let bookingId: string; // (optional) (default to undefined)
-
-const { status, data } = await apiInstance.apiBookingEndRideProcedureInitPost(
-    bookingId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **bookingId** | [**string**] |  | (optional) defaults to undefined|
-
-
-### Return type
-
-**BookingTO**
 
 ### Authorization
 
@@ -198,7 +103,7 @@ This endpoint does not have any parameters.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiBookingReserveCarPost**
-> ReservationTO apiBookingReserveCarPost()
+> string apiBookingReserveCarPost()
 
 
 ### Example
@@ -229,7 +134,7 @@ const { status, data } = await apiInstance.apiBookingReserveCarPost(
 
 ### Return type
 
-**ReservationTO**
+**string**
 
 ### Authorization
 
@@ -248,8 +153,8 @@ const { status, data } = await apiInstance.apiBookingReserveCarPost(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiBookingStartRidePost**
-> apiBookingStartRidePost()
+# **apiBookingUnlockCarPost**
+> apiBookingUnlockCarPost()
 
 
 ### Example
@@ -266,7 +171,7 @@ const apiInstance = new BookingApi(configuration);
 
 let reservationTO: ReservationTO; // (optional)
 
-const { status, data } = await apiInstance.apiBookingStartRidePost(
+const { status, data } = await apiInstance.apiBookingUnlockCarPost(
     reservationTO
 );
 ```

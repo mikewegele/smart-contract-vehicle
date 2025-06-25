@@ -2570,7 +2570,7 @@ export const BookingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiBookingReserveCarPost(reservationTO?: ReservationTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReservationTO>> {
+        async apiBookingReserveCarPost(reservationTO?: ReservationTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiBookingReserveCarPost(reservationTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['BookingApi.apiBookingReserveCarPost']?.[localVarOperationServerIndex]?.url;
@@ -2621,7 +2621,7 @@ export const BookingApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiBookingReserveCarPost(reservationTO?: ReservationTO, options?: RawAxiosRequestConfig): AxiosPromise<ReservationTO> {
+        apiBookingReserveCarPost(reservationTO?: ReservationTO, options?: RawAxiosRequestConfig): AxiosPromise<string> {
             return localVarFp.apiBookingReserveCarPost(reservationTO, options).then((request) => request(axios, basePath));
         },
         /**

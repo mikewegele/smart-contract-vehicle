@@ -56,7 +56,7 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReservationTO>> ReserveCar(ReservationTO reservation, CancellationToken ct)
+        public async Task<ActionResult<string>> ReserveCar(ReservationTO reservation, CancellationToken ct)
         {
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
             var user = _db.Users.Find(userId);
@@ -89,7 +89,9 @@ namespace SmartContractVehicle.Controller
             dbReservation.ReserveCar(_db);
 
             await _db.SaveChangesAsync(ct);
-            return Ok(reservation);
+
+            var message = $"Reservation confirmed with transaction {transacId} in block {tx.BlockNumber.Value}.";
+            return Ok(message);
         }
 
         [HttpPost]

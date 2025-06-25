@@ -137,6 +137,16 @@ const DashboardPage: React.FC = () => {
                 id: reservationId,
             })
         );
+        if (!hasFailed(response)) {
+            dispatch(
+                addLog({
+                    name: "Reservation Confirmed from Backend",
+                    message: response.data,
+                    id: txHash,
+                    timestamp: new Date().getTime(),
+                })
+            );
+        }
         return !hasFailed(response);
     };
 
