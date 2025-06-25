@@ -2,6 +2,7 @@ import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import { type ApiError } from "../../util/ApiUtils.ts";
 
 export interface Log {
+    logId: string;
     id?: string;
     name?: string;
     message?: string;
@@ -25,6 +26,13 @@ const reduceAddLog = (draft: Draft<State>, action: PayloadAction<Log>) => {
     draft.value.push(action.payload);
 };
 
+const reduceDeleteLog = (
+    draft: Draft<State>,
+    action: PayloadAction<string>
+) => {
+    draft.value = draft.value.filter((log) => log.logId !== action.payload);
+};
+
 const slice = createSlice({
     name: "Logs",
     initialState: {
@@ -33,10 +41,12 @@ const slice = createSlice({
     reducers: {
         ADD_LOG: reduceAddLog,
         SET_ERROR: reduceLogsError,
+        DELETE_LOG: reduceDeleteLog,
     },
 });
 
 const addLog = slice.actions["ADD_LOG"];
+const deleteLog = slice.actions["DELETE_LOG"];
 const reservationError = slice.actions["SET_ERROR"];
 
-export { slice as LogSlice, addLog, reservationError };
+export { slice as LogSlice, addLog, reservationError, deleteLog };

@@ -6,6 +6,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
+import { useAppDispatch } from "../../store/Store.ts";
+import { deleteLog } from "../../store/reducer/logs.ts";
 
 const useStyles = makeStyles()(() => ({
     container: {
@@ -120,6 +122,8 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
     const { classes, cx } = useStyles();
     const [open, setOpen] = useState(false);
 
+    const dispatch = useAppDispatch();
+
     const { logs } = useApiStates("logs");
 
     const [currentLogs, setCurrentLogs] = useState(logs.value);
@@ -169,6 +173,25 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                                     className={classes.logItem}
                                     elevation={3}
                                 >
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                            const updated = [...currentLogs];
+                                            updated.splice(index, 1);
+                                            setCurrentLogs(updated);
+                                            if (log.logId) {
+                                                dispatch(deleteLog(log.logId));
+                                            }
+                                        }}
+                                        sx={{
+                                            position: "absolute",
+                                            top: 4,
+                                            right: 4,
+                                            color: "#888",
+                                        }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
                                     <Stack spacing={0.5}>
                                         {log.name !== undefined && (
                                             <Typography variant="body2">
@@ -178,7 +201,8 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                                         )}
                                         {log.id !== undefined && (
                                             <Typography variant="body2">
-                                                <strong>Id:</strong> {log.id}
+                                                <strong>TxHash:</strong>{" "}
+                                                {log.id}
                                             </Typography>
                                         )}
                                         {log.message !== undefined && (

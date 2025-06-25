@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import ReservationDialog from "../components/vehicle/reservation/ReservationDialog.tsx";
 import { addLog } from "../store/reducer/logs.ts";
 import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
+import { v4 as uuidv4 } from "uuid";
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -140,6 +141,7 @@ const DashboardPage: React.FC = () => {
         if (!hasFailed(response)) {
             dispatch(
                 addLog({
+                    logId: uuidv4(),
                     name: "Reservation Confirmed from Backend",
                     message: response.data,
                     id: txHash,
@@ -167,6 +169,7 @@ const DashboardPage: React.FC = () => {
             const reservationId = blockResponse.data.id;
             dispatch(
                 addLog({
+                    logId: uuidv4(),
                     name: "Reserve Car",
                     message: `Reserve car: ${reservationId} in Blockchain`,
                     id: receipt.transactionHash,

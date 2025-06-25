@@ -16,6 +16,7 @@ import { makeStyles } from "tss-react/mui";
 import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { addLog } from "../store/reducer/logs.ts";
 import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
+import { v4 as uuidv4 } from "uuid";
 
 const useStyles = makeStyles()(() => ({
     box: {
@@ -155,6 +156,7 @@ const ReservationPage: React.FC = () => {
                 });
             dispatch(
                 addLog({
+                    logId: uuidv4(),
                     name: "Cancel Reservation in Blockchain",
                     message: `Cancelled Car: ${reservedCar.carId}`,
                     id: receipt.transactionHash,
@@ -195,6 +197,7 @@ const ReservationPage: React.FC = () => {
 
             dispatch(
                 addLog({
+                    logId: uuidv4(),
                     name: "Drive Car on Blockchain",
                     message: `Driving Car: ${reservedCar.carId}`,
                     id: receipt.transactionHash,
