@@ -232,7 +232,6 @@ const ReservationPage: React.FC = () => {
             setFeedbackMsg("Failed to unlock the car");
         } else {
             const driveResult = await handleDrive();
-            console.log(driveResult);
             if (!driveResult) {
                 setFeedbackSeverity("error");
                 setFeedbackMsg("Failed to drive the car on chain");
