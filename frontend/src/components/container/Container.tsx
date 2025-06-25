@@ -214,7 +214,7 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                                         {log.value !== undefined && (
                                             <Typography variant="body2">
                                                 <strong>ETH Payed:</strong>{" "}
-                                                {log.value} ETH
+                                                {log.value}ETH
                                             </Typography>
                                         )}
                                         {log.timestamp !== undefined && (
