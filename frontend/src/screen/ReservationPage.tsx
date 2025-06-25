@@ -158,6 +158,7 @@ const ReservationPage: React.FC = () => {
                     name: "Cancel Reservation in Blockchain",
                     message: `Cancelled Car: ${reservedCar.carId}`,
                     id: receipt.transactionHash,
+                    timestamp: new Date().getTime(),
                 })
             );
         } catch {
@@ -197,6 +198,7 @@ const ReservationPage: React.FC = () => {
                     name: "Drive Car on Blockchain",
                     message: `Driving Car: ${reservedCar.carId}`,
                     id: receipt.transactionHash,
+                    timestamp: new Date().getTime(),
                 })
             );
             return true;

@@ -5,6 +5,7 @@ export interface Log {
     id?: string;
     name?: string;
     message?: string;
+    timestamp?: number;
 }
 
 interface State {

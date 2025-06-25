@@ -187,6 +187,12 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                                                 {log.message}
                                             </Typography>
                                         )}
+                                        {log.timestamp !== undefined && (
+                                            <Typography variant="body2">
+                                                <strong>Timestamp:</strong>{" "}
+                                                {log.timestamp}
+                                            </Typography>
+                                        )}
                                     </Stack>
                                 </Paper>
                             ))

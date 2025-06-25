@@ -160,6 +160,7 @@ const DashboardPage: React.FC = () => {
                     name: "Reserve Car",
                     message: `Reserve car: ${reservationId} in Blockchain`,
                     id: receipt.transactionHash,
+                    timestamp: new Date().getTime(),
                 })
             );
             if (!reservationId) {
