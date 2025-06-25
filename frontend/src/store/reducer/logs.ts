@@ -7,7 +7,7 @@ export interface Log {
     name?: string;
     message?: string;
     timestamp?: number;
-    value?: number;
+    value?: string;
 }
 
 interface State {

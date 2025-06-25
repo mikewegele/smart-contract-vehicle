@@ -126,9 +126,13 @@ const DrivingPage: React.FC = () => {
                 .returnCar(car.carId, user.value.id)
                 .send({
                     from: web3.account,
-                    value: car.pricePerMinute * 10,
+                    value: web3.web3.utils.toWei("0.01", "ether"),
                 });
             const event = receipt.events?.CarReturned?.returnValues;
+            const etherValue = web3.web3?.utils.fromWei(
+                event.value.toString(),
+                "ether"
+            );
             dispatch(
                 addLog({
                     logId: uuidv4(),
@@ -136,7 +140,7 @@ const DrivingPage: React.FC = () => {
                     message: `Finished driving car ${car.carId}`,
                     id: receipt.transactionHash,
                     timestamp: Date.now(),
-                    value: event.value,
+                    value: etherValue,
                 })
             );
 

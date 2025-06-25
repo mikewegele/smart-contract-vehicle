@@ -168,6 +168,10 @@ const DashboardPage: React.FC = () => {
             }
             const reservationId = blockResponse.data.id;
             const event = receipt.events?.CarRented?.returnValues;
+            const etherValue = web3Context.web3?.utils.fromWei(
+                event.value.toString(),
+                "ether"
+            );
             dispatch(
                 addLog({
                     logId: uuidv4(),
@@ -175,7 +179,7 @@ const DashboardPage: React.FC = () => {
                     message: `Reserve car: ${reservationId} in Blockchain`,
                     id: receipt.transactionHash,
                     timestamp: new Date().getTime(),
-                    value: event.value,
+                    value: etherValue,
                 })
             );
             if (!reservationId) {
