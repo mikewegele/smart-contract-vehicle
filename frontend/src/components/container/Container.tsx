@@ -1,12 +1,11 @@
 import React, { type PropsWithChildren, useEffect, useState } from "react";
-import { Box, Fade, IconButton, Paper, Typography } from "@mui/material";
+import { Box, Fade, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { makeStyles } from "tss-react/mui";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import DefaultButton from "../button/DefaultButton.tsx";
 import useApiStates from "../../util/useApiStates.ts";
-import If from "../helper/If.tsx";
 
 const useStyles = makeStyles()(() => ({
     container: {
@@ -100,7 +99,15 @@ const useStyles = makeStyles()(() => ({
     logItem: {
         marginBottom: "0.5rem",
         fontSize: "0.8rem",
-        paddingBottom: "0.3rem",
+        maxWidth: "600px",
+        padding: "0.75rem",
+        borderRadius: "8px",
+        background: "rgba(255, 255, 255, 0.1)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        border: "1px solid rgba(255, 255, 255, 0.2)",
+        overflowWrap: "break-word",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
     },
 }));
 
@@ -157,17 +164,31 @@ const Container: React.FC<PropsWithChildren<Props>> = (props) => {
                         {Array.isArray(currentLogs) &&
                         currentLogs.length > 0 ? (
                             currentLogs.map((log, index) => (
-                                <div key={index} className={classes.logItem}>
-                                    <If condition={log.name !== undefined}>
-                                        <div>{log.name}</div>
-                                    </If>
-                                    <If condition={log.id !== undefined}>
-                                        <div>{log.id}</div>
-                                    </If>
-                                    <If condition={log.message !== undefined}>
-                                        <div>{log.message}</div>
-                                    </If>
-                                </div>
+                                <Paper
+                                    key={index}
+                                    className={classes.logItem}
+                                    elevation={3}
+                                >
+                                    <Stack spacing={0.5}>
+                                        {log.name !== undefined && (
+                                            <Typography variant="body2">
+                                                <strong>Type:</strong>{" "}
+                                                {log.name}
+                                            </Typography>
+                                        )}
+                                        {log.id !== undefined && (
+                                            <Typography variant="body2">
+                                                <strong>Id:</strong> {log.id}
+                                            </Typography>
+                                        )}
+                                        {log.message !== undefined && (
+                                            <Typography variant="body2">
+                                                <strong>Message:</strong>{" "}
+                                                {log.message}
+                                            </Typography>
+                                        )}
+                                    </Stack>
+                                </Paper>
                             ))
                         ) : (
                             <Typography variant="body2" color="textSecondary">
