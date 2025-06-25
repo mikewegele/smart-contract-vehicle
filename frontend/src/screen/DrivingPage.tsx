@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Box, Grid, LinearProgress, Typography } from "@mui/material";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
@@ -7,6 +7,10 @@ import { useParams } from "react-router-dom";
 import useApiStates from "../util/useApiStates.ts";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchAllCars } from "../store/reducer/cars.ts";
+import DefaultButton from "../components/button/DefaultButton.tsx";
+import { useWeb3 } from "../web3/Web3Provider.tsx";
+import { addLog } from "../store/reducer/logs.ts";
+import { v4 as uuidv4 } from "uuid";
 
 const useStyles = makeStyles()(() => ({
     glassBox: {
@@ -43,13 +47,15 @@ const DrivingPage: React.FC = () => {
 
     const { carId } = useParams();
 
-    const { cars } = useApiStates("cars");
+    const { cars, user } = useApiStates("cars", "user");
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         dispatch(fetchAllCars());
     }, [dispatch]);
+
+    const web3 = useWeb3();
 
     const car = cars.value.find((car) => car.carId === carId);
 
@@ -103,6 +109,43 @@ const DrivingPage: React.FC = () => {
             }
         }
     }, [currentTime, lastMoveTime]);
+
+    const handleFinishDriving = useCallback(async () => {
+        if (
+            !car ||
+            !web3.web3 ||
+            !web3.account ||
+            !web3.contract ||
+            !user.value.id
+        ) {
+            return null;
+        }
+
+        try {
+            const receipt = await web3.contract.methods
+                .returnCar(car.carId, user.value.id)
+                .send({
+                    from: web3.account,
+                    value: car.pricePerMinute * 10,
+                });
+            const event = receipt.events?.CarReturned?.returnValues;
+            dispatch(
+                addLog({
+                    logId: uuidv4(),
+                    name: "Finish Drive on Blockchain",
+                    message: `Finished driving car ${car.carId}`,
+                    id: receipt.transactionHash,
+                    timestamp: Date.now(),
+                    value: event.value,
+                })
+            );
+
+            return true;
+        } catch (error) {
+            console.error("Blockchain transaction failed", error);
+            return null;
+        }
+    }, [car, web3.web3, web3.account, web3.contract, user.value.id, dispatch]);
 
     return (
         <Container>
@@ -158,6 +201,9 @@ const DrivingPage: React.FC = () => {
                     </Typography>
                 </Grid>
             </Grid>
+            <DefaultButton onClick={handleFinishDriving}>
+                Finish Driving
+            </DefaultButton>
         </Container>
     );
 };

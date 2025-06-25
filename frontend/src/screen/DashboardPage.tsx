@@ -167,6 +167,7 @@ const DashboardPage: React.FC = () => {
                 return reservationHasFailed();
             }
             const reservationId = blockResponse.data.id;
+            const event = receipt.events?.CarRented?.returnValues;
             dispatch(
                 addLog({
                     logId: uuidv4(),
@@ -174,6 +175,7 @@ const DashboardPage: React.FC = () => {
                     message: `Reserve car: ${reservationId} in Blockchain`,
                     id: receipt.transactionHash,
                     timestamp: new Date().getTime(),
+                    value: event.value,
                 })
             );
             if (!reservationId) {

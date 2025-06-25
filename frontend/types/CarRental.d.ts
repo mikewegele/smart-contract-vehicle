@@ -27,6 +27,8 @@ export class CarRental extends Contract {
 
     driveCar(carId: string, userId: string): TransactionObject<void>;
 
+    returnCar(carId: string, userId: string): TransactionObject<void>;
+
     helloWorld(): TransactionObject<string>;
   };
   events: {
@@ -45,10 +47,12 @@ export class CarRental extends Contract {
       renter: string;
       userId: string;
       timestamp: string;
+      value: string;
       0: string;
       1: string;
       2: string;
       3: string;
+      4: string;
     }>;
     CarReservationCancelled: ContractEvent<{
       carId: string;
@@ -59,6 +63,18 @@ export class CarRental extends Contract {
       1: string;
       2: string;
       3: string;
+    }>;
+    CarReturned: ContractEvent<{
+      carId: string;
+      driver: string;
+      userId: string;
+      timestamp: string;
+      value: string;
+      0: string;
+      1: string;
+      2: string;
+      3: string;
+      4: string;
     }>;
     allEvents: (
       options?: EventOptions,
