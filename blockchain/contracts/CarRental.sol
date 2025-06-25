@@ -17,6 +17,12 @@ contract CarRental {
         uint256 timestamp
     );
 
+    event CarDriven(
+        string carId,
+        address indexed driver,
+        string userId,
+        uint256 timestamp
+    );
 
     function rentCar(string memory carId, string memory userId) public payable {
         require(msg.value > 0, "No Ether sent");
@@ -25,6 +31,10 @@ contract CarRental {
 
     function cancelReservation(string memory carId, string memory userId) public {
         emit CarReservationCancelled(carId, msg.sender, userId, block.timestamp);
+    }
+
+    function driveCar(string memory carId, string memory userId) public {
+        emit CarDriven(carId, msg.sender, userId, block.timestamp);
     }
 
     function helloWorld() public pure returns (string memory) {

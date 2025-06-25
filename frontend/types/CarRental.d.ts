@@ -25,9 +25,21 @@ export class CarRental extends Contract {
 
     cancelReservation(carId: string, userId: string): TransactionObject<void>;
 
+    driveCar(carId: string, userId: string): TransactionObject<void>;
+
     helloWorld(): TransactionObject<string>;
   };
   events: {
+    CarDriven: ContractEvent<{
+      carId: string;
+      driver: string;
+      userId: string;
+      timestamp: string;
+      0: string;
+      1: string;
+      2: string;
+      3: string;
+    }>;
     CarRented: ContractEvent<{
       carId: string;
       renter: string;

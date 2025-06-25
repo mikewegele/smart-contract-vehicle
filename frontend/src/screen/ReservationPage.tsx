@@ -173,6 +173,44 @@ const ReservationPage: React.FC = () => {
         web3.web3,
     ]);
 
+    const handleDrive = useCallback(async () => {
+        if (
+            !reservedCar ||
+            !web3.web3 ||
+            !web3.account ||
+            !web3.contract ||
+            !user.value.id ||
+            !reservedCar.carId
+        ) {
+            return null;
+        }
+
+        try {
+            const receipt = await web3.contract.methods
+                .driveCar(reservedCar.carId, user.value.id)
+                .send({
+                    from: web3.account,
+                });
+
+            dispatch(
+                addLog({
+                    name: "Drive Car on Blockchain",
+                    message: `Driving Car: ${reservedCar.carId}`,
+                    id: receipt.transactionHash,
+                })
+            );
+        } catch {
+            return null;
+        }
+    }, [
+        dispatch,
+        reservedCar,
+        user.value.id,
+        web3.account,
+        web3.contract,
+        web3.web3,
+    ]);
+
     const handleUnlock = useCallback(async () => {
         const reservedCarId = reservedCar?.carId;
         const userId = user.value.id;
@@ -190,6 +228,12 @@ const ReservationPage: React.FC = () => {
             setFeedbackSeverity("success");
             setFeedbackMsg("Failed to unlock the car");
         } else {
+            const driveResult = await handleDrive();
+            if (!driveResult) {
+                setFeedbackSeverity("error");
+                setFeedbackMsg("Failed to drive the car on chain");
+                return;
+            }
             navigate(`/driving/${reservedCarId}`);
         }
     }, [navigate, reservedCar?.carId, user.value.id]);
