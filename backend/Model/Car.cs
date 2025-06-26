@@ -37,7 +37,7 @@ namespace SmartContractVehicle.Model
             ? TimeSpan.Zero
             : DateTime.UtcNow - LastStatusChange;
 
-        public virtual Reservation? ActiveReservation { get; private set; }
+        public virtual Reservation? ActiveReservation { get; set; }
 
         public Car()
         {
@@ -82,7 +82,10 @@ namespace SmartContractVehicle.Model
                     break;
             }
 
-            ActiveReservation = nextStatus != CarStatuses.Available ? reservation : null;
+            ActiveReservation = nextStatus == CarStatuses.Available
+                ? null
+                : reservation;
+
             Status = newStatus;
             LastStatusChange = DateTime.UtcNow;
             return this;

@@ -12,7 +12,7 @@ import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { addLog } from "../store/reducer/logs.ts";
 import { v4 as uuidv4 } from "uuid";
 import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
-import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
 import { BookingApi } from "../api";
 
 const useStyles = makeStyles()(() => ({
@@ -202,7 +202,7 @@ const DrivingPage: React.FC = () => {
     }, [car, web3.web3, web3.account, web3.contract, user.value.id, dispatch]);
 
     const finishDrivingHasFailed = useCallback(() => {
-        setFeedbackMsg("Failed to reserve car.");
+        setFeedbackMsg("Failed to finish driving the car.");
         setFeedbackSeverity("error");
         setFeedbackOpen(true);
     }, []);
@@ -212,12 +212,15 @@ const DrivingPage: React.FC = () => {
         if (!receipt || !reservationCarObject) {
             return finishDrivingHasFailed();
         }
-        const response = await apiExec(BookingApi, (api) =>
+        const response = await apiExecWithToken(BookingApi, (api) =>
             api.apiBookingFinishDrivingPost(reservationCarObject.id)
         );
-        if (!hasFailed(response)) {
-            return finishDrivingHasFailed();
+        if (hasFailed(response)) {
+            console.log("HERE 2");
+            finishDrivingHasFailed();
+            return;
         } else {
+            console.log("HERE");
             navigate("/home");
         }
     }, [
