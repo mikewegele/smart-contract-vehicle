@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Grid, LinearProgress, Typography } from "@mui/material";
 import Container from "../components/container/Container.tsx";
 import NavLinks from "../components/NavLinks.tsx";
 import { makeStyles } from "tss-react/mui";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useApiStates from "../util/useApiStates.ts";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchAllCars } from "../store/reducer/cars.ts";
@@ -11,6 +11,9 @@ import DefaultButton from "../components/button/DefaultButton.tsx";
 import { useWeb3 } from "../web3/Web3Provider.tsx";
 import { addLog } from "../store/reducer/logs.ts";
 import { v4 as uuidv4 } from "uuid";
+import FeedbackSnackbar from "../components/snackbar/FeedbackSnackbar.tsx";
+import { apiExec, hasFailed } from "../util/ApiUtils.ts";
+import { BookingApi } from "../api";
 
 const useStyles = makeStyles()(() => ({
     glassBox: {
@@ -38,6 +41,36 @@ const useStyles = makeStyles()(() => ({
         fontWeight: 600,
         color: "#fff",
     },
+    buttonBox: {
+        display: "flex",
+        justifyContent: "center",
+        margin: "32px",
+    },
+    button: {
+        color: "#34495e",
+        background: "rgba(255, 255, 255, 0.25)",
+        borderRadius: "16px",
+        padding: "0.6rem 1.6rem",
+        fontWeight: 600,
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(255, 255, 255, 0.3)",
+        transition: "all 0.3s ease",
+        cursor: "pointer",
+        userSelect: "none",
+        boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 6px rgba(0,0,0,0.1)",
+        "&:hover": {
+            background: "rgba(255, 255, 255, 0.4)",
+            boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 12px rgba(0,0,0,0.15)",
+            transform: "translateY(-2px)",
+        },
+        "&:active": {
+            background: "rgba(255, 255, 255, 0.2)",
+            boxShadow: "inset 0 2px 6px rgba(0,0,0,0.2)",
+            transform: "translateY(1px)",
+        },
+    },
 }));
 
 const stopTimes = [0.3, 5, 10.5, 14, 19.5, 24, 26, 29, 30.5, 35, 38];
@@ -47,7 +80,11 @@ const DrivingPage: React.FC = () => {
 
     const { carId } = useParams();
 
-    const { cars, user } = useApiStates("cars", "user");
+    const { cars, user, reservation } = useApiStates(
+        "cars",
+        "user",
+        "reservation"
+    );
 
     const dispatch = useAppDispatch();
 
@@ -59,6 +96,8 @@ const DrivingPage: React.FC = () => {
 
     const car = cars.value.find((car) => car.carId === carId);
 
+    const navigate = useNavigate();
+
     const [speed, setSpeed] = useState(0);
     const [battery, setBattery] = useState(78);
     const [remainingReach, setRemainingReach] = useState<number | undefined>(
@@ -68,6 +107,17 @@ const DrivingPage: React.FC = () => {
     const [currentTime, setCurrentTime] = useState(0);
     const [lastMoveTime, setLastMoveTime] = useState<number | null>(null);
     const maxSpeed = 30;
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [feedbackMsg, setFeedbackMsg] = useState("");
+    const [feedbackSeverity, setFeedbackSeverity] = useState<
+        "success" | "error"
+    >("success");
+
+    const reservationCarObject = useMemo(() => {
+        return reservation.value.find(
+            (reservation) => reservation.reservedCarId === carId
+        );
+    }, [carId, reservation.value]);
 
     useEffect(() => {
         if (car) {
@@ -110,7 +160,7 @@ const DrivingPage: React.FC = () => {
         }
     }, [currentTime, lastMoveTime]);
 
-    const handleFinishDriving = useCallback(async () => {
+    const finishDrivingOnChain = useCallback(async () => {
         if (
             !car ||
             !web3.web3 ||
@@ -150,6 +200,32 @@ const DrivingPage: React.FC = () => {
             return null;
         }
     }, [car, web3.web3, web3.account, web3.contract, user.value.id, dispatch]);
+
+    const finishDrivingHasFailed = useCallback(() => {
+        setFeedbackMsg("Failed to reserve car.");
+        setFeedbackSeverity("error");
+        setFeedbackOpen(true);
+    }, []);
+
+    const handleFinishDriving = useCallback(async () => {
+        const receipt = await finishDrivingOnChain();
+        if (!receipt || !reservationCarObject) {
+            return finishDrivingHasFailed();
+        }
+        const response = await apiExec(BookingApi, (api) =>
+            api.apiBookingFinishDrivingPost(reservationCarObject.id)
+        );
+        if (!hasFailed(response)) {
+            return finishDrivingHasFailed();
+        } else {
+            navigate("/home");
+        }
+    }, [
+        finishDrivingHasFailed,
+        finishDrivingOnChain,
+        navigate,
+        reservationCarObject,
+    ]);
 
     return (
         <Container>
@@ -205,9 +281,20 @@ const DrivingPage: React.FC = () => {
                     </Typography>
                 </Grid>
             </Grid>
-            <DefaultButton onClick={handleFinishDriving}>
-                Finish Driving
-            </DefaultButton>
+            <Box className={classes.buttonBox}>
+                <DefaultButton
+                    onClick={handleFinishDriving}
+                    buttonclassname={classes.button}
+                >
+                    Finish Driving
+                </DefaultButton>
+            </Box>
+            <FeedbackSnackbar
+                open={feedbackOpen}
+                message={feedbackMsg}
+                severity={feedbackSeverity}
+                onClose={() => setFeedbackOpen(false)}
+            />
         </Container>
     );
 };

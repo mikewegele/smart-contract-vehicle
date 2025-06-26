@@ -244,7 +244,6 @@ const DashboardPage: React.FC = () => {
                 severity={feedbackSeverity}
                 onClose={() => setFeedbackOpen(false)}
             />
-            ;
         </Container>
     );
 };

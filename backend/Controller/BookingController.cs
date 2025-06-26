@@ -119,5 +119,34 @@ namespace SmartContractVehicle.Controller
 
             return Ok();
         }
+
+        [HttpPost]
+        public async Task<ActionResult> FinishDriving(Guid reservationId, CancellationToken ct)
+        {
+            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
+            var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var reservation = await _db.Reservations.FirstOrDefaultAsync(r => r.Id == reservationId, ct);
+            if (reservation == null)
+                return NotFound("Reservation not found.");
+
+            if (reservation.RentorId != user.Id)
+                return BadRequest("You can only finish your own reservation.");
+
+            var car = await _db.Cars.FindAsync(new object[] { reservation.ReservedCarId }, ct);
+            if (car == null)
+                return NotFound("Associated car not found.");
+
+            if ((CarStatuses)car.Status.Id != CarStatuses.InTransit)
+                return Conflict("Car is not currently marked as 'In Use'.");
+
+            car.SetStatus(await _db.CarStatuses.FindAsync((int)CarStatuses.Available), reservation);
+
+            await _db.SaveChangesAsync(ct);
+            return Ok("Car marked as available again. Drive finished.");
+        }
+
     }
 }
