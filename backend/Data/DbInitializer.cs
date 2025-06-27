@@ -31,23 +31,25 @@ namespace SmartContractVehicle.Data
             var geometryFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
             string[] brands = new string[] { "Tesla", "BMW", "Audi", "Mercedes", "Volkswagen", "Alexander Dennis" };
+
             string[][] modelNames = new string[][]
             {
                 new string[] { "Model S", "Model X" },
                 new string[] { "X5", "i3" },
                 new string[] { "A4", "Q7" },
-                new string[] { "C-Class", "GLA" },
+                new string[] { "C-Class", "GLA", "Citaro" },
                 new string[] { "Golf", "Tiguan" },
                 new string[] { "Enviro500" }
             };
+
             string[][][] trimNames = new string[][][]
             {
-                new string[][] { new string[] { "Long Range", "Plaid" }, new string[] { "Standard", "Performance" } },
-                new string[][] { new string[] { "xDrive40", "xDrive50" }, new string[] { "Urban", "Sport" } },
-                new string[][] { new string[] { "Premium", "Sport" }, new string[] { "Base", "Luxury" } },
-                new string[][] { new string[] { "AMG", "Avantgarde" }, new string[] { "Base", "Style" } },
-                new string[][] { new string[] { "Life", "Style" }, new string[] { "Base", "R-Line" } },
-                new string[][] { new string[] { "" } }
+                new string[][] { new string[] { "Long Range", "Plaid" }, new string[] { "Standard", "Performance" } }, // Tesla
+                new string[][] { new string[] { "xDrive40", "xDrive50" }, new string[] { "Urban", "Sport" } },          // BMW
+                new string[][] { new string[] { "Premium", "Sport" }, new string[] { "Base", "Luxury" } },              // Audi
+                new string[][] { new string[] { "AMG", "Avantgarde" }, new string[] { "Base", "Style" }, new string[] { "Hybrid" } }, // Mercedes
+                new string[][] { new string[] { "Life", "Style" }, new string[] { "Base", "R-Line" } },                // Volkswagen
+                new string[][] { new string[] { "Standard", "Double Decker" } }                                        // Alexander Dennis
             };
 
             var companies = new List<AutomotiveCompany>();
@@ -60,11 +62,15 @@ namespace SmartContractVehicle.Data
                     Id = Guid.NewGuid(),
                     Name = brands[b],
                     Models = new List<VehicleModel>(),
-                    ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}.png"
+                    ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower().Replace(" ", "")}.png"
                 };
 
                 for (int m = 0; m < modelNames[b].Length; m++)
                 {
+                    // Sicherstellen, dass genug Trim-Infos vorhanden sind
+                    if (m >= trimNames[b].Length)
+                        continue;
+
                     var model = new VehicleModel
                     {
                         Id = Guid.NewGuid(),
@@ -82,11 +88,11 @@ namespace SmartContractVehicle.Data
                             Model = model,
                             Fuel = fuels[random.Next(fuels.Length)],
                             Drivetrain = drivetrains[random.Next(drivetrains.Length)],
-                            ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower()}_{model.Name.ToLower().Replace(" ", "")}.png",
+                            ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower().Replace(" ", "")}_{model.Name.ToLower().Replace(" ", "")}.png",
                             Cars = new List<Car>()
                         };
 
-                        for (int c = 0; c < 5; c++) // 5 Autos pro Trim
+                        for (int c = 0; c < 10; c++)
                         {
                             var car = new Car(available)
                             {
@@ -95,8 +101,8 @@ namespace SmartContractVehicle.Data
                                 Owner = user,
                                 Trim = trim,
                                 CurrentPosition = geometryFactory.CreatePoint(new Coordinate(
-                                    13.2 + random.NextDouble() * 0.4, // longitude (E)
-                                    52.3 + random.NextDouble() * 0.3  // latitude (N)
+                                    13.2 + random.NextDouble() * 0.4,
+                                    52.3 + random.NextDouble() * 0.3
                                 )),
                                 RemainingReach = Math.Round(random.NextDouble() * 400 + 100, 2),
                                 Colour = new[] { "Red", "Blue", "Black", "White", "Grey", "Orange", "Yellow", "Pearl", "Green" }[random.Next(9)],
@@ -118,5 +124,6 @@ namespace SmartContractVehicle.Data
 
             return (companies, cars);
         }
+
     }
 }
