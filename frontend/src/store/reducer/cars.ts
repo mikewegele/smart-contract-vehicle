@@ -1,15 +1,19 @@
 import { createSlice, type Draft, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootDispatch } from "../Store";
 import { type ApiError, apiExec, hasFailed } from "../../util/ApiUtils.ts";
-import { CarApi, type CarTO, type GeoSpatialQueryTO } from "../../api";
+import {
+    CarApi,
+    type CarTO,
+    type DrivetrainTO,
+    type FuelTypeTO,
+    type GeoSpatialQueryTO,
+} from "../../api";
 import type { Position } from "../../util/location/useGeolocation.ts";
 
 interface State {
     value: CarTO[];
-    maxSeats: number;
-    maxPricePerMinute: number;
-    fuelTypes: string[];
-    driveTrains: string[];
+    fuelTypes: FuelTypeTO[];
+    driveTrains: DrivetrainTO[];
     error?: ApiError;
 }
 
@@ -23,23 +27,11 @@ const reduceCarError = (
 const reduceSetCars = (draft: Draft<State>, action: PayloadAction<CarTO[]>) => {
     draft.error = undefined;
     draft.value = action.payload;
-
-    const seatCounts = action.payload.map((car) => car.seats);
-    draft.maxSeats =
-        seatCounts.length > 0 ? Math.max(...seatCounts) : draft.maxSeats;
-
-    const pricePerMinuteCounts = action.payload.map(
-        (car) => car.pricePerMinute
-    );
-    draft.maxPricePerMinute =
-        pricePerMinuteCounts.length > 0
-            ? Math.max(...pricePerMinuteCounts)
-            : draft.maxPricePerMinute;
 };
 
 const reduceSetFuelTypes = (
     draft: Draft<State>,
-    action: PayloadAction<string[]>
+    action: PayloadAction<FuelTypeTO[]>
 ) => {
     draft.error = undefined;
     draft.fuelTypes = action.payload;
@@ -47,7 +39,7 @@ const reduceSetFuelTypes = (
 
 const reduceSetDriveTrains = (
     draft: Draft<State>,
-    action: PayloadAction<string[]>
+    action: PayloadAction<DrivetrainTO[]>
 ) => {
     draft.error = undefined;
     draft.driveTrains = action.payload;
@@ -59,6 +51,8 @@ const slice = createSlice({
         value: [],
         fuelTypes: [],
         driveTrains: [],
+        maxSeats: 0,
+        maxPricePerMinute: 0,
     } as State,
     reducers: {
         SET_CARS: reduceSetCars,
@@ -129,6 +123,8 @@ const fetchCarsByFilter = (
                 minPricePerMinute: filters.minPricePerMinute,
                 maxPricePerMinute: filters.maxPricePerMinute,
                 allowedDrivetrains: filters.allowedDrivetrains,
+                allowedFueltypes: filters.allowedFueltypes,
+                minRemainingReach: filters.minRemainingReach,
             })
         );
         if (hasFailed(response)) {

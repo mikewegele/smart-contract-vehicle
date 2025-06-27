@@ -3,18 +3,30 @@ import Container from "../components/container/Container.tsx";
 import DefaultTextField from "../components/textfield/DefaultTextField.tsx";
 import { Alert, Box, Typography } from "@mui/material";
 import NavLinks from "../components/NavLinks.tsx";
-import makeStyles from "../util/makeStyles.ts";
 import { UserApi, type UserProfileUpdateTO } from "../api";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
 import useApiStates from "../util/useApiStates.ts";
 import { apiExecWithToken, hasFailed } from "../util/ApiUtils.ts";
 import DefaultButton from "../components/button/DefaultButton.tsx";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     textField: {
-        width: "400px",
-        margin: "10px !important",
+        width: "40%",
+        margin: "10px 0 !important",
+        "& .MuiInputBase-root": {
+            background: "rgba(255, 255, 255, 0.5)",
+            borderRadius: 8,
+            backdropFilter: "blur(8px)",
+            border: "1px solid rgba(255, 255, 255, 0.7)",
+        },
+        "& .MuiInputBase-input": {
+            color: "#34495e",
+        },
+        "& label": {
+            color: "#00796b",
+        },
     },
 }));
 

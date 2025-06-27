@@ -1,0 +1,19 @@
+{
+  "name": "root",
+  "version": "1.0.0",
+  "scripts": {
+    "application": "concurrently -n db,be,sc,fe -c blue,green,magenta,yellow \"npm run database\" \"npm run backend\" \"npm run smart-contract\" \"npm run frontend\"",
+    "database": "cd stack && docker-compose up",
+    "backend": "/bin/bash run_backend.sh",
+    "smart-contract": "cd blockchain && npm i && npm run ganache",
+    "frontend": "cd blockchain && npm i && npm run deploy-and-copy && cd .. && cd ./frontend && npm i && npm run typechain && npm run dev && npm run apiGenerate",
+    "drop-all-tables": "/bin/bash drop_all_tables.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

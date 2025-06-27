@@ -14,6 +14,10 @@ Name | Type | Description | Notes
 **colour** | **string** |  | [default to undefined]
 **seatNumbers** | **number** |  | [default to undefined]
 **pricePerMinute** | **number** |  | [default to undefined]
+**status** | [**CarStatus**](CarStatus.md) |  | [optional] [default to undefined]
+**lastStatusChange** | **string** |  | [optional] [readonly] [default to undefined]
+**rideTime** | **string** |  | [optional] [readonly] [default to undefined]
+**activeReservation** | [**Reservation**](Reservation.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -30,6 +34,10 @@ const instance: Car = {
     colour,
     seatNumbers,
     pricePerMinute,
+    status,
+    lastStatusChange,
+    rideTime,
+    activeReservation,
 };
 ```
 

@@ -1,9 +1,9 @@
 import React from "react";
-import { TextField } from "@mui/material";
 import type { TextFieldProps } from "@mui/material";
-import makeStyles from "../../util/makeStyles.ts";
+import { TextField } from "@mui/material";
+import { makeStyles } from "tss-react/mui";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     input: {
         borderRadius: "8px",
         transition: "border-color 0.2s",

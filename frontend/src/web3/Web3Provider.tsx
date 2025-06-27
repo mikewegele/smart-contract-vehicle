@@ -38,16 +38,14 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
             }
 
             try {
-                const web3Instance = new Web3((window as any).ethereum);
-                await (window as any).ethereum.request({
-                    method: "eth_requestAccounts",
-                });
+                const web3Instance = new Web3(
+                    new Web3.providers.HttpProvider("http://127.0.0.1:7545")
+                );
                 const accounts = await web3Instance.eth.getAccounts();
                 setAccount(accounts[0]);
                 setWeb3(web3Instance);
 
                 const networkId = await web3Instance.eth.net.getId();
-                console.log("networkId", networkId);
                 const deployedNetwork = CarRentalContract.networks[networkId];
                 if (!deployedNetwork) {
                     // alert("Smart contract not deployed on the current network");

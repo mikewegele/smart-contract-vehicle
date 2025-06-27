@@ -5,8 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**producer** | [**AutomotiveCompanyTO**](AutomotiveCompanyTO.md) |  | [default to undefined]
+**id** | **string** |  | [default to undefined]
 **name** | **string** |  | [default to undefined]
+**producerId** | **string** |  | [default to undefined]
+**trims** | **Array&lt;string&gt;** |  | [default to undefined]
 
 ## Example
 
@@ -14,8 +16,10 @@ Name | Type | Description | Notes
 import { VehicleModelTO } from './api';
 
 const instance: VehicleModelTO = {
-    producer,
+    id,
     name,
+    producerId,
+    trims,
 };
 ```
 

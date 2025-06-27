@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
@@ -54,7 +55,36 @@ builder.Services.AddControllers()
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "SmartContractVehicle API", Version = "v1" });
+
+    // Add JWT auth to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your valid JWT token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // CORS
 builder.Services.AddCors(options =>
@@ -72,6 +102,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Scoped Services
 builder.Services.AddScoped<UserService>();
+
+// Hosted Services
+builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
+
 
 var app = builder.Build();
 
@@ -124,8 +158,8 @@ using (var scope = app.Services.CreateScope())
     {
         var fuels = context.FuelTypes.ToArray();
         var drivetrains = context.Drivetrains.ToArray();
-
-        var (companies, cars) = DbInitializer.SeedCars(user, fuels, drivetrains);
+        var available = context.CarStatuses.Find((int)CarStatuses.Available) ?? throw new Exception("The car status \"available\" was not found in the database. It is strictly required.");
+        var (companies, cars) = DbInitializer.SeedCars(user, fuels, drivetrains, available);
 
         var tac = context.AutomotiveCompanies.AddRangeAsync(companies);
         var tc = context.Cars.AddRangeAsync(cars);

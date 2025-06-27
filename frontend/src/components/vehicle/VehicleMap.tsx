@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L, { type LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import makeStyles from "../../util/makeStyles.ts";
+import { makeStyles } from "tss-react/mui";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -24,7 +24,7 @@ const createVehicleIcon = (imageUrl: string) =>
         className: "vehicle-marker-icon",
     });
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
     outerWrapper: {
         display: "flex",
         justifyContent: "center",
@@ -33,7 +33,6 @@ const useStyles = makeStyles(() => ({
     },
     mapWrapper: {
         width: "80%",
-        maxWidth: "1000px",
         height: "500px",
         borderRadius: "12px",
         overflow: "hidden",
@@ -49,10 +48,11 @@ const DEFAULT_IMAGE =
 
 interface Props {
     vehicles: CarTO[];
+    openDialog?: (vehicle: CarTO) => void;
 }
 
 const VehicleMap: React.FC<Props> = (props) => {
-    const { vehicles } = props;
+    const { vehicles, openDialog } = props;
 
     const { classes } = useStyles();
 
@@ -118,8 +118,17 @@ const VehicleMap: React.FC<Props> = (props) => {
                             )}
                         >
                             <Popup maxWidth={200}>
-                                <div style={{ textAlign: "center" }}>
-                                    <strong>{vehicle.modelName}</strong>
+                                <div
+                                    style={{
+                                        textAlign: "center",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() => openDialog(vehicle)}
+                                >
+                                    <strong>
+                                        {vehicle.companyName}{" "}
+                                        {vehicle.modelName}
+                                    </strong>
                                     <br />
                                     <img
                                         src={

@@ -2,10 +2,14 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { CarsSlice } from "./reducer/cars.ts";
 import { UserSlice } from "./reducer/user.ts";
+import { ReservationSlice } from "./reducer/reservation.ts";
+import { LogSlice } from "./reducer/logs.ts";
 
 export const rootReducer = combineReducers({
     cars: CarsSlice.reducer,
     user: UserSlice.reducer,
+    reservation: ReservationSlice.reducer,
+    logs: LogSlice.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

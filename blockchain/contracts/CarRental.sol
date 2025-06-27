@@ -1,57 +1,57 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract SimpleCarRental {
-    address public owner;
+contract CarRental {
 
-    constructor() {
-        owner = msg.sender;
+    event CarRented(
+        string carId,
+        address indexed renter,
+        string userId,
+        uint256 timestamp,
+        uint256 value
+    );
+
+    event CarReservationCancelled(
+        string carId,
+        address indexed renter,
+        string userId,
+        uint256 timestamp
+    );
+
+    event CarDriven(
+        string carId,
+        address indexed driver,
+        string userId,
+        uint256 timestamp
+    );
+
+    event CarReturned(
+        string carId,
+        address indexed driver,
+        string userId,
+        uint256 timestamp,
+        uint256 value
+    );
+
+    function rentCar(string memory carId, string memory userId) public payable {
+        require(msg.value > 0, "No Ether sent");
+        emit CarRented(carId, msg.sender, userId, block.timestamp, msg.value);
     }
 
-    struct Car {
-        uint256 id;
-        string model;
-        uint256 pricePerDay;
-        bool isAvailable;
-        address renter;
+    function cancelReservation(string memory carId, string memory userId) public {
+        emit CarReservationCancelled(carId, msg.sender, userId, block.timestamp);
     }
 
-    uint256 public nextCarId = 1;
-    mapping(uint256 => Car) public cars;
-
-    event CarAdded(uint256 carId, string model, uint256 pricePerDay);
-    event CarRented(uint256 carId, address renter, uint256 daysRented);
-    event CarReturned(uint256 carId, address renter);
-
-     function helloWorld() public pure returns (string memory) {
-            return "Hello, world!";
-        }
-
-    function addCar(string memory model, uint256 pricePerDay) public {
-        cars[nextCarId] = Car(nextCarId, model, pricePerDay, true, address(0));
-        emit CarAdded(nextCarId, model, pricePerDay);
-        nextCarId++;
+    function driveCar(string memory carId, string memory userId) public {
+        emit CarDriven(carId, msg.sender, userId, block.timestamp);
     }
 
-    function rentCar(uint256 carId, uint256 numberOfDays) public payable {
-        Car storage car = cars[carId];
-        car.isAvailable = false;
-        car.renter = msg.sender;
-        emit CarRented(carId, msg.sender, numberOfDays);
+    function returnCar(string memory carId, string memory userId) public payable {
+        require(msg.value > 0, "Payment required to finish driving");
+        emit CarReturned(carId, msg.sender, userId, block.timestamp, msg.value);
     }
 
-    function returnCar(uint256 carId) public {
-        Car storage car = cars[carId];
-        car.isAvailable = true;
-        car.renter = address(0);
-        emit CarReturned(carId, msg.sender);
-    }
-
-    function getCar(uint256 carId) public view returns (Car memory) {
-        return cars[carId];
-    }
-
-    function withdraw() public {
-        payable(owner).transfer(address(this).balance);
+    function helloWorld() public pure returns (string memory) {
+        return "Hello, world!";
     }
 }

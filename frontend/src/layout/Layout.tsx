@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
     BrowserRouter as Router,
     Navigate,
@@ -9,6 +9,10 @@ import EntryPage from "../screen/EntryPage.tsx";
 import DashboardPage from "../screen/DashboardPage.tsx";
 import ProfilePage from "../screen/ProfilePage.tsx";
 import SmartContractTestPage from "../screen/SmartContractTestPage.tsx";
+import { useAppDispatch } from "../store/Store.ts";
+import { fetchUser } from "../store/reducer/user.ts";
+import ReservationPage from "../screen/ReservationPage.tsx";
+import DrivingPage from "../screen/DrivingPage.tsx";
 
 const isLoggedIn = () => {
     return Boolean(localStorage.getItem("token"));
@@ -21,6 +25,12 @@ const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({
 };
 
 const Layout: React.FC = () => {
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
+
     return (
         <Router>
             <Routes>
@@ -39,6 +49,14 @@ const Layout: React.FC = () => {
                 <Route
                     path="/profile"
                     element={<ProtectedRoute element={<ProfilePage />} />}
+                />
+                <Route
+                    path="/reservation/:carId"
+                    element={<ProtectedRoute element={<ReservationPage />} />}
+                />
+                <Route
+                    path="/driving/:carId"
+                    element={<ProtectedRoute element={<DrivingPage />} />}
                 />
             </Routes>
         </Router>

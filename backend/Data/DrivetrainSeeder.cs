@@ -18,25 +18,26 @@ public enum Drivetrains
 }
 
 public static class DrivetrainSeeder
-{    public static void Seed(ModelBuilder modelBuilder)
-        {
-            var drivetrains = Enum.GetValues<Data.Drivetrains>()
-                .Select(d => new Model.Drivetrain
-                {
-                    Id = (int)d,
-                    Name = GetDisplayName(d)
-                });
+{
+    public static void Seed(ModelBuilder modelBuilder)
+    {
+        var drivetrains = Enum.GetValues<Data.Drivetrains>()
+            .Select(d => new Model.Drivetrain
+            {
+                Id = (int)d,
+                Name = GetDisplayName(d)
+            });
 
-            modelBuilder.Entity<Model.Drivetrain>().HasData(drivetrains);
-        }
+        modelBuilder.Entity<Model.Drivetrain>().HasData(drivetrains);
+    }
 
-        private static string GetDisplayName(Enum value)
-        {
-            return value.GetType()
-                .GetMember(value.ToString())
-                .First()
-                .GetCustomAttributes(false)
-                .OfType<DisplayAttribute>()
-                .FirstOrDefault()?.Name ?? value.ToString();
-        }
+    private static string GetDisplayName(Enum value)
+    {
+        return value.GetType()
+            .GetMember(value.ToString())
+            .First()
+            .GetCustomAttributes(false)
+            .OfType<DisplayAttribute>()
+            .FirstOrDefault()?.Name ?? value.ToString();
+    }
 }
