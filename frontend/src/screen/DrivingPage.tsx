@@ -194,11 +194,9 @@ const DrivingPage: React.FC = () => {
             api.apiBookingFinishDrivingPost(reservationCarObject.id)
         );
         if (hasFailed(response)) {
-            console.log("HERE 2");
             finishDrivingHasFailed();
             return;
         } else {
-            console.log("HERE");
             navigate("/home");
         }
     }, [

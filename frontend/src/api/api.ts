@@ -2433,6 +2433,43 @@ export const BookingApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        apiBookingCancelReservationPost: async (reservationId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Booking/CancelReservation`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication Bearer required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (reservationId !== undefined) {
+                localVarQueryParameter['reservationId'] = reservationId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [reservationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         apiBookingFinishDrivingPost: async (reservationId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/Booking/FinishDriving`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -2596,7 +2633,19 @@ export const BookingApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiBookingFinishDrivingPost(reservationId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async apiBookingCancelReservationPost(reservationId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiBookingCancelReservationPost(reservationId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['BookingApi.apiBookingCancelReservationPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} [reservationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiBookingFinishDrivingPost(reservationId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ReservationTO>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiBookingFinishDrivingPost(reservationId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['BookingApi.apiBookingFinishDrivingPost']?.[localVarOperationServerIndex]?.url;
@@ -2662,7 +2711,16 @@ export const BookingApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiBookingFinishDrivingPost(reservationId?: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+        apiBookingCancelReservationPost(reservationId?: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.apiBookingCancelReservationPost(reservationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [reservationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiBookingFinishDrivingPost(reservationId?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<ReservationTO>> {
             return localVarFp.apiBookingFinishDrivingPost(reservationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2710,6 +2768,17 @@ export class BookingApi extends BaseAPI {
      */
     public apiBookingBlockCarPost(carId?: string, options?: RawAxiosRequestConfig) {
         return BookingApiFp(this.configuration).apiBookingBlockCarPost(carId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [reservationId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BookingApi
+     */
+    public apiBookingCancelReservationPost(reservationId?: string, options?: RawAxiosRequestConfig) {
+        return BookingApiFp(this.configuration).apiBookingCancelReservationPost(reservationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

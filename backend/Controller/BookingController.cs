@@ -121,6 +121,37 @@ namespace SmartContractVehicle.Controller
         }
 
         [HttpPost]
+        public async Task<ActionResult> CancelReservation(Guid reservationId, CancellationToken ct)
+        {
+            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
+            var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var reservation = await _db.Reservations.FirstOrDefaultAsync(r => r.Id == reservationId, ct);
+            if (reservation == null)
+                return NotFound("Reservation not found.");
+
+            if (reservation.RentorId != user.Id)
+                return BadRequest("You can only finish your own reservation.");
+
+            var car = await _db.Cars.FindAsync(new object[] { reservation.ReservedCarId }, ct);
+            if (car == null)
+                return NotFound("Associated car not found.");
+
+            car.SetStatus(await _db.CarStatuses.FindAsync((int)CarStatuses.Available), reservation);
+            car.ActiveReservation = null;
+            reservation = await _db.Reservations.FindAsync(reservationId);
+            if (reservation != null)
+            {
+                _db.Reservations.Remove(reservation);
+                await _db.SaveChangesAsync();
+            }
+            return Ok(reservation);
+        }
+
+
+        [HttpPost]
         public async Task<ActionResult<IEnumerable<ReservationTO>>> FinishDriving(Guid reservationId, CancellationToken ct)
         {
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;

@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**apiBookingBlockCarPost**](#apibookingblockcarpost) | **POST** /api/Booking/BlockCar | |
+|[**apiBookingCancelReservationPost**](#apibookingcancelreservationpost) | **POST** /api/Booking/CancelReservation | |
 |[**apiBookingFinishDrivingPost**](#apibookingfinishdrivingpost) | **POST** /api/Booking/FinishDriving | |
 |[**apiBookingGetAllReservationsGet**](#apibookinggetallreservationsget) | **GET** /api/Booking/GetAllReservations | |
 |[**apiBookingReserveCarPost**](#apibookingreservecarpost) | **POST** /api/Booking/ReserveCar | |
@@ -60,8 +61,58 @@ const { status, data } = await apiInstance.apiBookingBlockCarPost(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **apiBookingCancelReservationPost**
+> apiBookingCancelReservationPost()
+
+
+### Example
+
+```typescript
+import {
+    BookingApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new BookingApi(configuration);
+
+let reservationId: string; // (optional) (default to undefined)
+
+const { status, data } = await apiInstance.apiBookingCancelReservationPost(
+    reservationId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **reservationId** | [**string**] |  | (optional) defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **apiBookingFinishDrivingPost**
-> apiBookingFinishDrivingPost()
+> Array<ReservationTO> apiBookingFinishDrivingPost()
 
 
 ### Example
@@ -91,7 +142,7 @@ const { status, data } = await apiInstance.apiBookingFinishDrivingPost(
 
 ### Return type
 
-void (empty response body)
+**Array<ReservationTO>**
 
 ### Authorization
 
@@ -100,7 +151,7 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

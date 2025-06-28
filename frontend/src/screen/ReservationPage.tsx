@@ -134,7 +134,7 @@ const ReservationPage: React.FC = () => {
             : undefined;
     }, [carId, cars.value, reservationCarObject]);
 
-    const handleCancel = useCallback(async () => {
+    const handleCancelOnChain = useCallback(async () => {
         if (!reservedCar) {
             return;
         }
@@ -166,7 +166,7 @@ const ReservationPage: React.FC = () => {
         } catch {
             return null;
         }
-        setExpired(true);
+        return true;
     }, [
         dispatch,
         reservedCar,
@@ -175,6 +175,28 @@ const ReservationPage: React.FC = () => {
         web3.contract,
         web3.web3,
     ]);
+
+    const cancelHasFailed = useCallback(() => {
+        setFeedbackMsg("Failed to cancel the reservation.");
+        setFeedbackSeverity("error");
+        setFeedbackOpen(true);
+    }, []);
+
+    const handleCancel = useCallback(async () => {
+        const receipt = await handleCancelOnChain();
+        if (!receipt || !reservationCarObject) {
+            return cancelHasFailed();
+        }
+        const response = await apiExecWithToken(BookingApi, (api) =>
+            api.apiBookingFinishDrivingPost(reservationCarObject.id)
+        );
+        if (hasFailed(response)) {
+            cancelHasFailed();
+            return;
+        } else {
+            return null;
+        }
+    }, [cancelHasFailed, handleCancelOnChain, reservationCarObject]);
 
     const handleDrive = useCallback(async (): Promise<true | null> => {
         if (
