@@ -32,11 +32,6 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({
         hasInitialized.current = true;
 
         async function init() {
-            if (!(window as any).ethereum) {
-                // alert("Please install MetaMask!");
-                return;
-            }
-
             try {
                 const web3Instance = new Web3(
                     new Web3.providers.HttpProvider("http://127.0.0.1:7545")
