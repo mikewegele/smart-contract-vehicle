@@ -188,7 +188,7 @@ const ReservationPage: React.FC = () => {
             return cancelHasFailed();
         }
         const response = await apiExecWithToken(BookingApi, (api) =>
-            api.apiBookingFinishDrivingPost(reservationCarObject.id)
+            api.apiBookingCancelReservationPost(reservationCarObject.id)
         );
         if (hasFailed(response)) {
             cancelHasFailed();
