@@ -6,7 +6,7 @@
     "database": "cd stack && docker-compose up",
     "backend": "/bin/bash run_backend.sh",
     "smart-contract": "cd blockchain && npm i && npm run ganache",
-    "frontend": "cd blockchain && npm i && npm run deploy-and-copy && cd .. && cd ./frontend && npm i && npm run typechain && npm run dev && npm run apiGenerate",
+    "frontend": "cd blockchain && npm i && npm run deploy-and-copy && cd .. && cd ./frontend && npm i && npm run typechain && npm run dev && npm run generateApi",
     "drop-all-tables": "/bin/bash drop_all_tables.sh"
   },
   "keywords": [],

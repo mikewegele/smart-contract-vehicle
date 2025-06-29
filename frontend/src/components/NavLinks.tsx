@@ -65,7 +65,6 @@ const NavLinks: React.FC<Props> = ({ isLoggedIn }) => {
             >
                 Home
             </DefaultButton>
-            <DefaultButton className={classes.button}>About Us</DefaultButton>
             <DefaultButton
                 className={classes.button}
                 onClick={() => navigate("/smart")}
