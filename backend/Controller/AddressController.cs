@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.Model;
 
-namespace SmartContractVehicle.Controllers
+namespace SmartContractVehicle.Controller
 {
     [ApiController]
     [Route("api/[controller]/[action]/")]
