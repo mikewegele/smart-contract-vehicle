@@ -1,0 +1,162 @@
+﻿@using System.Linq
+@model IEnumerable<SmartContractVehicle.DTO.CarConnectionStatusTO>
+@{
+    ViewData["Title"] = "Real-Time Car Map";
+}
+
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- SignalR JS Client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+<style>
+    .car-list-item.connected {
+        background-color: #d4edda; /* Light green */
+    }
+
+    .car-list-item.disconnected {
+        background-color: #f8d7da; /* Light red */
+    }
+
+    .custom-div-icon div {
+        transition: transform 0.5s linear; /* Smooth rotation for heading changes */
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Map Column -->
+        <div class="col-lg-9 mb-3">
+            <div id="map" style="height: 80vh; border-radius: 8px; border: 1px solid #ccc;"></div>
+        </div>
+        <!-- Car List Column -->
+        <div class="col-lg-3">
+            <h2 class="h4">Vehicle Status</h2>
+            <ul id="carList" class="list-group">
+                @if (!Model.Any())
+                {
+                    <li class="list-group-item">No cars found in the system.</li>
+                }
+                else
+                {
+                    @foreach (var car in Model.OrderBy(c => c.VIN))
+                    {
+                        <li id="car-@car.VIN" class="list-group-item car-list-item @(car.IsConnected ? "connected" : "disconnected")">
+                            <strong>@car.VIN</strong> - <span class="status-text">@(car.IsConnected ? "Connected" : "Disconnected")</span>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/Dashboard") // <-- CORRECTED: This now matches your Program.cs
+            .withAutomaticReconnect()
+            .build();
+
+        const map = L.map('map').setView([52.5200, 13.4050], 10); // Centered on Berlin
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const carMarkers = {};
+
+        function createTriangleIcon(color) {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="font-size: 24px; color: ${color};">▲</div>`,
+                iconSize: [30, 42],
+                iconAnchor: [15, 42]
+            });
+        }
+
+        const icons = {
+            green: createTriangleIcon('green'),
+            red: createTriangleIcon('red'),
+            yellow: createTriangleIcon('yellow')
+        };
+
+        function getIconForCar(car) {
+            if (!car.isConnected) return icons.red;
+            if (car.telemetry && car.telemetry.currentSpeed > 0) return icons.yellow;
+            return icons.green;
+        }
+
+        function updateCarOnMap(car) {
+            const marker = carMarkers[car.vin];
+            const icon = getIconForCar(car);
+            const position = car.telemetry ? [car.telemetry.currentPosition.y, car.telemetry.currentPosition.x] : null;
+
+            if (marker) { // Marker exists, update it
+                if (position) {
+                    marker.setLatLng(position);
+                }
+                marker.setIcon(icon);
+                marker.setPopupContent(`<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`);
+            } else if (position) { // Marker doesn't exist, create it
+                const newMarker = L.marker(position, { icon: icon }).addTo(map);
+                newMarker.bindPopup(`<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`);
+                carMarkers[car.vin] = newMarker;
+            }
+
+            // Update marker rotation if connected and has heading
+            const markerToRotate = carMarkers[car.vin];
+            if (markerToRotate && car.isConnected && car.telemetry) {
+                const iconElement = markerToRotate.getElement()?.querySelector('.custom-div-icon div');
+                if (iconElement) {
+                    iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
+                }
+            }
+        }
+
+        function updateCarInList(car) {
+            const carListItem = document.getElementById(`car-${car.vin}`);
+            if (carListItem) {
+                const statusText = carListItem.querySelector('.status-text');
+                if (car.isConnected) {
+                    carListItem.classList.remove('disconnected');
+                    carListItem.classList.add('connected');
+                    statusText.textContent = 'Connected';
+                } else {
+                    carListItem.classList.remove('connected');
+                    carListItem.classList.add('disconnected');
+                    statusText.textContent = 'Disconnected';
+                }
+            }
+        }
+
+        // Handler for receiving the full initial list of cars
+        connection.on("InitialCarStates", function (cars) {
+            cars.forEach(car => {
+                updateCarOnMap(car);
+                updateCarInList(car); // Ensure list is in sync
+            });
+        });
+
+        // Handler for single car updates
+        connection.on("CarStateChanged", function (car) {
+            updateCarOnMap(car);
+            updateCarInList(car);
+        });
+
+        // Start the connection and request the initial state
+        async function start() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected to /Dashboard.");
+                await connection.invoke("GetInitialCarStates");
+            } catch (err) {
+                console.error(err);
+                setTimeout(start, 5000);
+            }
+        };
+
+        start();
+    });
+</script>
