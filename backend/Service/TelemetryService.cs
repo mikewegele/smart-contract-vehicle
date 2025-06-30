@@ -1,12 +1,8 @@
-﻿// TelemetryService.cs
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
-using SmartContractVehicle.Data; // Ensure this using statement points to your DbContext
+﻿using Microsoft.AspNetCore.SignalR;
+using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Hubs;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SmartContractVehicle.Service
 {
@@ -28,19 +24,44 @@ namespace SmartContractVehicle.Service
         }
 
         /// <summary>
-        /// Announces to the dashboard that a car is connected, without waiting for telemetry.
+        /// Announces to the dashboard that a car is connected, providing its last known location.
         /// </summary>
-        /// <param name="vin">The Vehicle Identification Number of the connected car.</param>
         public void SetCarConnected(string vin)
         {
+            using var scope = _scopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            // Find the car in the database to get its last known state.
+            var car = dbContext.Cars.FirstOrDefault(c => c.VIN == vin);
+
+            // This shouldn't happen because RegisterCar validates existence, but as a safeguard:
+            if (car == null || car.CurrentPosition == null)
+            {
+                _logger.LogWarning("Could not announce initial position for VIN {VIN}: car or its position not found in DB.", vin);
+                // Announce connection status so the list updates, even if the map can't.
+                var statusOnly = new CarConnectionStatusTO { VIN = vin, IsConnected = true, Telemetry = null };
+                _monitorHubContext.Clients.All.SendAsync("CarStateChanged", statusOnly);
+                return;
+            }
+
+            // Create a telemetry object from the car's last known data in the database.
+            var initialTelemetry = new TelemetryTO
+            {
+                CurrentPosition = car.CurrentPosition,
+                CurrentSpeed = 0, // Car is stationary on connect
+                Heading = 0,
+                RemainingReach = car.RemainingReach // Assumes a 'RemainingReach' property
+            };
+
             var carStatus = new CarConnectionStatusTO
             {
                 VIN = vin,
                 IsConnected = true,
-                Telemetry = null // No telemetry data is available on initial connection.
+                Telemetry = initialTelemetry
             };
+
             _monitorHubContext.Clients.All.SendAsync("CarStateChanged", carStatus);
-            _logger.LogInformation("Announced connection for VIN: {VIN}", vin);
+            _logger.LogInformation("Announced connection for VIN: {VIN} with initial position.", vin);
         }
 
         public void UpdateCarState(string vin, TelemetryTO newState)
@@ -70,10 +91,6 @@ namespace SmartContractVehicle.Service
             }
         }
 
-        /// <summary>
-        /// Retrieves the current telemetry for a given car VIN from the in-memory store.
-        /// </summary>
-        /// <returns>The car's telemetry DTO, or null if the car is not currently reporting its state.</returns>
         public TelemetryTO? GetCarState(string vin)
         {
             _carStates.TryGetValue(vin, out var state);
@@ -89,12 +106,22 @@ namespace SmartContractVehicle.Service
 
             var carStatuses = allCars.Select(car =>
             {
-                var isConnected = _carStates.TryGetValue(car.VIN, out var telemetry);
+                var isConnected = _carStates.TryGetValue(car.VIN, out var liveTelemetry);
+
+                // Use live telemetry if available, otherwise use last known data from DB.
+                var telemetryForStatus = liveTelemetry ?? new TelemetryTO
+                {
+                    CurrentPosition = car.CurrentPosition,
+                    CurrentSpeed = 0,
+                    Heading = 0,
+                    RemainingReach = car.RemainingReach
+                };
+
                 return new CarConnectionStatusTO
                 {
                     VIN = car.VIN,
                     IsConnected = isConnected,
-                    Telemetry = telemetry
+                    Telemetry = telemetryForStatus
                 };
             }).ToList();
 

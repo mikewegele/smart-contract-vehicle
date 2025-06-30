@@ -4,6 +4,9 @@
     ViewData["Title"] = "Real-Time Car Map";
 }
 
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
 <!-- Leaflet CSS and JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -12,43 +15,69 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
 <style>
-    .car-list-item.connected {
-        background-color: #d4edda; /* Light green */
+    .car-card {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, border-left-color 0.3s linear;
+        border: 1px solid #dee2e6;
+        border-radius: .375rem;
+        padding: 0.75rem;
+        height: 100%;
     }
 
-    .car-list-item.disconnected {
-        background-color: #f8d7da; /* Light red */
-    }
+        .car-card:hover {
+            background-color: #e9ecef;
+        }
+
+        .car-card.connected {
+            border-left: 5px solid #28a745;
+        }
+
+        .car-card.disconnected {
+            border-left: 5px solid #dc3545;
+        }
 
     .custom-div-icon div {
-        transition: transform 0.5s linear; /* Smooth rotation for heading changes */
+        transition: transform 0.5s linear, font-size 0.1s linear;
+    }
+
+    .telemetry-info {
+        font-size: 0.8em;
+        color: #6c757d;
     }
 </style>
 
 <div class="container-fluid mt-4">
     <div class="row">
-        <!-- Map Column -->
-        <div class="col-lg-9 mb-3">
-            <div id="map" style="height: 80vh; border-radius: 8px; border: 1px solid #ccc;"></div>
+        <div class="col-12 mb-3">
+            <div id="map" style="height: 75vh; border-radius: 8px; border: 1px solid #ccc;"></div>
         </div>
-        <!-- Car List Column -->
-        <div class="col-lg-3">
+        <div class="col-12">
             <h2 class="h4">Vehicle Status</h2>
-            <ul id="carList" class="list-group">
+            <div id="carList" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                 @if (!Model.Any())
                 {
-                    <li class="list-group-item">No cars found in the system.</li>
+                    <div class="col">
+                        <div class="car-card">No cars found in the system.</div>
+                    </div>
                 }
                 else
                 {
                     @foreach (var car in Model.OrderBy(c => c.VIN))
                     {
-                        <li id="car-@car.VIN" class="list-group-item car-list-item @(car.IsConnected ? "connected" : "disconnected")">
-                            <strong>@car.VIN</strong> - <span class="status-text">@(car.IsConnected ? "Connected" : "Disconnected")</span>
-                        </li>
+                        <div class="col">
+                            <div id="car-@car.VIN" class="car-card @(car.IsConnected ? "connected" : "disconnected")" data-vin="@car.VIN">
+                                <strong>@car.VIN</strong>
+                                <small class="status-text d-block">@(car.IsConnected ? "Connected" : "Disconnected")</small>
+                                <div class="telemetry-info mt-1">
+                                    <span title="Speed"> Speed: <span class="telemetry-speed">@(car.Telemetry != null ? $"{car.Telemetry.CurrentSpeed:F1} km/h" : "--")</span></span><br>
+                                    <span title="Remaining Reach"> Remaining Reach: <span class="telemetry-reach">@(car.Telemetry != null ? $"{car.Telemetry.RemainingReach:F1} km" : "--")</span></span><br>
+                                    <span title="Heading"> Heading: <span class="telemetry-heading">@(car.Telemetry != null ? $"{car.Telemetry.Heading:F0}°" : "--")</span></span>
+                                </div>
+                            </div>
+                        </div>
                     }
                 }
-            </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -56,11 +85,11 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/Dashboard") // <-- CORRECTED: This now matches your Program.cs
+            .withUrl("/Dashboard")
             .withAutomaticReconnect()
             .build();
 
-        const map = L.map('map').setView([52.5200, 13.4050], 10); // Centered on Berlin
+        const map = L.map('map').setView([52.5200, 13.4050], 10);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
@@ -70,7 +99,7 @@
         function createTriangleIcon(color) {
             return L.divIcon({
                 className: 'custom-div-icon',
-                html: `<div style="font-size: 24px; color: ${color};">▲</div>`,
+                html: `<div style="color: ${color};">▲</div>`,
                 iconSize: [30, 42],
                 iconAnchor: [15, 42]
             });
@@ -88,71 +117,111 @@
             return icons.green;
         }
 
-        function updateCarOnMap(car) {
+        function setMarkerIconSize(marker) {
+            if (!marker) return;
+            const zoom = map.getZoom();
+            const newSize = Math.max(32, 80 + (zoom - 12) * 16);
+            const iconElement = marker.getElement()?.querySelector('.custom-div-icon div');
+            if (iconElement) {
+                iconElement.style.fontSize = `${newSize}px`;
+            }
+        }
+
+        function updateAllMarkerSizes() {
+            for (const vin in carMarkers) {
+                setMarkerIconSize(carMarkers[vin]);
+            }
+        }
+
+        function updateCar(car) {
+            const carCard = document.querySelector(`#carList [data-vin="${car.vin}"]`);
+            if (carCard) {
+                const statusText = carCard.querySelector('.status-text');
+                carCard.classList.toggle('connected', car.isConnected);
+                carCard.classList.toggle('disconnected', !car.isConnected);
+                statusText.textContent = car.isConnected ? 'Connected' : 'Disconnected';
+
+                const speedEl = carCard.querySelector('.telemetry-speed');
+                const reachEl = carCard.querySelector('.telemetry-reach');
+                const headingEl = carCard.querySelector('.telemetry-heading');
+
+                if (car.isConnected && car.telemetry) {
+                    speedEl.textContent = `${car.telemetry.currentSpeed.toFixed(1)} km/h`;
+                    reachEl.textContent = `${car.telemetry.remainingReach.toFixed(1)} km`;
+                    headingEl.textContent = `${car.telemetry.heading.toFixed(0)}°`;
+                } else {
+                    speedEl.textContent = '--';
+                    reachEl.textContent = '--';
+                    headingEl.textContent = '--';
+                }
+            }
+
             const marker = carMarkers[car.vin];
-            const icon = getIconForCar(car);
             const position = car.telemetry ? [car.telemetry.currentPosition.y, car.telemetry.currentPosition.x] : null;
 
-            if (marker) { // Marker exists, update it
-                if (position) {
-                    marker.setLatLng(position);
+            if (!position) {
+                if (marker) {
+                    marker.remove();
+                    delete carMarkers[car.vin];
                 }
+                return;
+            }
+
+            const icon = getIconForCar(car);
+            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`;
+
+            if (marker) {
+                marker.setLatLng(position);
                 marker.setIcon(icon);
-                marker.setPopupContent(`<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`);
-            } else if (position) { // Marker doesn't exist, create it
+                marker.setPopupContent(popupContent);
+            } else {
                 const newMarker = L.marker(position, { icon: icon }).addTo(map);
-                newMarker.bindPopup(`<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`);
+                newMarker.bindPopup(popupContent);
                 carMarkers[car.vin] = newMarker;
             }
 
-            // Update marker rotation if connected and has heading
-            const markerToRotate = carMarkers[car.vin];
-            if (markerToRotate && car.isConnected && car.telemetry) {
-                const iconElement = markerToRotate.getElement()?.querySelector('.custom-div-icon div');
+            const markerToUpdate = carMarkers[car.vin];
+            setMarkerIconSize(markerToUpdate);
+            if (markerToUpdate && car.isConnected && car.telemetry) {
+                const iconElement = markerToUpdate.getElement()?.querySelector('.custom-div-icon div');
                 if (iconElement) {
                     iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
                 }
             }
         }
 
-        function updateCarInList(car) {
-            const carListItem = document.getElementById(`car-${car.vin}`);
-            if (carListItem) {
-                const statusText = carListItem.querySelector('.status-text');
-                if (car.isConnected) {
-                    carListItem.classList.remove('disconnected');
-                    carListItem.classList.add('connected');
-                    statusText.textContent = 'Connected';
-                } else {
-                    carListItem.classList.remove('connected');
-                    carListItem.classList.add('disconnected');
-                    statusText.textContent = 'Disconnected';
-                }
+        function zoomToCar(vin) {
+            const marker = carMarkers[vin];
+            if (marker) {
+                map.flyTo(marker.getLatLng(), 16);
+                marker.openPopup();
+            } else {
+                console.warn(`Zoom failed: No map marker found for VIN: ${vin}. This can happen if the vehicle has no location data.`);
             }
         }
 
-        // Handler for receiving the full initial list of cars
-        connection.on("InitialCarStates", function (cars) {
-            cars.forEach(car => {
-                updateCarOnMap(car);
-                updateCarInList(car); // Ensure list is in sync
-            });
+        document.getElementById('carList').addEventListener('click', function(e) {
+            const carItem = e.target.closest('.car-card');
+            if (carItem && carItem.dataset.vin) {
+                zoomToCar(carItem.dataset.vin);
+            }
         });
 
-        // Handler for single car updates
-        connection.on("CarStateChanged", function (car) {
-            updateCarOnMap(car);
-            updateCarInList(car);
-        });
+        map.on('zoomend', updateAllMarkerSizes);
 
-        // Start the connection and request the initial state
+        connection.on("InitialCarStates", (cars) => {
+            cars.forEach(updateCar);
+            updateAllMarkerSizes();
+        });
+        connection.on("CarStateChanged", updateCar);
+
         async function start() {
             try {
                 await connection.start();
                 console.log("SignalR Connected to /Dashboard.");
                 await connection.invoke("GetInitialCarStates");
             } catch (err) {
-                console.error(err);
+                console.error("SignalR Connection Error: ", err);
                 setTimeout(start, 5000);
             }
         };
