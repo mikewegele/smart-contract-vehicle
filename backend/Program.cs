@@ -108,6 +108,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ICarCommandService, CarCommandService>();
 
+// Singleton Services
+builder.Services.AddSingleton<ConnectionMapping>();
+
 // Hosted Services
 builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
 
