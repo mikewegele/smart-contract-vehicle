@@ -36,8 +36,10 @@
             border-left: 5px solid #dc3545;
         }
 
-    .custom-div-icon div {
+    .custom-div-icon .triangle-marker {
         transition: transform 0.5s linear, font-size 0.1s linear;
+        text-align: center;
+        line-height: 1;
     }
 
     .telemetry-info {
@@ -71,7 +73,8 @@
                                 <div class="telemetry-info mt-1">
                                     <span title="Speed"> Speed: <span class="telemetry-speed">@(car.Telemetry != null ? $"{car.Telemetry.CurrentSpeed:F1} km/h" : "--")</span></span><br>
                                     <span title="Remaining Reach"> Remaining Reach: <span class="telemetry-reach">@(car.Telemetry != null ? $"{car.Telemetry.RemainingReach:F1} km" : "--")</span></span><br>
-                                    <span title="Heading"> Heading: <span class="telemetry-heading">@(car.Telemetry != null ? $"{car.Telemetry.Heading:F0}°" : "--")</span></span>
+                                    <span title="Heading"> Heading: <span class="telemetry-heading">@(car.Telemetry != null ? $"{car.Telemetry.Heading:F0}°" : "--")</span></span><br>
+                                    <span title="Position"> Position: <span class="telemetry-position">@(car.Telemetry?.CurrentPosition != null ? $"{car.Telemetry.CurrentPosition.Y:F4}, {car.Telemetry.CurrentPosition.X:F4}" : "--")</span></span>
                                 </div>
                             </div>
                         </div>
@@ -99,9 +102,9 @@
         function createTriangleIcon(color) {
             return L.divIcon({
                 className: 'custom-div-icon',
-                html: `<div style="color: ${color};">▲</div>`,
-                iconSize: [30, 42],
-                iconAnchor: [15, 42]
+                html: `<div class="triangle-marker" style="color: ${color};">▲</div>`,
+                iconSize: null,
+                iconAnchor: null
             });
         }
 
@@ -113,17 +116,20 @@
 
         function getIconForCar(car) {
             if (!car.isConnected) return icons.red;
-            if (car.telemetry && car.telemetry.currentSpeed > 0) return icons.yellow;
+            if (car.telemetry) return icons.yellow;
             return icons.green;
         }
 
         function setMarkerIconSize(marker) {
             if (!marker) return;
             const zoom = map.getZoom();
-            const newSize = Math.max(32, 80 + (zoom - 12) * 16);
-            const iconElement = marker.getElement()?.querySelector('.custom-div-icon div');
+            // UPDATED: Halved the base size and scaling factor
+            const newSize = Math.max(16, 40 + (zoom - 12) * 8);
+            const iconElement = marker.getElement()?.querySelector('.triangle-marker');
             if (iconElement) {
                 iconElement.style.fontSize = `${newSize}px`;
+                marker.options.icon.options.iconAnchor = [newSize / 2, newSize];
+                marker.update();
             }
         }
 
@@ -144,20 +150,31 @@
                 const speedEl = carCard.querySelector('.telemetry-speed');
                 const reachEl = carCard.querySelector('.telemetry-reach');
                 const headingEl = carCard.querySelector('.telemetry-heading');
+                const positionEl = carCard.querySelector('.telemetry-position');
 
                 if (car.isConnected && car.telemetry) {
                     speedEl.textContent = `${car.telemetry.currentSpeed.toFixed(1)} km/h`;
                     reachEl.textContent = `${car.telemetry.remainingReach.toFixed(1)} km`;
                     headingEl.textContent = `${car.telemetry.heading.toFixed(0)}°`;
+                    if (car.telemetry.currentPosition && car.telemetry.currentPosition.coordinates) {
+                        const lat = car.telemetry.currentPosition.coordinates[1];
+                        const lon = car.telemetry.currentPosition.coordinates[0];
+                        positionEl.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    } else {
+                        positionEl.textContent = '--';
+                    }
                 } else {
                     speedEl.textContent = '--';
                     reachEl.textContent = '--';
                     headingEl.textContent = '--';
+                    positionEl.textContent = '--';
                 }
             }
 
             const marker = carMarkers[car.vin];
-            const position = car.telemetry ? [car.telemetry.currentPosition.y, car.telemetry.currentPosition.x] : null;
+            const position = (car.telemetry && car.telemetry.currentPosition && car.telemetry.currentPosition.coordinates)
+                ? [car.telemetry.currentPosition.coordinates[1], car.telemetry.currentPosition.coordinates[0]] // [lat, lon]
+                : null;
 
             if (!position) {
                 if (marker) {
@@ -178,12 +195,13 @@
                 const newMarker = L.marker(position, { icon: icon }).addTo(map);
                 newMarker.bindPopup(popupContent);
                 carMarkers[car.vin] = newMarker;
+                console.log(`Marker created and added to map for VIN: ${car.vin}`, newMarker);
             }
 
             const markerToUpdate = carMarkers[car.vin];
             setMarkerIconSize(markerToUpdate);
             if (markerToUpdate && car.isConnected && car.telemetry) {
-                const iconElement = markerToUpdate.getElement()?.querySelector('.custom-div-icon div');
+                const iconElement = markerToUpdate.getElement()?.querySelector('.triangle-marker');
                 if (iconElement) {
                     iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
                 }
@@ -196,7 +214,7 @@
                 map.flyTo(marker.getLatLng(), 16);
                 marker.openPopup();
             } else {
-                console.warn(`Zoom failed: No map marker found for VIN: ${vin}. This can happen if the vehicle has no location data.`);
+                console.warn(`Zoom failed: No map marker found for VIN: ${vin}.`);
             }
         }
 
@@ -212,7 +230,14 @@
         connection.on("InitialCarStates", (cars) => {
             cars.forEach(updateCar);
             updateAllMarkerSizes();
+
+            const markers = Object.values(carMarkers);
+            if (markers.length > 0) {
+                const featureGroup = L.featureGroup(markers);
+                map.fitBounds(featureGroup.getBounds(), { padding: [50, 50] });
+            }
         });
+
         connection.on("CarStateChanged", updateCar);
 
         async function start() {
