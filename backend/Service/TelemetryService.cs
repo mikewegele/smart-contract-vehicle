@@ -1,15 +1,9 @@
-﻿// TelemetryService.cs
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.SignalR;
 using NetTopologySuite.Geometries;
-using SmartContractVehicle.Data; // Ensure this using statement points to your DbContext
+using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Hubs;
-using SmartContractVehicle.Model; // Assuming your Car model is here
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace SmartContractVehicle.Service
 {
     public class TelemetryService
