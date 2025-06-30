@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmartContractVehicle.Data;
+using SmartContractVehicle.Hubs;
 using SmartContractVehicle.Model;
 using SmartContractVehicle.Service;
 using System.Text;
@@ -97,11 +98,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add SignalR Service
+builder.Services.AddSignalR();
+
 // AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Scoped Services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ICarCommandService, CarCommandService>();
 
 // Hosted Services
 builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
@@ -170,5 +175,7 @@ using (var scope = app.Services.CreateScope())
 
 }
 
+
+app.MapHub<CarHub>("/Telemetry");
 
 app.Run();
