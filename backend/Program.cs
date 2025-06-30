@@ -99,14 +99,18 @@ builder.Services.AddCors(options =>
 });
 
 // Add SignalR Service
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options => // Configure JSON serialization for NetTopologySuite
+    {
+        options.PayloadSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+    });
 
 // AutoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Scoped Services
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<ICarCommandService, CarCommandService>();
+builder.Services.AddScoped<CarCommandService>();
 
 // Singleton Services
 builder.Services.AddSingleton<ConnectionMapping>();

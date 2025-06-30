@@ -5,17 +5,12 @@ namespace SmartContractVehicle.Service;
 
 // This service holds the real-time state of all active cars.
 // It is registered as a Singleton to maintain state across requests.
-public class TelemetryService
+public class TelemetryService(ILogger<TelemetryService> logger)
 {
-    private readonly ILogger<TelemetryService> _logger;
+    private readonly ILogger<TelemetryService> _logger = logger;
 
     // A thread-safe dictionary to store the latest telemetry for each VIN.
-    private readonly ConcurrentDictionary<string, TelemetryTO> _carStates = new ConcurrentDictionary<string, TelemetryTO>();
-
-    public TelemetryService(ILogger<TelemetryService> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ConcurrentDictionary<string, TelemetryTO> _carStates = new();
 
     /// <summary>
     /// Updates the telemetry for a given car VIN.

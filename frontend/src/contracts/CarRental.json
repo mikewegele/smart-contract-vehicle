@@ -6071,10 +6071,16 @@
       "links": {},
       "address": "0x4e9F63C5630A5507D13689f4A13030d295440025",
       "transactionHash": "0x6b0d5ed334b5becfb3df8b641a94378e5e6d782297a1e4cbdabab9dc111031d9"
+    },
+    "1751304345064": {
+      "events": {},
+      "links": {},
+      "address": "0xdFF27A9FB62FCb9C7C5A4775a78B80DB21e40EF3",
+      "transactionHash": "0xb1b0dbae1f45768e12e874dd4a8a2275c3b63ad7256bc5bad0d54c30df61820a"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-06-30T15:50:07.150Z",
+  "updatedAt": "2025-06-30T17:26:04.839Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
