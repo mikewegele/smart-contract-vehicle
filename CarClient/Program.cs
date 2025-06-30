@@ -3,24 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.IO.Converters;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
-// Define a DTO class that matches the server-side DTO.
-// In a real project, this would be in a shared class library.
-public class TelemetryTO
-{
-    public Point CurrentPosition { get; set; }
-    public double CurrentSpeed { get; set; }
-    public double Heading { get; set; }
-    public double RemainingReach { get; set; }
-}
-
+using CarClient.DTO;
 public class Program
 {
     private static ILogger<Program> _logger;
@@ -184,9 +169,9 @@ public class Program
     private static void UpdateSimulation(Random random)
     {
         // Adjust speed and heading
-        if (random.Next(10) > 7) _currentTelemetry.CurrentSpeed += random.Next(-5, 6);
+        if (random.Next(10) > 7) _currentTelemetry.CurrentSpeed += random.Next(-50, 50);
         if (_currentTelemetry.CurrentSpeed < 0) _currentTelemetry.CurrentSpeed = 0;
-        if (_currentTelemetry.CurrentSpeed > 100) _currentTelemetry.CurrentSpeed = 100;
+        if (_currentTelemetry.CurrentSpeed > 180) _currentTelemetry.CurrentSpeed = 180;
 
         if (random.Next(10) > 5) _currentTelemetry.Heading += random.Next(-10, 11);
         _currentTelemetry.Heading = (_currentTelemetry.Heading + 360) % 360;
