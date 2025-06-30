@@ -52,7 +52,9 @@ namespace SmartContractVehicle.Controller
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReservationTO>>> GetAllReservations(CancellationToken ct)
         {
-            var reservations = await _db.Reservations.ToListAsync(ct);
+            var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
+
+            var reservations = await _db.Reservations.Where(r => r.RentorId == userId).ToListAsync(ct);
             var reservationDTOs = _mapper.Map<IEnumerable<ReservationTO>>(reservations);
             return Ok(reservationDTOs);
         }
@@ -119,13 +121,15 @@ namespace SmartContractVehicle.Controller
             var car = _db.Cars.Find(dBReservation.ReservedCarId);
             if (car is null) return NotFound("The car reserved doesn't seem to exist.");
 
-            await _carCommandService.SendUnlockCommandAsync(car.VIN);
+            var answer = await _carCommandService.SendUnlockCommandAsync(car.VIN);
+            if (!answer.Success) return BadRequest(answer.Message);
             // TODO Create new Ride Object and share it with the user, we later can use this to save ride info etc
 
             return Ok();
         }
 
         [HttpPost]
+        public async Task<ActionResult<ReservationTO>> FinishDriving(Guid reservationId, CancellationToken ct)
         public async Task<ActionResult> CancelReservation(Guid reservationId, CancellationToken ct)
         {
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
@@ -174,6 +178,9 @@ namespace SmartContractVehicle.Controller
             var car = await _db.Cars.FindAsync([reservation.ReservedCarId], ct);
             if (car == null)
                 return NotFound("Associated car not found.");
+
+            var answer = await _carCommandService.SendLockCommandAsync(car.VIN);
+            if (!answer.Success) return BadRequest(answer.Message);
 
             car.SetStatus(await _db.CarStatuses.FindAsync([(int)CarStatuses.Available], ct), reservation);
             car.ActiveReservation = null;

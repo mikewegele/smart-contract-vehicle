@@ -2,9 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 public class Program
 {
@@ -20,10 +17,6 @@ public class Program
         var services = new ServiceCollection();
 
         // Logging-Dienste hinzufügen.
-        // HINWEIS: Dies erfordert die folgenden NuGet-Pakete:
-        // - Microsoft.Extensions.Logging
-        // - Microsoft.Extensions.Logging.Configuration
-        // - Microsoft.Extensions.Logging.Console
         services.AddLogging(builder =>
         {
             builder.AddConfiguration(configuration.GetSection("Logging"));
@@ -55,19 +48,27 @@ public class Program
         logger.LogInformation("Car client initialized for VIN: {VIN}", vin);
         logger.LogInformation("Connecting to hub at {HubUrl}...", hubUrl);
 
-        // Definieren, was passiert, wenn der Server einen "LockCommand" sendet
-        connection.On("LockCommand", () =>
+        // Definieren, was passiert, wenn der Server einen Sperrbefehl anfordert.
+        // Der Handler wird explizit als Func<bool> gecastet, um sicherzustellen, dass ein Ergebnis zurückgegeben wird.
+        connection.On("RequestLock", (Func<bool>)(() =>
         {
-            logger.LogInformation("Received LOCK command. Executing lock sequence...");
-            // TODO: Hier die eigentliche Logik zum Verriegeln des Autos hinzufügen
-        });
+            logger.LogInformation("Received LOCK request. Executing lock sequence...");
+            // TODO: Hier die eigentliche Logik zum Verriegeln des Autos hinzufügen.
+            // Geben Sie 'true' zurück, wenn erfolgreich, andernfalls 'false'.
+            var success = true; // Simulieren eines erfolgreichen Vorgangs
+            logger.LogInformation("Lock sequence result: {Success}", success);
+            return success;
+        }));
 
-        // Definieren, was passiert, wenn der Server einen "UnlockCommand" sendet
-        connection.On("UnlockCommand", () =>
+        // Definieren, was passiert, wenn der Server einen Entsperrbefehl anfordert.
+        connection.On("RequestUnlock", (Func<bool>)(() =>
         {
-            logger.LogInformation("Received UNLOCK command. Executing unlock sequence...");
-            // TODO: Hier die eigentliche Logik zum Entriegeln des Autos hinzufügen
-        });
+            logger.LogInformation("Received UNLOCK request. Executing unlock sequence...");
+            // TODO: Hier die eigentliche Logik zum Entriegeln des Autos hinzufügen.
+            var success = true; // Simulieren eines erfolgreichen Vorgangs
+            logger.LogInformation("Unlock sequence result: {Success}", success);
+            return success;
+        }));
 
         // Schleife zur Handhabung der Verbindung und Registrierung
         while (true)
@@ -77,18 +78,17 @@ public class Program
                 await connection.StartAsync();
                 logger.LogInformation("Connection established successfully with Connection ID: {ConnectionId}", connection.ConnectionId);
 
-                // Das Auto registrieren und das Ergebnis überprüfen
                 var registrationSuccess = await connection.InvokeAsync<bool>("RegisterCar", vin);
 
                 if (registrationSuccess)
                 {
                     logger.LogInformation("Client registered successfully with VIN: {VIN}", vin);
-                    break; // Verbindungsschleife beenden und den Client weiterlaufen lassen
+                    break;
                 }
                 else
                 {
                     logger.LogError("Registration failed. The VIN '{VIN}' is invalid or not found in the database. Shutting down.", vin);
-                    return; // Anwendung beenden
+                    return;
                 }
             }
             catch (Exception ex)
