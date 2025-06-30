@@ -35,7 +35,40 @@ public class Program
             .BuildServiceProvider();
 
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-        var vin = args.Length > 0 ? args[0] : "TESTVIN123456789";
+
+        // --- Command-Line Argument Parsing ---
+        var vin = "TESTVIN123456789";
+        var latitude = 52.5163; // Default: Brandenburg Gate
+        var longitude = 13.3777; // Default: Brandenburg Gate
+        var remainingReach = 350.5;
+
+        if (args.Length > 0)
+        {
+            vin = args[0];
+        }
+
+        if (args.Length >= 4)
+        {
+            if (double.TryParse(args[1], out var latArg) &&
+                double.TryParse(args[2], out var lonArg) &&
+                double.TryParse(args[3], out var reachArg))
+            {
+                latitude = latArg;
+                longitude = lonArg;
+                remainingReach = reachArg;
+                _logger.LogInformation("Using command-line arguments for initial state: Lat={Lat}, Lon={Lon}, Reach={Reach}", latitude, longitude, remainingReach);
+            }
+            else
+            {
+                _logger.LogWarning("Could not parse all command-line arguments for state. Using default values.");
+            }
+        }
+        else if (args.Length > 1) // User provided some but not all args
+        {
+            _logger.LogWarning("Incomplete state arguments provided. Expected: <VIN> <Latitude> <Longitude> <Reach>. Using default values for state.");
+        }
+        // --- End of Argument Parsing ---
+
         var hubUrl = configuration["SignalR:HubUrl"];
 
         if (string.IsNullOrEmpty(hubUrl))
@@ -56,14 +89,13 @@ public class Program
             })
             .Build();
 
-        // Initialize car telemetry
+        // Initialize car telemetry using values from args or defaults
         _currentTelemetry = new TelemetryTO
         {
-            // Starting point: Near Brandenburg Gate in Berlin (Longitude, Latitude)
-            CurrentPosition = new Point(13.3777, 52.5163, 0) { SRID = 4326 },
+            CurrentPosition = new Point(longitude, latitude, 0) { SRID = 4326 },
             CurrentSpeed = 0,
             Heading = 45, // Northeast
-            RemainingReach = 350.5
+            RemainingReach = remainingReach
         };
 
         _logger.LogInformation("Car client initialized for VIN: {VIN}", vin);
