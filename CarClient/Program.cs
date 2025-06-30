@@ -11,6 +11,7 @@ public class Program
     private static ILogger<Program> _logger;
     private static HubConnection _connection;
     private static TelemetryTO _currentTelemetry;
+    private static bool _isLocked = true; // The car starts in a locked state.
     private const int UpdateIntervalMs = 2000; // Update every 2 seconds
 
     // Geospatial transformation objects
@@ -101,7 +102,8 @@ public class Program
     {
         _connection.On("RequestLock", (Func<bool>)(() =>
         {
-            _logger.LogInformation("Received LOCK request. Stopping car and executing lock sequence...");
+            _logger.LogInformation("Received LOCK request. Stopping car and setting state to locked.");
+            _isLocked = true;
             _currentTelemetry.CurrentSpeed = 0;
             var success = true;
             _logger.LogInformation("Lock sequence result: {Success}", success);
@@ -110,7 +112,8 @@ public class Program
 
         _connection.On("RequestUnlock", (Func<bool>)(() =>
         {
-            _logger.LogInformation("Received UNLOCK request. Executing unlock sequence...");
+            _logger.LogInformation("Received UNLOCK request. Setting state to unlocked.");
+            _isLocked = false;
             var success = true;
             _logger.LogInformation("Unlock sequence result: {Success}", success);
             return success;
@@ -151,10 +154,15 @@ public class Program
         var random = new Random();
         while (!token.IsCancellationRequested)
         {
-            UpdateSimulation(random);
+            // Only update the car's position and speed if it's unlocked.
+            if (!_isLocked)
+            {
+                UpdateSimulation(random);
+            }
 
             try
             {
+                // Always send the current state to the server, even if it hasn't changed.
                 await _connection.SendAsync("UpdateCarState", _currentTelemetry, token);
             }
             catch (Exception ex)
