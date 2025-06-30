@@ -6,6 +6,8 @@ using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using CarClient.DTO;
+
+namespace CarClient;
 public class Program
 {
     private static ILogger<Program> _logger;
