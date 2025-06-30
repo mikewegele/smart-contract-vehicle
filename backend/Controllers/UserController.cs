@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using SmartContractVehicle.Model;
 
-namespace SmartContractVehicle.Controller;
+namespace SmartContractVehicle.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]/")]

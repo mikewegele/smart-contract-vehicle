@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿// CarHub.cs
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
@@ -46,6 +47,10 @@ namespace SmartContractVehicle.Hubs
 
             _connectionMapping.Add(vin, Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, vin);
+
+            // Announce to the dashboard that this car is now connected.
+            _telemetryService.SetCarConnected(vin);
+
             _logger.LogInformation("Car client with VIN {VIN} connected and registered with connection ID {ConnectionId}.", vin, Context.ConnectionId);
             return true;
         }
@@ -72,7 +77,7 @@ namespace SmartContractVehicle.Hubs
             if (vin != null)
             {
                 _connectionMapping.Remove(vin);
-                _telemetryService.RemoveCarState(vin); // Clean up the state
+                _telemetryService.RemoveCarState(vin); // This already notifies the dashboard
                 _logger.LogInformation("Client for VIN {VIN} disconnected.", vin);
             }
 

@@ -119,6 +119,7 @@ builder.Services.AddSingleton<TelemetryService>();
 // Hosted Services
 builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
 
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -185,5 +186,10 @@ using (var scope = app.Services.CreateScope())
 
 
 app.MapHub<CarHub>("/Telemetry");
+app.MapHub<CarMonitorHub>("/Dashboard");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Map}/{action=Index}/{id?}");
 
 app.Run();
