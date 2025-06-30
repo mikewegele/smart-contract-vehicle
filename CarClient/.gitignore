@@ -1,0 +1,57 @@
+# .NET Core
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+!appsettings.json
+
+# Logs
+*.log
+Logs/
+
+# Paketverwaltung
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Build Ergebnisse
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio
+.vscode/
+.vs/
+*.dbmdl
+*.cache
+*.ide
+
+# Rider
+.idea/
+
+# Test-Ergebnisse
+TestResults/
+*.coverage
+*.coveragexml
+
+# EF Core Migrations Snapshots (optional ignorieren)
+**/Migrations/*.Designer.cs
+**/Migrations/*ModelSnapshot.cs
+*/Migrations/*
+
+# Sonstiges
+*.swp
+*.DS_Store
+Thumbs.db
+
+# macOS spezifisch
+.DS_Store

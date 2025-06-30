@@ -1,22 +1,24 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
 using SmartContractVehicle.Data;
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Model;
-using Microsoft.EntityFrameworkCore;
-using Nethereum.Web3;
-using Nethereum.RPC.Eth.DTOs;
+using SmartContractVehicle.Service;
 
 namespace SmartContractVehicle.Controller
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
-    public class BookingController(AppDbContext db, IMapper mapper) : ControllerBase
+    public class BookingController(AppDbContext db, IMapper mapper, ICarCommandService carCommandService) : ControllerBase
     {
         private readonly AppDbContext _db = db;
         private readonly IMapper _mapper = mapper;
+        private readonly ICarCommandService  _carCommandService = carCommandService;
 
         /// <summary>
         /// This function will block the car from getting reserved by any one but the one who blocked it
@@ -114,7 +116,10 @@ namespace SmartContractVehicle.Controller
             if (dBReservation.RentorId != loggedInUser.Id) return BadRequest("You must provide a reservation of your own.");
 
             // TODO Send Notifcation to the car to open
+            var car = _db.Cars.Find(dBReservation.ReservedCarId);
+            if (car is null) return NotFound("The car reserved doesn't seem to exist.");
 
+            await _carCommandService.SendUnlockCommandAsync(car.VIN);
             // TODO Create new Ride Object and share it with the user, we later can use this to save ride info etc
 
             return Ok();
@@ -155,7 +160,7 @@ namespace SmartContractVehicle.Controller
         public async Task<ActionResult<IEnumerable<ReservationTO>>> FinishDriving(Guid reservationId, CancellationToken ct)
         {
             var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
-            var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+            var user = await _db.Users.FindAsync([userId], ct);
             if (user == null)
                 return NotFound("User not found.");
 
@@ -166,13 +171,13 @@ namespace SmartContractVehicle.Controller
             if (reservation.RentorId != user.Id)
                 return BadRequest("You can only finish your own reservation.");
 
-            var car = await _db.Cars.FindAsync(new object[] { reservation.ReservedCarId }, ct);
+            var car = await _db.Cars.FindAsync([reservation.ReservedCarId], ct);
             if (car == null)
                 return NotFound("Associated car not found.");
 
-            car.SetStatus(await _db.CarStatuses.FindAsync((int)CarStatuses.Available), reservation);
+            car.SetStatus(await _db.CarStatuses.FindAsync([(int)CarStatuses.Available], ct), reservation);
             car.ActiveReservation = null;
-            reservation = await _db.Reservations.FindAsync(reservationId);
+            reservation = await _db.Reservations.FindAsync([reservationId], ct);
             if (reservation != null)
             {
                 _db.Reservations.Remove(reservation);
