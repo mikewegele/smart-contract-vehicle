@@ -110,6 +110,7 @@ builder.Services.AddScoped<ICarCommandService, CarCommandService>();
 
 // Singleton Services
 builder.Services.AddSingleton<ConnectionMapping>();
+builder.Services.AddSingleton<TelemetryService>();
 
 // Hosted Services
 builder.Services.AddHostedService<StatusTimerService>(); // This service will update the database so cars status will get reset
