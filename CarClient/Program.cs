@@ -13,7 +13,9 @@ public class Program
 {
     private static ILogger<Program> _logger;
     private static HubConnection _connection;
-    private static TelemetryTO _currentTelemetry;
+    // **CHANGE**: Telemetry is now nullable and starts as null.
+    // It will be initialized by the server.
+    private static TelemetryTO _currentTelemetry = null;
     private static bool _isLocked = true;
     private const int UpdateIntervalMs = 2000;
 
@@ -27,16 +29,6 @@ public class Program
         _logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
         var vin = args.Length > 0 ? args[0] : "TESTVIN123456789";
-        var latitude = 52.5163;
-        var longitude = 13.3777;
-        var remainingReach = 350.5;
-
-        if (args.Length >= 4 && double.TryParse(args[1], out var latArg) && double.TryParse(args[2], out var lonArg) && double.TryParse(args[3], out var reachArg))
-        {
-            latitude = latArg;
-            longitude = lonArg;
-            remainingReach = reachArg;
-        }
 
         var hubUrl = configuration["SignalR:HubUrl"];
         if (string.IsNullOrEmpty(hubUrl))
@@ -47,8 +39,6 @@ public class Program
 
         InitializeCoordinateSystems();
 
-        // **FIX:** Re-added the JSON Protocol configuration with the GeoJsonConverterFactory.
-        // This is CRITICAL for correctly serializing the Point object.
         _connection = new HubConnectionBuilder()
             .WithUrl(hubUrl)
             .WithAutomaticReconnect()
@@ -58,22 +48,17 @@ public class Program
             })
             .Build();
 
-        _currentTelemetry = new TelemetryTO
-        {
-            CurrentPosition = new Point(longitude, latitude, 0) { SRID = 4326 },
-            CurrentSpeed = 0,
-            Heading = 45,
-            RemainingReach = remainingReach
-        };
+        // **REMOVED**: Local telemetry initialization is removed.
 
-        _logger.LogInformation("Car client initialized for VIN: {VIN}", vin);
+        _logger.LogInformation("Car client started for VIN: {VIN}", vin);
+        _logger.LogInformation("Waiting for server to provide initial state via 'RequestUnlockAndSync'...");
         SetupHubEventHandlers();
 
         if (await ConnectAndRegisterAsync(vin))
         {
             var cts = new CancellationTokenSource();
             _ = Task.Run(() => Drive(cts.Token));
-            _logger.LogInformation("Client is running. Press Enter to exit.");
+            _logger.LogInformation("Client is connected and running. Press Enter to exit.");
             Console.ReadLine();
             cts.Cancel();
             await _connection.DisposeAsync();
@@ -96,16 +81,23 @@ public class Program
         {
             _logger.LogInformation("Received LOCK request. Stopping car and setting state to locked.");
             _isLocked = true;
-            _currentTelemetry.CurrentSpeed = 0;
+            if (_currentTelemetry != null)
+            {
+                _currentTelemetry.CurrentSpeed = 0;
+            }
             return true;
         }));
 
-        _connection.On("RequestUnlockAndSync", (Func<TelemetryTO, bool>)((initialState) =>
+        _connection.On("RequestUnlockAndSync", (Func<TelemetryTO, bool>)((serverState) =>
         {
-            _logger.LogInformation("Received UNLOCK AND SYNC request. Updating state from server.");
-            _currentTelemetry = initialState;
+            _logger.LogInformation("Received UNLOCK AND SYNC request. Initializing state from server.");
+
+            // The client's entire telemetry state is now set by the server.
+            _currentTelemetry = serverState;
             _isLocked = false;
-            _logger.LogInformation("State synchronized: Position=({Lat},{Lon}), Reach={Reach} km. Car is now UNLOCKED.",
+
+            _logger.LogInformation("State initialized by server. Car is now UNLOCKED.");
+            _logger.LogInformation("Current State: Position=({Lat},{Lon}), Reach={Reach} km.",
                 _currentTelemetry.CurrentPosition.Y,
                 _currentTelemetry.CurrentPosition.X,
                 _currentTelemetry.RemainingReach);
@@ -145,19 +137,22 @@ public class Program
     {
         var random = new Random();
         while (!token.IsCancellationRequested)
-        {
-            if (!_isLocked)
+        {   
+            if (_currentTelemetry != null)
             {
-                UpdateSimulation(random);
-            }
+                if (!_isLocked)
+                {
+                    UpdateSimulation(random);
+                }
 
-            try
-            {
-                await _connection.SendAsync("UpdateCarState", _currentTelemetry, token);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send telemetry update to server.");
+                try
+                {
+                    await _connection.SendAsync("UpdateCarState", _currentTelemetry, token);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send telemetry update to server.");
+                }
             }
 
             await Task.Delay(UpdateIntervalMs, token);
@@ -166,6 +161,9 @@ public class Program
 
     private static void UpdateSimulation(Random random)
     {
+        // This check is important in case this method is ever called before initialization
+        if (_currentTelemetry == null) return;
+
         if (random.Next(10) > 4) _currentTelemetry.CurrentSpeed += random.Next(-50, 50);
         if (_currentTelemetry.CurrentSpeed < 0) _currentTelemetry.CurrentSpeed = 0;
         if (_currentTelemetry.CurrentSpeed > 180) _currentTelemetry.CurrentSpeed = 180;
