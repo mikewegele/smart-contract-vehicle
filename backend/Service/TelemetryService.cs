@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using SmartContractVehicle.Data;
+﻿// TelemetryService.cs
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
+using NetTopologySuite.Geometries;
+using SmartContractVehicle.Data; // Ensure this using statement points to your DbContext
 using SmartContractVehicle.DTO;
 using SmartContractVehicle.Hubs;
+using SmartContractVehicle.Model; // Assuming your Car model is here
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartContractVehicle.Service
 {
@@ -30,27 +36,23 @@ namespace SmartContractVehicle.Service
         {
             using var scope = _scopeFactory.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-            // Find the car in the database to get its last known state.
             var car = dbContext.Cars.FirstOrDefault(c => c.VIN == vin);
 
-            // This shouldn't happen because RegisterCar validates existence, but as a safeguard:
-            if (car == null || car.CurrentPosition == null)
+            if (car == null)
             {
-                _logger.LogWarning("Could not announce initial position for VIN {VIN}: car or its position not found in DB.", vin);
-                // Announce connection status so the list updates, even if the map can't.
-                var statusOnly = new CarConnectionStatusTO { VIN = vin, IsConnected = true, Telemetry = null };
-                _monitorHubContext.Clients.All.SendAsync("CarStateChanged", statusOnly);
+                _logger.LogWarning("Cannot announce connection for VIN {VIN}: car not found in DB.", vin);
                 return;
             }
 
-            // Create a telemetry object from the car's last known data in the database.
+            // UPDATED: Use the car's position, or default to a known location (Berlin) if it's null.
+            var initialPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
+
             var initialTelemetry = new TelemetryTO
             {
-                CurrentPosition = car.CurrentPosition,
-                CurrentSpeed = 0, // Car is stationary on connect
-                Heading = 0,
-                RemainingReach = car.RemainingReach // Assumes a 'RemainingReach' property
+                CurrentPosition = initialPosition,
+                CurrentSpeed = 0,
+                Heading =0,
+                RemainingReach = car.RemainingReach
             };
 
             var carStatus = new CarConnectionStatusTO
@@ -108,10 +110,12 @@ namespace SmartContractVehicle.Service
             {
                 var isConnected = _carStates.TryGetValue(car.VIN, out var liveTelemetry);
 
-                // Use live telemetry if available, otherwise use last known data from DB.
+                // UPDATED: Use live telemetry if available, otherwise use last known data from DB,
+                // defaulting to Berlin if the DB position is also null.
+                var dbPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
                 var telemetryForStatus = liveTelemetry ?? new TelemetryTO
                 {
-                    CurrentPosition = car.CurrentPosition,
+                    CurrentPosition = dbPosition,
                     CurrentSpeed = 0,
                     Heading = 0,
                     RemainingReach = car.RemainingReach
