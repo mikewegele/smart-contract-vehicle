@@ -29,11 +29,11 @@
         }
 
         .car-card.connected {
-            border-left: 5px solid #28a745;
+            border-left: 5px solid #28a745; /* Green for connected */
         }
 
         .car-card.disconnected {
-            border-left: 5px solid #dc3545;
+            border-left: 5px solid #6c757d; /* Grey for disconnected */
         }
 
     .custom-div-icon .triangle-marker {
@@ -103,33 +103,38 @@
             return L.divIcon({
                 className: 'custom-div-icon',
                 html: `<div class="triangle-marker" style="color: ${color};">▲</div>`,
-                iconSize: null,
-                iconAnchor: null
+                iconSize: null, // Will be set dynamically by setMarkerIconSize
+                iconAnchor: null // Will be set dynamically by setMarkerIconSize
             });
         }
 
         const icons = {
-            green: createTriangleIcon('green'),
-            red: createTriangleIcon('red'),
-            yellow: createTriangleIcon('yellow')
+            green: createTriangleIcon('green'),   // Connected, not driving
+            yellow: createTriangleIcon('orange'), // Connected and driving (changed from yellow for better contrast)
+            grey: createTriangleIcon('grey')      // Disconnected
         };
 
         function getIconForCar(car) {
-            if (!car.isConnected) return icons.red;
-            if (car.telemetry) return icons.yellow;
-            return icons.green;
+            if (!car.isConnected) {
+                return icons.grey; // Grey for disconnected
+            }
+            // If connected, check if it's driving (speed > 0)
+            if (car.telemetry && car.telemetry.currentSpeed > 0) {
+                return icons.yellow; // Yellow/Orange for connected and driving
+            }
+            return icons.green; // Green for connected and stationary (speed = 0)
         }
 
         function setMarkerIconSize(marker) {
             if (!marker) return;
             const zoom = map.getZoom();
-            // UPDATED: Halved the base size and scaling factor
             const newSize = Math.max(16, 40 + (zoom - 12) * 8);
             const iconElement = marker.getElement()?.querySelector('.triangle-marker');
             if (iconElement) {
                 iconElement.style.fontSize = `${newSize}px`;
+                // Update iconAnchor to center the triangle base at the coordinates
                 marker.options.icon.options.iconAnchor = [newSize / 2, newSize];
-                marker.update();
+                marker.update(); // Force Leaflet to re-render the icon with new size/anchor
             }
         }
 
@@ -152,7 +157,8 @@
                 const headingEl = carCard.querySelector('.telemetry-heading');
                 const positionEl = carCard.querySelector('.telemetry-position');
 
-                if (car.isConnected && car.telemetry) {
+                // Always attempt to display telemetry info if available, otherwise display '--'
+                if (car.telemetry) {
                     speedEl.textContent = `${car.telemetry.currentSpeed.toFixed(1)} km/h`;
                     reachEl.textContent = `${car.telemetry.remainingReach.toFixed(1)} km`;
                     headingEl.textContent = `${car.telemetry.heading.toFixed(0)}°`;
@@ -161,9 +167,11 @@
                         const lon = car.telemetry.currentPosition.coordinates[0];
                         positionEl.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
                     } else {
-                        positionEl.textContent = '--';
+                        positionEl.textContent = '--'; // Fallback if coordinates are missing
                     }
                 } else {
+                    // This block should ideally not be hit if TelemetryService always sends a TelemetryTO object,
+                    // but it's a good fallback for robustness.
                     speedEl.textContent = '--';
                     reachEl.textContent = '--';
                     headingEl.textContent = '--';
@@ -171,39 +179,45 @@
                 }
             }
 
-            const marker = carMarkers[car.vin];
+            // Position should always be available now from TelemetryService
             const position = (car.telemetry && car.telemetry.currentPosition && car.telemetry.currentPosition.coordinates)
                 ? [car.telemetry.currentPosition.coordinates[1], car.telemetry.currentPosition.coordinates[0]] // [lat, lon]
                 : null;
 
+            // If for some reason position is still null, log a warning and return.
             if (!position) {
-                if (marker) {
-                    marker.remove();
-                    delete carMarkers[car.vin];
-                }
+                console.warn(`No valid position for VIN ${car.vin}. Cannot display marker.`);
                 return;
             }
 
             const icon = getIconForCar(car);
-            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}`;
+            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}<br><b>Speed:</b> ${car.telemetry ? car.telemetry.currentSpeed.toFixed(1) + ' km/h' : '--'}`;
 
+            let marker = carMarkers[car.vin];
             if (marker) {
                 marker.setLatLng(position);
                 marker.setIcon(icon);
                 marker.setPopupContent(popupContent);
             } else {
-                const newMarker = L.marker(position, { icon: icon }).addTo(map);
-                newMarker.bindPopup(popupContent);
-                carMarkers[car.vin] = newMarker;
-                console.log(`Marker created and added to map for VIN: ${car.vin}`, newMarker);
+                marker = L.marker(position, { icon: icon }).addTo(map);
+                marker.bindPopup(popupContent);
+                carMarkers[car.vin] = marker;
+                console.log(`Marker created and added to map for VIN: ${car.vin}`, marker);
             }
 
-            const markerToUpdate = carMarkers[car.vin];
-            setMarkerIconSize(markerToUpdate);
-            if (markerToUpdate && car.isConnected && car.telemetry) {
-                const iconElement = markerToUpdate.getElement()?.querySelector('.triangle-marker');
+            setMarkerIconSize(marker); // Ensure size is updated for new/existing markers
+
+            // Rotate marker only if connected and has valid telemetry for heading
+            if (car.isConnected && car.telemetry && car.telemetry.currentSpeed > 0) {
+                const iconElement = marker.getElement()?.querySelector('.triangle-marker');
                 if (iconElement) {
                     iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
+                }
+            } else if (marker) {
+                // If disconnected or stationary, reset rotation to 0
+                const iconElement = marker.getElement()?.querySelector('.triangle-marker');
+                if (iconElement) {
+                    iconElement.style.transform = `rotate(0deg)`;
                 }
             }
         }
