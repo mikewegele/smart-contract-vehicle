@@ -14,7 +14,7 @@ namespace SmartContractVehicle.Data
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            string[] roles = { RENTER, LESSOR, ADMIN };
+            string[] roles = [RENTER, LESSOR, ADMIN];
 
             foreach (var role in roles)
             {
@@ -30,27 +30,27 @@ namespace SmartContractVehicle.Data
             var random = new Random();
             var geometryFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            string[] brands = new string[] { "Tesla", "BMW", "Audi", "Mercedes", "Volkswagen", "Alexander Dennis" };
+            string[] brands = ["Tesla", "BMW", "Audi", "Mercedes", "Volkswagen", "Alexander Dennis"];
 
-            string[][] modelNames = new string[][]
-            {
-                new string[] { "Model S", "Model X" },
-                new string[] { "X5", "i3" },
-                new string[] { "A4", "Q7" },
-                new string[] { "C-Class", "GLA", "Citaro" },
-                new string[] { "Golf", "Tiguan" },
-                new string[] { "Enviro500" }
-            };
+            string[][] modelNames =
+            [
+                ["Model S", "Model X"],
+                ["X5", "i3"],
+                ["A4", "Q7"],
+                ["C-Class", "GLA", "Citaro"],
+                ["Golf", "Tiguan"],
+                ["Enviro500"]
+            ];
 
-            string[][][] trimNames = new string[][][]
-            {
-                new string[][] { new string[] { "Long Range", "Plaid" }, new string[] { "Standard", "Performance" } }, // Tesla
-                new string[][] { new string[] { "xDrive40", "xDrive50" }, new string[] { "Urban", "Sport" } },          // BMW
-                new string[][] { new string[] { "Premium", "Sport" }, new string[] { "Base", "Luxury" } },              // Audi
-                new string[][] { new string[] { "AMG", "Avantgarde" }, new string[] { "Base", "Style" }, new string[] { "Hybrid" } }, // Mercedes
-                new string[][] { new string[] { "Life", "Style" }, new string[] { "Base", "R-Line" } },                // Volkswagen
-                new string[][] { new string[] { "Standard", "Double Decker" } }                                        // Alexander Dennis
-            };
+            string[][][] trimNames =
+            [
+                [["Long Range", "Plaid"], ["Standard", "Performance"]], // Tesla
+                [["xDrive40", "xDrive50"], ["Urban", "Sport"]],         // BMW
+                [["Premium", "Sport"], ["Base", "Luxury"]],             // Audi
+                [["AMG", "Avantgarde"], ["Base", "Style"], ["Hybrid"]], // Mercedes
+                [["Life", "Style"], ["Base", "R-Line"]],                // Volkswagen
+                [["Standard", "Double Decker"]]                         // Alexander Dennis
+            ];
 
             var companies = new List<AutomotiveCompany>();
             var cars = new List<Car>();
@@ -61,7 +61,7 @@ namespace SmartContractVehicle.Data
                 {
                     Id = Guid.NewGuid(),
                     Name = brands[b],
-                    Models = new List<VehicleModel>(),
+                    Models = [],
                     ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower().Replace(" ", "")}.png"
                 };
 
@@ -76,7 +76,7 @@ namespace SmartContractVehicle.Data
                         Id = Guid.NewGuid(),
                         Name = modelNames[b][m],
                         Producer = company,
-                        Trims = new List<VehicleTrim>()
+                        Trims = []
                     };
 
                     for (int t = 0; t < trimNames[b][m].Length; t++)
@@ -89,7 +89,7 @@ namespace SmartContractVehicle.Data
                             Fuel = fuels[random.Next(fuels.Length)],
                             Drivetrain = drivetrains[random.Next(drivetrains.Length)],
                             ImagePath = $"https://mikewegele.github.io/smart-contract-vehicle/images/{brands[b].ToLower().Replace(" ", "")}_{model.Name.ToLower().Replace(" ", "")}.png",
-                            Cars = new List<Car>()
+                            Cars = []
                         };
 
                         for (int c = 0; c < 10; c++)
@@ -97,7 +97,7 @@ namespace SmartContractVehicle.Data
                             var car = new Car(available)
                             {
                                 Id = Guid.NewGuid(),
-                                VIN = $"VIN{Guid.NewGuid().ToString().Substring(0, 13)}",
+                                VIN = $"VIN{Guid.NewGuid().ToString()[..13]}",
                                 Owner = user,
                                 Trim = trim,
                                 CurrentPosition = geometryFactory.CreatePoint(new Coordinate(

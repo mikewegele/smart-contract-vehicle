@@ -43,7 +43,7 @@ namespace SmartContractVehicle.Service
             var toWgs84 = transformFactory.CreateFromCoordinateSystems(utm, wgs84);
 
             // Transform center to UTM
-            double[] utmCenter = toUtm.MathTransform.Transform(new[] { center.X, center.Y });
+            double[] utmCenter = toUtm.MathTransform.Transform([center.X, center.Y]);
 
             // Create UTM geometry factory
             var geometryFactoryUtm = new GeometryFactory(new PrecisionModel(), 32600 + utmZone); // EPSG:326XX
@@ -55,11 +55,11 @@ namespace SmartContractVehicle.Service
             Geometry circleUtm = utmPoint.Buffer(radiusMeters, numPoints);
 
             // Transform circle back to WGS84
-            Coordinate[] coords = circleUtm.Coordinates.Select(c =>
+            Coordinate[] coords = [.. circleUtm.Coordinates.Select(c =>
             {
                 var wgs = toWgs84.MathTransform.Transform([c.X, c.Y]);
                 return new Coordinate(wgs[0], wgs[1]);
-            }).ToArray();
+            })];
 
             var geometryFactoryWgs84 = new GeometryFactory(new PrecisionModel(), 4326);
             return geometryFactoryWgs84.CreatePolygon(coords);
