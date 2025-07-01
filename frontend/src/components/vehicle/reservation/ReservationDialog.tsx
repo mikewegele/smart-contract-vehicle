@@ -16,21 +16,24 @@ import { makeStyles } from "tss-react/mui";
 
 const useStyles = makeStyles()(() => ({
     paper: {
-        background: "rgba(255, 255, 255, 0.75)",
-        backdropFilter: "blur(20px)",
+        background: "rgba(255, 255, 255, 0.35)",
+        backdropFilter: "blur(30px) saturate(180%)",
+        WebkitBackdropFilter: "blur(30px) saturate(180%)",
         borderRadius: 20,
-        border: "1.5px solid rgba(255, 255, 255, 0.9)",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.06)",
+        border: "1.5px solid rgba(255, 255, 255, 0.5)",
+        boxShadow: "0 20px 40px rgba(0, 0, 0, 0.15)",
     },
     dialogTitle: {
         fontWeight: 600,
         fontSize: "1.8rem",
         letterSpacing: "0.03em",
+        color: "#1a1a1a",
     },
     questionText: {
         fontWeight: 500,
         fontSize: "1.2rem",
         marginTop: "1.5rem",
+        color: "#2a2a2a",
     },
 }));
 
