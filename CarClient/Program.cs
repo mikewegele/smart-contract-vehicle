@@ -10,6 +10,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
@@ -30,7 +31,7 @@ public class Program
         }
 
         var vins = configuration.GetSection("Vins").Get<List<string>>();
-        if (vins == null || !vins.Any())
+        if (vins == null || vins.Count == 0)
         {
             logger.LogError("No VINs found in appsettings.json. Please add a 'Vins' array.");
             return;
@@ -53,7 +54,7 @@ public class Program
         logger.LogInformation("All clients are running. Press Enter to shut down.");
         Console.ReadLine();
 
-        logger.LogInformation("Shutting down all clients...", vins.Count);
+        logger.LogInformation("Shutting down all {VinCount} clients...", vins.Count);
         cts.Cancel();
         await Task.WhenAll(clientTasks);
         logger.LogInformation("All clients have been shut down.");
