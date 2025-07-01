@@ -12,15 +12,18 @@ namespace SmartContractVehicle.Service
         private readonly IHubContext<CarMonitorHub> _monitorHubContext;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ConcurrentDictionary<string, TelemetryTO> _carStates = new();
+        private readonly ConnectionMapping _connectionMapping;
 
         public TelemetryService(
             ILogger<TelemetryService> logger,
             IHubContext<CarMonitorHub> monitorHubContext,
-            IServiceScopeFactory scopeFactory)
+            IServiceScopeFactory scopeFactory,
+            ConnectionMapping connectionMapping)
         {
             _logger = logger;
             _monitorHubContext = monitorHubContext;
             _scopeFactory = scopeFactory;
+            _connectionMapping = connectionMapping;
         }
 
         /// <summary>
@@ -102,10 +105,10 @@ namespace SmartContractVehicle.Service
 
             var carStatuses = allCars.Select(car =>
             {
-                var isConnected = _carStates.TryGetValue(car.VIN, out var liveTelemetry);
+                var isConnected = _connectionMapping.GetConnectionId(car.VIN) != null;
 
-                // UPDATED: Use live telemetry if available, otherwise use last known data from DB,
-                // defaulting to Berlin if the DB position is also null.
+                _carStates.TryGetValue(car.VIN, out var liveTelemetry);
+
                 var dbPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
                 var telemetryForStatus = liveTelemetry ?? new TelemetryTO
                 {
