@@ -11,12 +11,24 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Null check for Configuration
+if (builder.Configuration == null)
+{
+    throw new InvalidOperationException("Configuration is not available.");
+}
+
 // Database
+var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(defaultConnectionString))
+{
+    throw new InvalidOperationException("DefaultConnection connection string is not configured in appsettings.json.");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options
     .UseLazyLoadingProxies()
     .UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        defaultConnectionString,
         o => o.UseNetTopologySuite()
     )
 );
@@ -34,16 +46,28 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+    var jwtKey = builder.Configuration["Jwt:Key"];
+
+    if (string.IsNullOrEmpty(jwtIssuer))
+    {
+        throw new InvalidOperationException("Jwt:Issuer is not configured in appsettings.json.");
+    }
+    if (string.IsNullOrEmpty(jwtKey))
+    {
+        throw new InvalidOperationException("Jwt:Key is not configured in appsettings.json.");
+    }
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Issuer"],
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtIssuer, // Often the audience is the same as the issuer
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
@@ -92,9 +116,23 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        // It's good practice to get origins from configuration, especially in production
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        {
+            // Fallback or throw if no origins are configured. For development, you might allow specific defaults.
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174") // Defaulting for development
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+            // Alternatively, throw an exception:
+            // throw new InvalidOperationException("Cors:AllowedOrigins is not configured in appsettings.json.");
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
     });
 });
 
@@ -113,7 +151,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CarCommandService>();
 
 // Singleton Services
-builder.Services.AddSingleton<ConnectionMapping>();
+builder.Services.AddSingleton<ConnectionMappingService>();
 builder.Services.AddSingleton<TelemetryService>();
 
 // Hosted Services
@@ -132,8 +170,6 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         options.RoutePrefix = string.Empty;
     });
-   
-   
 }
 
 app.UseCors("AllowFrontend");
@@ -146,12 +182,12 @@ app.MapControllers();
 // Seed roles into the DB
 using (var scope = app.Services.CreateScope())
 {
-    await DbInitializer.SeedRolesAsync(scope.ServiceProvider);
+    // Null checks for services resolved from the service provider
+    var serviceProvider = scope.ServiceProvider ?? throw new InvalidOperationException("Service provider is null during scope creation.");
+    await DbInitializer.SeedRolesAsync(serviceProvider);
 
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
-
+    var context = serviceProvider.GetService<AppDbContext>() ?? throw new InvalidOperationException("AppDbContext not registered or resolved from service provider.");
+    var userManager = serviceProvider.GetService<UserManager<User>>() ?? throw new InvalidOperationException("UserManager<User> not registered or resolved from service provider.");
     var mail = "this.is.not@an-email.dd";
     var user = await userManager.FindByEmailAsync(mail);
     if (user == null)
@@ -172,6 +208,8 @@ using (var scope = app.Services.CreateScope())
     {
         var fuels = context.FuelTypes.ToArray();
         var drivetrains = context.Drivetrains.ToArray();
+
+        // Null check for Find result
         var available = context.CarStatuses.Find((int)CarStatuses.Available) ?? throw new Exception("The car status \"available\" was not found in the database. It is strictly required.");
         var (companies, cars) = DbInitializer.SeedCars(user, fuels, drivetrains, available);
 
@@ -181,7 +219,6 @@ using (var scope = app.Services.CreateScope())
         await tc;
         await context.SaveChangesAsync();
     }
-
 }
 
 

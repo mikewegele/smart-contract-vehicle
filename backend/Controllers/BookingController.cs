@@ -15,22 +15,13 @@ namespace SmartContractVehicle.Controllers;
 [Route("api/[controller]/[action]")]
 [ApiController]
 [Authorize]
-public class BookingController : ControllerBase
+public class BookingController(AppDbContext db, IMapper mapper, CarCommandService carCommandService, ILogger<BookingController> logger, TelemetryService telemetryService) : ControllerBase
 {
-    private readonly AppDbContext _db;
-    private readonly IMapper _mapper;
-    private readonly CarCommandService _carCommandService;
-    private readonly ILogger<BookingController> _logger;
-    private readonly TelemetryService _telemetryService;
-
-    public BookingController(AppDbContext db, IMapper mapper, CarCommandService carCommandService, ILogger<BookingController> logger, TelemetryService telemetryService)
-    {
-        _db = db;
-        _mapper = mapper;
-        _carCommandService = carCommandService;
-        _logger = logger;
-        _telemetryService = telemetryService;
-    }
+    private readonly AppDbContext _db = db;
+    private readonly IMapper _mapper = mapper;
+    private readonly CarCommandService _carCommandService = carCommandService;
+    private readonly ILogger<BookingController> _logger = logger;
+    private readonly TelemetryService _telemetryService = telemetryService;
 
     /// <summary>
     /// This function will block the car from getting reserved by any one but the one who blocked it
@@ -44,14 +35,14 @@ public class BookingController : ControllerBase
         var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
         _logger.LogInformation("User {UserId} is attempting to block car {CarId}", userId, carId);
 
-        var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+        var user = await _db.Users.FindAsync([userId], ct);
         if (user is null)
         {
             _logger.LogWarning("User with ID {UserId} not found while trying to block car {CarId}", userId, carId);
             return NotFound("The user was not found.");
         }
 
-        var car = await _db.Cars.FindAsync(new object[] { carId }, ct);
+        var car = await _db.Cars.FindAsync([carId], ct);
         if (car is null)
         {
             _logger.LogWarning("Car with ID {CarId} not found for blocking request by user {UserId}", carId, userId);
@@ -92,14 +83,14 @@ public class BookingController : ControllerBase
         var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
         _logger.LogInformation("User {UserId} is attempting to reserve car with reservation {ReservationId} and transaction {TransactionId}", userId, reservation.Id, reservation.BlockchainTransactionId);
 
-        var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+        var user = await _db.Users.FindAsync([userId], ct);
         if (user is null)
         {
             _logger.LogWarning("User {UserId} not found while trying to reserve with reservation {ReservationId}", userId, reservation.Id);
             return NotFound("User not found.");
         }
 
-        var dbReservation = await _db.Reservations.FindAsync(new object[] { reservation.Id }, ct);
+        var dbReservation = await _db.Reservations.FindAsync([reservation.Id], ct);
         if (dbReservation is null)
         {
             _logger.LogWarning("Reservation {ReservationId} not found for user {UserId}", reservation.Id, userId);
@@ -110,7 +101,7 @@ public class BookingController : ControllerBase
         var rpcUrl = "http://127.0.0.1:7545";
         var web3 = new Web3(rpcUrl);
 
-        Transaction tx = null;
+        Transaction? tx = null;
         try
         {
             _logger.LogDebug("Fetching transaction {TransactionId} from blockchain for user {UserId}", transacId, userId);
@@ -144,14 +135,14 @@ public class BookingController : ControllerBase
         var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
         _logger.LogInformation("User {UserId} is attempting to unlock car with reservation {ReservationId}", userId, userReservation.Id);
 
-        var loggedInUser = await _db.Users.FindAsync(new object[] { userId }, ct);
+        var loggedInUser = await _db.Users.FindAsync([userId], ct);
         if (loggedInUser is null)
         {
             _logger.LogWarning("User {UserId} not found while trying to unlock car with reservation {ReservationId}", userId, userReservation.Id);
             return NotFound("The user was not found.");
         }
 
-        var dBReservation = await _db.Reservations.FindAsync(new object[] { userReservation.Id }, ct);
+        var dBReservation = await _db.Reservations.FindAsync([userReservation.Id], ct);
         if (dBReservation == null)
         {
             _logger.LogWarning("Reservation {ReservationId} not found for unlock request by user {UserId}", userReservation.Id, userId);
@@ -170,15 +161,13 @@ public class BookingController : ControllerBase
             return BadRequest("You must provide a reservation of your own.");
         }
 
-        var car = await _db.Cars.FindAsync(new object[] { dBReservation.ReservedCarId }, ct);
+        var car = await _db.Cars.FindAsync([dBReservation.ReservedCarId], ct);
         if (car is null)
         {
             _logger.LogWarning("Car with ID {CarId} for reservation {ReservationId} not found during unlock attempt by user {UserId}", dBReservation.ReservedCarId, dBReservation.Id, userId);
             return NotFound("The car reserved doesn't seem to exist.");
         }
 
-        // **FIX:** Create a new Point object with an explicit Z-coordinate of 0.
-        // This prevents the NaN serialization error.
         var initialState = new TelemetryTO
         {
             CurrentPosition = new Point(car.CurrentPosition.X, car.CurrentPosition.Y) { SRID = car.CurrentPosition.SRID },
@@ -206,7 +195,7 @@ public class BookingController : ControllerBase
         var userId = User.Claims.First(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti).Value;
         _logger.LogInformation("User {UserId} is attempting to finish driving for reservation {ReservationId}", userId, reservationId);
 
-        var user = await _db.Users.FindAsync(new object[] { userId }, ct);
+        var user = await _db.Users.FindAsync([userId], ct);
         if (user == null)
         {
             _logger.LogWarning("User {UserId} not found while trying to finish driving for reservation {ReservationId}", userId, reservationId);
@@ -226,7 +215,7 @@ public class BookingController : ControllerBase
             return BadRequest("You can only finish your own reservation.");
         }
 
-        var car = await _db.Cars.FindAsync(new object[] { reservation.ReservedCarId }, ct);
+        var car = await _db.Cars.FindAsync([reservation.ReservedCarId], ct);
         if (car == null)
         {
             _logger.LogWarning("Car with ID {CarId} for reservation {ReservationId} not found during finish driving attempt by user {UserId}", reservation.ReservedCarId, reservation.Id, user.Id);
@@ -255,7 +244,7 @@ public class BookingController : ControllerBase
             return BadRequest(answer.Message);
         }
 
-        car.SetStatus(await _db.CarStatuses.FindAsync(new object[] { (int)CarStatuses.Available }, ct), reservation);
+        car.SetStatus(await _db.CarStatuses.FindAsync([(int)CarStatuses.Available], ct), reservation);
         car.ActiveReservation = null;
 
         _db.Reservations.Remove(reservation);

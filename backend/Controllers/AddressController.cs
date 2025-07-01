@@ -21,7 +21,7 @@ public class AddressController(AppDbContext db) : ControllerBase
     [HttpDelete]
     public IActionResult Delete(int id)
     {
-        db.Addresses.Where(a => a.Id == id).ExecuteDelete();
+        _db.Addresses.Where(a => a.Id == id).ExecuteDelete();
         return Ok();
     }
 

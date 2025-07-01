@@ -3,7 +3,7 @@
 namespace SmartContractVehicle.Service;
 
 // This service will be registered as a Singleton to maintain state.
-public class ConnectionMapping
+public class ConnectionMappingService
 {
     // Using ConcurrentDictionary for thread-safe access.
     private readonly ConcurrentDictionary<string, string> _connections = new();

@@ -10,13 +10,13 @@ namespace SmartContractVehicle.Hubs
     {
         private readonly ILogger<CarHub> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly ConnectionMapping _connectionMapping;
+        private readonly ConnectionMappingService _connectionMapping;
         private readonly TelemetryService _telemetryService;
 
         public CarHub(
             ILogger<CarHub> logger,
             IServiceScopeFactory scopeFactory,
-            ConnectionMapping connectionMapping,
+            ConnectionMappingService connectionMapping,
             TelemetryService telemetryService)
         {
             _logger = logger;
