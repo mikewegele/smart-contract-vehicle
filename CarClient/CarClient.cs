@@ -3,33 +3,25 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems.Transformations;
 using CarClient.DTO;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CarClient;
 
 /// <summary>
 /// Represents a single car client, managing its own connection, state, and simulation logic.
 /// </summary>
-public class CarClient
+public class CarClient(string vin, string hubUrl, ICoordinateTransformation wgs84ToUtm, ICoordinateTransformation utmToWgs84, ILoggerFactory loggerFactory)
 {
-    private readonly ILogger<CarClient> _logger;
-    private readonly string _vin;
-    private readonly string _baseHubUrl; // Renamed to clarify it's the base URL
-    private readonly ICoordinateTransformation _wgs84ToUtm;
-    private readonly ICoordinateTransformation _utmToWgs84;
+    private readonly ILogger<CarClient> _logger = loggerFactory.CreateLogger<CarClient>();
+    private readonly string _vin = vin;
+    private readonly string _baseHubUrl = hubUrl; // Renamed to clarify it's the base URL
+    private readonly ICoordinateTransformation _wgs84ToUtm = wgs84ToUtm;
+    private readonly ICoordinateTransformation _utmToWgs84 = utmToWgs84;
 
     private HubConnection _connection;
     private TelemetryTO _currentTelemetry;
     private bool _isLocked = true; // Initial state: car is locked
     private const int UpdateIntervalMs = 2000;
-
-    public CarClient(string vin, string hubUrl, ICoordinateTransformation wgs84ToUtm, ICoordinateTransformation utmToWgs84, ILoggerFactory loggerFactory)
-    {
-        _vin = vin;
-        _baseHubUrl = hubUrl; // Store the base URL
-        _wgs84ToUtm = wgs84ToUtm;
-        _utmToWgs84 = utmToWgs84;
-        _logger = loggerFactory.CreateLogger<CarClient>();
-    }
 
     public async Task StartAsync(CancellationToken token)
     {
