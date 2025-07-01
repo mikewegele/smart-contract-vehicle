@@ -17,7 +17,6 @@ const useStyles = makeStyles()(() => ({
         transition: "all 0.3s ease",
         cursor: "pointer",
         userSelect: "none",
-
         "&:hover": {
             background: "rgba(0, 121, 107, 0.5)",
             boxShadow:

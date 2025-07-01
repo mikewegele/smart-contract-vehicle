@@ -54,9 +54,13 @@ interface Props {
     isLoggedIn: boolean;
 }
 
-const NavLinks: React.FC<Props> = ({ isLoggedIn }) => {
+const NavLinks: React.FC<Props> = (props) => {
+    const { isLoggedIn } = props;
+
     const { classes } = useStyles();
+
     const navigate = useNavigate();
+
     return (
         <div className={classes.navLinks}>
             <DefaultButton
