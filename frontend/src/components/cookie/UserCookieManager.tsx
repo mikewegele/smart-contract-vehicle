@@ -18,25 +18,39 @@ const useStyles = makeStyles()(() => ({
         marginTop: "24px",
         fontFamily: "'Roboto', sans-serif",
     },
-    btn: {
-        margin: "8px",
-        borderRadius: "20px",
-        paddingLeft: "24px",
-        paddingRight: "24px",
+    paper: {
+        background: "rgba(255, 255, 255, 0.5) !important",
+        backdropFilter: "blur(2px) !important",
+        WebkitBackdropFilter: "blur(2px) !important",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05) !important",
+        borderRadius: "16px !important",
+        color: "#233241 !important",
     },
     dialogContent: {
         paddingTop: "8px",
         paddingBottom: "24px",
+        color: "#233241",
     },
     dialogTitle: {
         display: "flex",
         alignItems: "center",
         gap: "10px",
         fontWeight: 600,
+        color: "#233241",
     },
-    icon: {
-        fontSize: "28px",
-        color: "#f9a825",
+    btn: {
+        margin: "8px",
+        borderRadius: "20px",
+        paddingLeft: "24px",
+        paddingRight: "24px",
+        background: "rgba(255, 255, 255, 0.6)",
+        color: "#233241",
+        backdropFilter: "blur(1px)",
+        border: "1px solid rgba(255, 255, 255, 0.6)",
+        transition: "background 0.3s",
+        "&:hover": {
+            background: "rgba(255, 255, 255, 0.7)",
+        },
     },
 }));
 
@@ -64,7 +78,12 @@ const UserCookieManager: React.FC = () => {
 
     return (
         <Box className={classes.root}>
-            <Dialog open={open} onClose={() => {}} disableEscapeKeyDown>
+            <Dialog
+                open={open}
+                onClose={() => {}}
+                disableEscapeKeyDown
+                classes={{ paper: classes.paper }}
+            >
                 <DialogTitle className={classes.dialogTitle}>
                     Cookie not set
                 </DialogTitle>
