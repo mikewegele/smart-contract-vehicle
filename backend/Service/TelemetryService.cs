@@ -52,12 +52,14 @@ namespace SmartContractVehicle.Service
 
             // Create an initial TelemetryTO based on DB data, or a default if no live data has been received yet.
             // This will be the initial state sent to the dashboard.
+            // When a car first connects, it is assumed to be locked until explicitly unlocked.
             var initialTelemetry = new TelemetryTO
             {
                 CurrentPosition = initialPosition,
                 CurrentSpeed = 0, // Assume 0 speed on initial connection
                 Heading = 0,      // Assume 0 heading on initial connection
-                RemainingReach = car.RemainingReach // Use remaining reach from DB
+                RemainingReach = car.RemainingReach, // Use remaining reach from DB
+                IsLocked = true // Initial state for a newly connected car is locked
             };
 
             // Store this initial telemetry as the live state for this VIN.
@@ -72,7 +74,7 @@ namespace SmartContractVehicle.Service
 
             // Broadcast the connected status with initial telemetry to all dashboard clients.
             await _monitorHubContext.Clients.All.SendAsync("CarStateChanged", carStatus);
-            _logger.LogInformation("Announced connection for VIN: {VIN} with initial position.", vin);
+            _logger.LogInformation("Announced connection for VIN: {VIN} with initial position and locked status.", vin);
         }
 
         /// <summary>
@@ -81,18 +83,19 @@ namespace SmartContractVehicle.Service
         public async void UpdateCarState(string vin, TelemetryTO newState)
         {
             // Update the live telemetry in the concurrent dictionary.
+            // The newState already contains the IsLocked status from the client.
             _liveCarTelemetries.AddOrUpdate(vin, newState, (key, existingVal) => newState);
 
             var carStatus = new CarConnectionStatusTO
             {
                 VIN = vin,
                 IsConnected = true, // A car sending updates is by definition connected
-                Telemetry = newState // Send the latest telemetry
+                Telemetry = newState // Send the latest telemetry, including IsLocked
             };
 
             // Broadcast the updated state to all dashboard clients.
             await _monitorHubContext.Clients.All.SendAsync("CarStateChanged", carStatus);
-            _logger.LogInformation("Updated state for VIN: {VIN}.", vin);
+            _logger.LogInformation("Updated state for VIN: {VIN}. Speed: {Speed}, Locked: {IsLocked}", vin, newState.CurrentSpeed, newState.IsLocked);
         }
 
         /// <summary>
@@ -106,7 +109,7 @@ namespace SmartContractVehicle.Service
                 _logger.LogInformation("Removed live state for disconnected VIN: {VIN}", vin);
 
                 // Create a CarConnectionStatusTO indicating disconnection.
-                // Use the last known telemetry (which includes position) so the marker stays on the map.
+                // Use the last known telemetry (which includes position and IsLocked) so the marker stays on the map.
                 var carStatus = new CarConnectionStatusTO
                 {
                     VIN = vin,
@@ -119,7 +122,7 @@ namespace SmartContractVehicle.Service
             }
             else
             {
-                _logger.LogWarning("Attempted to remove state for VIN {VIN}, but it was not found in live states.", vin);
+                _logger.LogWarning("Attempted to remove state for VIN {VIN}, but it was not found in live states. Fetching from DB as fallback.", vin);
                 // Even if not found in live states, if it was in connection mapping, it means it was connected.
                 // We should still send a disconnected status using DB data as fallback.
                 using var scope = _scopeFactory.CreateScope();
@@ -134,7 +137,8 @@ namespace SmartContractVehicle.Service
                         CurrentPosition = lastKnownPosition,
                         CurrentSpeed = 0,
                         Heading = 0,
-                        RemainingReach = car.RemainingReach
+                        RemainingReach = car.RemainingReach,
+                        IsLocked = true // Assume disconnected cars are locked by default for display
                     };
                     var carStatus = new CarConnectionStatusTO
                     {
@@ -178,7 +182,7 @@ namespace SmartContractVehicle.Service
                     // If connected, try to get the live telemetry.
                     if (_liveCarTelemetries.TryGetValue(car.VIN, out var liveTelemetry))
                     {
-                        telemetryForStatus = liveTelemetry;
+                        telemetryForStatus = liveTelemetry; // Use live telemetry, which includes IsLocked
                     }
                     else
                     {
@@ -189,21 +193,23 @@ namespace SmartContractVehicle.Service
                             CurrentPosition = initialPosition,
                             CurrentSpeed = 0,
                             Heading = 0,
-                            RemainingReach = car.RemainingReach
+                            RemainingReach = car.RemainingReach,
+                            IsLocked = true // Assume new connections start locked
                         };
                     }
                 }
                 else // If not connected
                 {
                     // For disconnected cars, use their last known position from the DB
-                    // and set speed/heading to 0.
+                    // and set speed/heading to 0. Assume they are locked when disconnected.
                     var lastKnownPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
                     telemetryForStatus = new TelemetryTO
                     {
                         CurrentPosition = lastKnownPosition,
                         CurrentSpeed = 0,
                         Heading = 0,
-                        RemainingReach = car.RemainingReach
+                        RemainingReach = car.RemainingReach,
+                        IsLocked = true // Assume disconnected cars are locked
                     };
                 }
 

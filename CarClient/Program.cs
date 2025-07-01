@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
-using CarClient.DTO; 
+using CarClient.DTO;
 
 namespace CarClient;
 
@@ -56,7 +56,7 @@ public class Program
         logger.LogInformation("All clients are running. Press Enter to shut down.");
         Console.ReadLine();
 
-        logger.LogInformation("Shutting down all clients...");
+        logger.LogInformation("Shutting down all clients...", vins.Count);
         cts.Cancel();
         await Task.WhenAll(clientTasks);
         logger.LogInformation("All clients have been shut down.");
@@ -87,7 +87,7 @@ public class CarClient
 
     private HubConnection _connection;
     private TelemetryTO _currentTelemetry;
-    private bool _isLocked = true;
+    private bool _isLocked = true; // Initial state: car is locked
     private const int UpdateIntervalMs = 2000;
 
     public CarClient(string vin, string hubUrl, ICoordinateTransformation wgs84ToUtm, ICoordinateTransformation utmToWgs84, ILoggerFactory loggerFactory)
@@ -117,7 +117,7 @@ public class CarClient
 
         try
         {
-         
+
             await ConnectAndStartDriving(token);
         }
         catch (OperationCanceledException)
@@ -146,7 +146,11 @@ public class CarClient
         {
             _logger.LogInformation("[{VIN}] Received LOCK request. Stopping car.", _vin);
             _isLocked = true;
-            if (_currentTelemetry != null) _currentTelemetry.CurrentSpeed = 0;
+            if (_currentTelemetry != null)
+            {
+                _currentTelemetry.CurrentSpeed = 0;
+                _currentTelemetry.IsLocked = true; // Update TelemetryTO with locked status
+            }
             return true;
         });
 
@@ -163,6 +167,7 @@ public class CarClient
 
             // Restore the client's heading if it existed
             _currentTelemetry.Heading = headingToKeep;
+            _currentTelemetry.IsLocked = false; // Update TelemetryTO with unlocked status
 
             _isLocked = false;
 
@@ -210,6 +215,9 @@ public class CarClient
         {
             if (_currentTelemetry != null)
             {
+                // Ensure _currentTelemetry.IsLocked always reflects the internal _isLocked state
+                _currentTelemetry.IsLocked = _isLocked;
+
                 if (!_isLocked)
                 {
                     UpdateSimulation(random);
@@ -247,7 +255,8 @@ public class CarClient
         {
             _currentTelemetry.CurrentSpeed = 0;
             _currentTelemetry.RemainingReach = 0;
-            return;
+            // When reach is 0, the car should effectively be considered "stopped" and potentially "locked"
+            // This is a design choice; for now, we'll just stop it.
         }
 
         var currentWgs84Coord = new[] { _currentTelemetry.CurrentPosition.X, _currentTelemetry.CurrentPosition.Y };
@@ -262,7 +271,7 @@ public class CarClient
 
         _currentTelemetry.CurrentPosition = new Point(newWgs84Coord[0], newWgs84Coord[1], 0) { SRID = 4326 };
 
-        _logger.LogInformation("[{VIN}] Telemetry -> Speed: {Speed:F1} km/h, Heading: {Heading:F0}°, Pos: ({Lat:F4}, {Lon:F4}), Reach: {Reach:F2} km",
-            _vin, _currentTelemetry.CurrentSpeed, _currentTelemetry.Heading, _currentTelemetry.CurrentPosition.Y, _currentTelemetry.CurrentPosition.X, _currentTelemetry.RemainingReach);
+        _logger.LogInformation("[{VIN}] Telemetry -> Speed: {Speed:F1} km/h, Heading: {Heading:F0}°, Pos: ({Lat:F4}, {Lon:F4}), Reach: {Reach:F2} km, Locked: {IsLocked}",
+            _vin, _currentTelemetry.CurrentSpeed, _currentTelemetry.Heading, _currentTelemetry.CurrentPosition.Y, _currentTelemetry.CurrentPosition.X, _currentTelemetry.RemainingReach, _currentTelemetry.IsLocked);
     }
 }
