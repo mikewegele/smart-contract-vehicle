@@ -8,7 +8,6 @@ import {
 import EntryPage from "../screen/EntryPage.tsx";
 import DashboardPage from "../screen/DashboardPage.tsx";
 import ProfilePage from "../screen/ProfilePage.tsx";
-import SmartContractTestPage from "../screen/SmartContractTestPage.tsx";
 import { useAppDispatch } from "../store/Store.ts";
 import { fetchUser } from "../store/reducer/user.ts";
 import ReservationPage from "../screen/ReservationPage.tsx";
@@ -39,12 +38,6 @@ const Layout: React.FC = () => {
                 <Route
                     path="/home"
                     element={<ProtectedRoute element={<DashboardPage />} />}
-                />
-                <Route
-                    path="/smart"
-                    element={
-                        <ProtectedRoute element={<SmartContractTestPage />} />
-                    }
                 />
                 <Route
                     path="/profile"
