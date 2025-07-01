@@ -101,17 +101,17 @@ namespace SmartContractVehicle.Service
         public async void RemoveCarState(string vin)
         {
             // Try to remove the live telemetry from the dictionary.
-            if (_liveCarTelemetries.TryRemove(vin, out _)) // We don't need the lastKnownState here for the broadcast
+            if (_liveCarTelemetries.TryRemove(vin, out var lastKnownState)) // Capture lastKnownState
             {
                 _logger.LogInformation("Removed live state for disconnected VIN: {VIN}", vin);
 
-                // Create a CarConnectionStatusTO indicating disconnection and NO live telemetry.
-                // Setting Telemetry to null is crucial for the frontend to remove the marker.
+                // Create a CarConnectionStatusTO indicating disconnection.
+                // Use the last known telemetry (which includes position) so the marker stays on the map.
                 var carStatus = new CarConnectionStatusTO
                 {
                     VIN = vin,
                     IsConnected = false,
-                    Telemetry = null // Explicitly set telemetry to null for disconnected cars
+                    Telemetry = lastKnownState // Keep last known telemetry for display on map
                 };
 
                 // Broadcast the disconnected status to all dashboard clients.
@@ -120,6 +120,30 @@ namespace SmartContractVehicle.Service
             else
             {
                 _logger.LogWarning("Attempted to remove state for VIN {VIN}, but it was not found in live states.", vin);
+                // Even if not found in live states, if it was in connection mapping, it means it was connected.
+                // We should still send a disconnected status using DB data as fallback.
+                using var scope = _scopeFactory.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var car = dbContext.Cars.FirstOrDefault(c => c.VIN == vin);
+
+                if (car != null)
+                {
+                    var lastKnownPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
+                    var defaultTelemetry = new TelemetryTO
+                    {
+                        CurrentPosition = lastKnownPosition,
+                        CurrentSpeed = 0,
+                        Heading = 0,
+                        RemainingReach = car.RemainingReach
+                    };
+                    var carStatus = new CarConnectionStatusTO
+                    {
+                        VIN = vin,
+                        IsConnected = false,
+                        Telemetry = defaultTelemetry
+                    };
+                    await _monitorHubContext.Clients.All.SendAsync("CarStateChanged", carStatus);
+                }
             }
         }
 
@@ -147,14 +171,11 @@ namespace SmartContractVehicle.Service
             {
                 // Determine if the car is currently connected based on ConnectionMapping.
                 var isConnected = _connectionMapping.GetConnectionId(car.VIN) != null;
-
-                TelemetryTO? telemetryForStatus = null;
+                TelemetryTO telemetryForStatus;
 
                 if (isConnected)
                 {
                     // If connected, try to get the live telemetry.
-                    // If no live telemetry yet (e.g., just connected but no UpdateCarState received),
-                    // use initial data from DB or default.
                     if (_liveCarTelemetries.TryGetValue(car.VIN, out var liveTelemetry))
                     {
                         telemetryForStatus = liveTelemetry;
@@ -172,14 +193,25 @@ namespace SmartContractVehicle.Service
                         };
                     }
                 }
-                // If not connected, telemetryForStatus remains null, which is what the frontend expects
-                // to remove the marker and display '--' for telemetry fields.
+                else // If not connected
+                {
+                    // For disconnected cars, use their last known position from the DB
+                    // and set speed/heading to 0.
+                    var lastKnownPosition = car.CurrentPosition ?? new Point(13.4050, 52.5200) { SRID = 4326 };
+                    telemetryForStatus = new TelemetryTO
+                    {
+                        CurrentPosition = lastKnownPosition,
+                        CurrentSpeed = 0,
+                        Heading = 0,
+                        RemainingReach = car.RemainingReach
+                    };
+                }
 
                 return new CarConnectionStatusTO
                 {
                     VIN = car.VIN,
                     IsConnected = isConnected,
-                    Telemetry = telemetryForStatus // Will be null if disconnected, or live data if connected
+                    Telemetry = telemetryForStatus
                 };
             }).ToList();
 
