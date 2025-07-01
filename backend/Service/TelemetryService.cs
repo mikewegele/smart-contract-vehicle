@@ -7,29 +7,21 @@ using System.Collections.Concurrent;
 
 namespace SmartContractVehicle.Service
 {
-    public class TelemetryService
+    public class TelemetryService(
+        ILogger<TelemetryService> logger,
+        IHubContext<CarMonitorHub> monitorHubContext,
+        IServiceScopeFactory scopeFactory,
+        ConnectionMappingService connectionMapping)
     {
-        private readonly ILogger<TelemetryService> _logger;
-        private readonly IHubContext<CarMonitorHub> _monitorHubContext;
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ILogger<TelemetryService> _logger = logger;
+        private readonly IHubContext<CarMonitorHub> _monitorHubContext = monitorHubContext;
+        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
         // This dictionary stores the LATEST telemetry received from connected cars.
         // It should NOT be used to store disconnected car states or their last known telemetry
         // after they disconnect, as the source of truth for disconnected cars' last state
         // is the database. For connected cars, it's the live telemetry.
         private readonly ConcurrentDictionary<string, TelemetryTO> _liveCarTelemetries = new();
-        private readonly ConnectionMapping _connectionMapping;
-
-        public TelemetryService(
-            ILogger<TelemetryService> logger,
-            IHubContext<CarMonitorHub> monitorHubContext,
-            IServiceScopeFactory scopeFactory,
-            ConnectionMapping connectionMapping)
-        {
-            _logger = logger;
-            _monitorHubContext = monitorHubContext;
-            _scopeFactory = scopeFactory;
-            _connectionMapping = connectionMapping;
-        }
+        private readonly ConnectionMappingService _connectionMapping = connectionMapping;
 
         /// <summary>
         /// Announces to the dashboard that a car is connected, providing its initial state.

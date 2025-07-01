@@ -4,14 +4,9 @@ using SmartContractVehicle.Service;
 
 namespace SmartContractVehicle.Controllers;
 
-public class MapController : Controller
+public class MapController(TelemetryService telemetryService) : Controller
 {
-    private readonly TelemetryService _telemetryService;
-
-    public MapController(TelemetryService telemetryService)
-    {
-        _telemetryService = telemetryService;
-    }
+    private readonly TelemetryService _telemetryService = telemetryService;
 
     public IActionResult Index()
     {

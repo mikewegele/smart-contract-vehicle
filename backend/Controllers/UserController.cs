@@ -5,7 +5,6 @@ using SmartContractVehicle.DTO;
 using SmartContractVehicle.Service;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using SmartContractVehicle.Model;
 
 namespace SmartContractVehicle.Controllers;
 
@@ -42,25 +41,6 @@ public class UserController(AppDbContext db, IMapper mapper, UserService userSer
     {
         var createdUser = await _userService.CreateUserAsync(dto);
         return Ok(createdUser);
-    }
-
-    [HttpPatch]
-    public IActionResult Update(User user)
-    {
-        if (ModelState.IsValid)
-        {
-            _db.Users.Update(user);
-            _db.SaveChanges();
-            user = _db.Users.Find(user.Id);
-            if (user != null)
-            {
-                return StatusCode(500);
-            }
-
-            return Ok(user);
-        }
-
-            return BadRequest();
     }
 
     [HttpGet("{id}")]
