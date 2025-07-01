@@ -74,7 +74,8 @@
                                     <span title="Speed"> Speed: <span class="telemetry-speed">@(car.Telemetry != null ? $"{car.Telemetry.CurrentSpeed:F1} km/h" : "--")</span></span><br>
                                     <span title="Remaining Reach"> Remaining Reach: <span class="telemetry-reach">@(car.Telemetry != null ? $"{car.Telemetry.RemainingReach:F1} km" : "--")</span></span><br>
                                     <span title="Heading"> Heading: <span class="telemetry-heading">@(car.Telemetry != null ? $"{car.Telemetry.Heading:F0}°" : "--")</span></span><br>
-                                    <span title="Position"> Position: <span class="telemetry-position">@(car.Telemetry?.CurrentPosition != null ? $"{car.Telemetry.CurrentPosition.Y:F4}, {car.Telemetry.CurrentPosition.X:F4}" : "--")</span></span>
+                                    <span title="Position"> Position: <span class="telemetry-position">@(car.Telemetry?.CurrentPosition != null ? $"{car.Telemetry.CurrentPosition.Y:F4}, {car.Telemetry.CurrentPosition.X:F4}" : "--")</span></span><br>
+                                    <span title="Lock Status"> Lock Status: <span class="telemetry-lock-status">@(car.Telemetry != null ? (car.Telemetry.IsLocked ? "Locked" : "Unlocked") : "--")</span></span>
                                 </div>
                             </div>
                         </div>
@@ -109,20 +110,24 @@
         }
 
         const icons = {
-            green: createTriangleIcon('green'),   // Connected, not driving
-            yellow: createTriangleIcon('orange'), // Connected and driving (changed from yellow for better contrast)
-            grey: createTriangleIcon('grey')      // Disconnected
+            green: createTriangleIcon('green'),    // Connected, not driving, unlocked
+            orange: createTriangleIcon('orange'), // Connected and driving, unlocked
+            grey: createTriangleIcon('grey'),      // Disconnected
+            red: createTriangleIcon('red')         // Connected, locked
         };
 
         function getIconForCar(car) {
             if (!car.isConnected) {
                 return icons.grey; // Grey for disconnected
             }
-            // If connected, check if it's driving (speed > 0)
-            if (car.telemetry && car.telemetry.currentSpeed > 0) {
-                return icons.yellow; // Yellow/Orange for connected and driving
+            if (car.telemetry && car.telemetry.isLocked) {
+                return icons.green; // Green for connected and locked
             }
-            return icons.green; // Green for connected and stationary (speed = 0)
+            // If connected and unlocked, check if it's driving (speed > 0)
+            if (car.telemetry && car.telemetry.currentSpeed > 0) {
+                return icons.red; // Red for connected and driving
+            }
+            return icons.orange; // Yellow/Orange for connected and stationary (speed = 0)
         }
 
         function setMarkerIconSize(marker) {
@@ -156,6 +161,7 @@
                 const reachEl = carCard.querySelector('.telemetry-reach');
                 const headingEl = carCard.querySelector('.telemetry-heading');
                 const positionEl = carCard.querySelector('.telemetry-position');
+                const lockStatusEl = carCard.querySelector('.telemetry-lock-status'); // New element
 
                 // Always attempt to display telemetry info if available, otherwise display '--'
                 if (car.telemetry) {
@@ -169,6 +175,7 @@
                     } else {
                         positionEl.textContent = '--'; // Fallback if coordinates are missing
                     }
+                    lockStatusEl.textContent = car.telemetry.isLocked ? 'Locked' : 'Unlocked'; // Update lock status
                 } else {
                     // This block should ideally not be hit if TelemetryService always sends a TelemetryTO object,
                     // but it's a good fallback for robustness.
@@ -176,6 +183,7 @@
                     reachEl.textContent = '--';
                     headingEl.textContent = '--';
                     positionEl.textContent = '--';
+                    lockStatusEl.textContent = '--'; // Fallback for lock status
                 }
             }
 
@@ -191,7 +199,7 @@
             }
 
             const icon = getIconForCar(car);
-            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}<br><b>Speed:</b> ${car.telemetry ? car.telemetry.currentSpeed.toFixed(1) + ' km/h' : '--'}`;
+            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}<br><b>Speed:</b> ${car.telemetry ? car.telemetry.currentSpeed.toFixed(1) + ' km/h' : '--'}<br><b>Lock Status:</b> ${car.telemetry ? (car.telemetry.isLocked ? 'Locked' : 'Unlocked') : '--'}`;
 
             let marker = carMarkers[car.vin];
             if (marker) {
@@ -207,14 +215,14 @@
 
             setMarkerIconSize(marker); // Ensure size is updated for new/existing markers
 
-            // Rotate marker only if connected and has valid telemetry for heading
-            if (car.isConnected && car.telemetry && car.telemetry.currentSpeed > 0) {
+            // Rotate marker only if connected, unlocked and has valid telemetry for heading and is driving
+            if (car.isConnected && car.telemetry && !car.telemetry.isLocked && car.telemetry.currentSpeed > 0) {
                 const iconElement = marker.getElement()?.querySelector('.triangle-marker');
                 if (iconElement) {
                     iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
                 }
             } else if (marker) {
-                // If disconnected or stationary, reset rotation to 0
+                // If disconnected, locked or stationary, reset rotation to 0
                 const iconElement = marker.getElement()?.querySelector('.triangle-marker');
                 if (iconElement) {
                     iconElement.style.transform = `rotate(0deg)`;

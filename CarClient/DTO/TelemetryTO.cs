@@ -9,4 +9,5 @@ public class TelemetryTO
     public double CurrentSpeed { get; set; } // Speed in km/h
     public double Heading { get; set; } // Heading in degrees (0-360)
     public double RemainingReach { get; set; } // Remaining reach in km
+    public bool IsLocked { get; set; } // Added for lock/unlock status
 }
