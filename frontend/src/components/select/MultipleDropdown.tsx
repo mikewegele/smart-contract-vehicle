@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
     Box,
     Chip,
@@ -8,20 +8,34 @@ import {
     Select,
     type SelectChangeEvent,
 } from "@mui/material";
+import { makeStyles } from "tss-react/mui";
 
-type Props = {
+const useStyles = makeStyles()(() => ({
+    box: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 0.5,
+    },
+}));
+
+interface Props {
     label: string;
     options: string[];
     value: string[];
     onChange: (value: string[]) => void;
-};
+}
 
 const MultipleDropdown: React.FC<Props> = (props) => {
     const { label, options, value, onChange } = props;
 
-    const handleChange = (event: SelectChangeEvent<string[]>) => {
-        onChange(event.target.value as string[]);
-    };
+    const { classes } = useStyles();
+
+    const handleChange = useCallback(
+        (event: SelectChangeEvent<string[]>) => {
+            onChange(event.target.value as string[]);
+        },
+        [onChange]
+    );
 
     return (
         <FormControl fullWidth>
@@ -31,7 +45,7 @@ const MultipleDropdown: React.FC<Props> = (props) => {
                 value={value}
                 onChange={handleChange}
                 renderValue={(selected) => (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    <Box className={classes.box}>
                         {(selected as string[]).map((val) => (
                             <Chip key={val} label={val} />
                         ))}
