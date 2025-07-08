@@ -2,7 +2,7 @@
   "name": "root",
   "version": "1.0.0",
   "scripts": {
-    "application": "concurrently -n db,be,sc,fe -c blue,green,grey,magenta,yellow \"npm run database\" \"npm run backend\" \"npm run car-clients\" \"npm run smart-contract\" \"npm run frontend\"",
+    "application": "concurrently -n db,be,cc,sc,fe -c blue,green,grey,magenta,yellow \"npm run database\" \"npm run backend\" \"npm run car-clients\" \"npm run smart-contract\" \"npm run frontend\"",
     "database": "cd stack && docker-compose up",
     "backend": "/bin/bash run_backend.sh",
     "smart-contract": "cd blockchain && npm i && npm run ganache",
