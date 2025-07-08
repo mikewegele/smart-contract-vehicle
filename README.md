@@ -20,7 +20,6 @@ Ensure you have the following installed before proceeding:
 
 - [Visual Studio](https://visualstudio.microsoft.com/) with the **.NET Core Development** workload.
 - **PostgreSQL Extension** in Visual Studio for easier database management.
--
 
 ---
 
@@ -47,6 +46,10 @@ This project uses multiple scripts to manage the database, backend, blockchain, 
   Builds and runs the React frontend, deploys smart contracts, generates TypeScript types, and serves the app in your
   browser.
 
+- **`npm run car-clients`**
+  Build and runs the cars Client. Remeber to set the VINs Array in the appsettings.json to the ones in your database.
+  Also needs the backend running to function.  
+
 ---
 
 ## Recommended start sequence
@@ -63,12 +66,17 @@ Open separate terminal windows/tabs and run these commands in order:
    ```bash
    npm run backend
    ```
-3. **Start the blockchain environment:**
+3. **Start the car clients:**
+   ```bash
+   npm run car-client
+   ```
+
+5. **Start the blockchain environment:**
 
    ```bash
    npm run smart-contract
    ```
-4. **Start the frontend:**
+6. **Start the frontend:**
 
    ```bash
    npm run frontend
@@ -100,6 +108,7 @@ terminals allows all services to operate concurrently.
    ```
 
 Backend will be available on `http://localhost:5147`.
+The Map for the connected Cars will be available on `http://localhost:5147/Map`.
 
 ### Frontend Setup (React)
 
