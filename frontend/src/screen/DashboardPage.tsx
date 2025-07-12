@@ -10,6 +10,9 @@ import {
     fetchAllFuelTypes,
     fetchCarsByFilter,
 } from "../store/reducer/cars.ts";
+import {
+    fetchUser,
+} from "../store/reducer/user.ts";
 import { useAppDispatch } from "../store/Store.ts";
 import { Box } from "@mui/material";
 import { useGeolocation } from "../util/location/useGeolocation.ts";
@@ -75,6 +78,7 @@ const DashboardPage: React.FC = () => {
     const web3Context = useWeb3();
 
     useEffect(() => {
+        dispatch(fetchUser())
         dispatch(fetchAllCars());
         dispatch(fetchAllFuelTypes());
         dispatch(fetchAllDriveTrains());
@@ -219,7 +223,6 @@ const DashboardPage: React.FC = () => {
                     </Box>
                 </Box>
 
-                <Box className={classes.rightBox}></Box>
             </Box>
             {appliedFilters && (
                 <Box mt={4}>

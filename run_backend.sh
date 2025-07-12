@@ -13,4 +13,4 @@ MIGRATION_NAME="AutoMigration_$TIMESTAMP"
 dotnet ef migrations add "$MIGRATION_NAME"
 dotnet ef database update
 
-dotnet run
+dotnet run --launch-profile "https"

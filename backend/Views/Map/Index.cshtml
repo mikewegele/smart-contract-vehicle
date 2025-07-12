@@ -1,0 +1,278 @@
+﻿@using System.Linq
+@model IEnumerable<SmartContractVehicle.DTO.CarConnectionStatusTO>
+@{
+    ViewData["Title"] = "Real-Time Car Map";
+}
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- SignalR JS Client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+<style>
+    .car-card {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, border-left-color 0.3s linear;
+        border: 1px solid #dee2e6;
+        border-radius: .375rem;
+        padding: 0.75rem;
+        height: 100%;
+    }
+
+        .car-card:hover {
+            background-color: #e9ecef;
+        }
+
+        .car-card.connected {
+            border-left: 5px solid #28a745; /* Green for connected */
+        }
+
+        .car-card.disconnected {
+            border-left: 5px solid #6c757d; /* Grey for disconnected */
+        }
+
+    .custom-div-icon .triangle-marker {
+        transition: transform 0.5s linear, font-size 0.1s linear;
+        text-align: center;
+        line-height: 1;
+    }
+
+    .telemetry-info {
+        font-size: 0.8em;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <div id="map" style="height: 75vh; border-radius: 8px; border: 1px solid #ccc;"></div>
+        </div>
+        <div class="col-12">
+            <h2 class="h4">Vehicle Status</h2>
+            <div id="carList" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                @if (!Model.Any())
+                {
+                    <div class="col">
+                        <div class="car-card">No cars found in the system.</div>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var car in Model.OrderBy(c => c.VIN))
+                    {
+                        <div class="col">
+                            <div id="car-@car.VIN" class="car-card @(car.IsConnected ? "connected" : "disconnected")" data-vin="@car.VIN">
+                                <strong>@car.VIN</strong>
+                                <small class="status-text d-block">@(car.IsConnected ? "Connected" : "Disconnected")</small>
+                                <div class="telemetry-info mt-1">
+                                    <span title="Speed"> Speed: <span class="telemetry-speed">@(car.Telemetry != null ? $"{car.Telemetry.CurrentSpeed:F1} km/h" : "--")</span></span><br>
+                                    <span title="Remaining Reach"> Remaining Reach: <span class="telemetry-reach">@(car.Telemetry != null ? $"{car.Telemetry.RemainingReach:F1} km" : "--")</span></span><br>
+                                    <span title="Heading"> Heading: <span class="telemetry-heading">@(car.Telemetry != null ? $"{car.Telemetry.Heading:F0}°" : "--")</span></span><br>
+                                    <span title="Position"> Position: <span class="telemetry-position">@(car.Telemetry?.CurrentPosition != null ? $"{car.Telemetry.CurrentPosition.Y:F4}, {car.Telemetry.CurrentPosition.X:F4}" : "--")</span></span><br>
+                                    <span title="Lock Status"> Lock Status: <span class="telemetry-lock-status">@(car.Telemetry != null ? (car.Telemetry.IsLocked ? "Locked" : "Unlocked") : "--")</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/Dashboard")
+            .withAutomaticReconnect()
+            .build();
+
+        const map = L.map('map').setView([52.5200, 13.4050], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const carMarkers = {};
+
+        function createTriangleIcon(color) {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="triangle-marker" style="color: ${color};">▲</div>`,
+                iconSize: null, // Will be set dynamically by setMarkerIconSize
+                iconAnchor: null // Will be set dynamically by setMarkerIconSize
+            });
+        }
+
+        const icons = {
+            green: createTriangleIcon('green'),    // Connected, not driving, unlocked
+            orange: createTriangleIcon('orange'), // Connected and driving, unlocked
+            grey: createTriangleIcon('grey'),      // Disconnected
+            red: createTriangleIcon('red')         // Connected, locked
+        };
+
+        function getIconForCar(car) {
+            if (!car.isConnected) {
+                return icons.grey; // Grey for disconnected
+            }
+            if (car.telemetry && car.telemetry.isLocked) {
+                return icons.green; // Green for connected and locked
+            }
+            // If connected and unlocked, check if it's driving (speed > 0)
+            if (car.telemetry && car.telemetry.currentSpeed > 0) {
+                return icons.red; // Red for connected and driving
+            }
+            return icons.orange; // Yellow/Orange for connected and stationary (speed = 0)
+        }
+
+        function setMarkerIconSize(marker) {
+            if (!marker) return;
+            const zoom = map.getZoom();
+            const newSize = Math.max(16, 40 + (zoom - 12) * 8);
+            const iconElement = marker.getElement()?.querySelector('.triangle-marker');
+            if (iconElement) {
+                iconElement.style.fontSize = `${newSize}px`;
+                // Update iconAnchor to center the triangle base at the coordinates
+                marker.options.icon.options.iconAnchor = [newSize / 2, newSize];
+                marker.update(); // Force Leaflet to re-render the icon with new size/anchor
+            }
+        }
+
+        function updateAllMarkerSizes() {
+            for (const vin in carMarkers) {
+                setMarkerIconSize(carMarkers[vin]);
+            }
+        }
+
+        function updateCar(car) {
+            const carCard = document.querySelector(`#carList [data-vin="${car.vin}"]`);
+            if (carCard) {
+                const statusText = carCard.querySelector('.status-text');
+                carCard.classList.toggle('connected', car.isConnected);
+                carCard.classList.toggle('disconnected', !car.isConnected);
+                statusText.textContent = car.isConnected ? 'Connected' : 'Disconnected';
+
+                const speedEl = carCard.querySelector('.telemetry-speed');
+                const reachEl = carCard.querySelector('.telemetry-reach');
+                const headingEl = carCard.querySelector('.telemetry-heading');
+                const positionEl = carCard.querySelector('.telemetry-position');
+                const lockStatusEl = carCard.querySelector('.telemetry-lock-status'); // New element
+
+                // Always attempt to display telemetry info if available, otherwise display '--'
+                if (car.telemetry) {
+                    speedEl.textContent = `${car.telemetry.currentSpeed.toFixed(1)} km/h`;
+                    reachEl.textContent = `${car.telemetry.remainingReach.toFixed(1)} km`;
+                    headingEl.textContent = `${car.telemetry.heading.toFixed(0)}°`;
+                    if (car.telemetry.currentPosition && car.telemetry.currentPosition.coordinates) {
+                        const lat = car.telemetry.currentPosition.coordinates[1];
+                        const lon = car.telemetry.currentPosition.coordinates[0];
+                        positionEl.textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    } else {
+                        positionEl.textContent = '--'; // Fallback if coordinates are missing
+                    }
+                    lockStatusEl.textContent = car.telemetry.isLocked ? 'Locked' : 'Unlocked'; // Update lock status
+                } else {
+                    // This block should ideally not be hit if TelemetryService always sends a TelemetryTO object,
+                    // but it's a good fallback for robustness.
+                    speedEl.textContent = '--';
+                    reachEl.textContent = '--';
+                    headingEl.textContent = '--';
+                    positionEl.textContent = '--';
+                    lockStatusEl.textContent = '--'; // Fallback for lock status
+                }
+            }
+
+            // Position should always be available now from TelemetryService
+            const position = (car.telemetry && car.telemetry.currentPosition && car.telemetry.currentPosition.coordinates)
+                ? [car.telemetry.currentPosition.coordinates[1], car.telemetry.currentPosition.coordinates[0]] // [lat, lon]
+                : null;
+
+            // If for some reason position is still null, log a warning and return.
+            if (!position) {
+                console.warn(`No valid position for VIN ${car.vin}. Cannot display marker.`);
+                return;
+            }
+
+            const icon = getIconForCar(car);
+            const popupContent = `<b>VIN:</b> ${car.vin}<br><b>Status:</b> ${car.isConnected ? 'Connected' : 'Disconnected'}<br><b>Speed:</b> ${car.telemetry ? car.telemetry.currentSpeed.toFixed(1) + ' km/h' : '--'}<br><b>Lock Status:</b> ${car.telemetry ? (car.telemetry.isLocked ? 'Locked' : 'Unlocked') : '--'}`;
+
+            let marker = carMarkers[car.vin];
+            if (marker) {
+                marker.setLatLng(position);
+                marker.setIcon(icon);
+                marker.setPopupContent(popupContent);
+            } else {
+                marker = L.marker(position, { icon: icon }).addTo(map);
+                marker.bindPopup(popupContent);
+                carMarkers[car.vin] = marker;
+                console.log(`Marker created and added to map for VIN: ${car.vin}`, marker);
+            }
+
+            setMarkerIconSize(marker); // Ensure size is updated for new/existing markers
+
+            // Rotate marker only if connected, unlocked and has valid telemetry for heading and is driving
+            if (car.isConnected && car.telemetry && !car.telemetry.isLocked && car.telemetry.currentSpeed > 0) {
+                const iconElement = marker.getElement()?.querySelector('.triangle-marker');
+                if (iconElement) {
+                    iconElement.style.transform = `rotate(${car.telemetry.heading}deg)`;
+                }
+            } else if (marker) {
+                // If disconnected, locked or stationary, reset rotation to 0
+                const iconElement = marker.getElement()?.querySelector('.triangle-marker');
+                if (iconElement) {
+                    iconElement.style.transform = `rotate(0deg)`;
+                }
+            }
+        }
+
+        function zoomToCar(vin) {
+            const marker = carMarkers[vin];
+            if (marker) {
+                map.flyTo(marker.getLatLng(), 16);
+                marker.openPopup();
+            } else {
+                console.warn(`Zoom failed: No map marker found for VIN: ${vin}.`);
+            }
+        }
+
+        document.getElementById('carList').addEventListener('click', function(e) {
+            const carItem = e.target.closest('.car-card');
+            if (carItem && carItem.dataset.vin) {
+                zoomToCar(carItem.dataset.vin);
+            }
+        });
+
+        map.on('zoomend', updateAllMarkerSizes);
+
+        connection.on("InitialCarStates", (cars) => {
+            cars.forEach(updateCar);
+            updateAllMarkerSizes();
+
+            const markers = Object.values(carMarkers);
+            if (markers.length > 0) {
+                const featureGroup = L.featureGroup(markers);
+                map.fitBounds(featureGroup.getBounds(), { padding: [50, 50] });
+            }
+        });
+
+        connection.on("CarStateChanged", updateCar);
+
+        async function start() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected to /Dashboard.");
+                await connection.invoke("GetInitialCarStates");
+            } catch (err) {
+                console.error("SignalR Connection Error: ", err);
+                setTimeout(start, 5000);
+            }
+        };
+
+        start();
+    });
+</script>

@@ -8,15 +8,10 @@ namespace SmartContractVehicle.Service
     /// This Service periodically (every 5 seconds) checks the database for Cars that are blocked or reserved and are over their timeout span
     /// The correct timespans are taken from Models.Reservation _reservationTime and _blockageTime
     /// </summary>
-    public class StatusTimerService : BackgroundService
+    public class StatusTimerService(IServiceScopeFactory scopeFactory) : BackgroundService
     {
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
         private readonly TimeSpan _intervall = TimeSpan.FromSeconds(5);
-
-        public StatusTimerService(IServiceScopeFactory scopeFactory)
-        {
-            _scopeFactory = scopeFactory;
-        }
 
         protected override async Task ExecuteAsync(CancellationToken ct)
         {

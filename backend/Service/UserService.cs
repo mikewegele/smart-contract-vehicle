@@ -4,14 +4,9 @@ using SmartContractVehicle.DTO;
 
 namespace SmartContractVehicle.Service;
 
-public class UserService
+public class UserService(UserManager<User> userManager)
 {
-    private readonly UserManager<User> _userManager;
-
-    public UserService(UserManager<User> userManager)
-    {
-        _userManager = userManager;
-    }
+    private readonly UserManager<User> _userManager = userManager;
 
     public async Task<IdentityResult> CreateUserAsync(RegisterTO dto)
     {
@@ -39,7 +34,7 @@ public class UserService
         if (user.IsRenter)
             rolesToAssign.Add(Data.DbInitializer.RENTER);
 
-        if (rolesToAssign.Any())
+        if (rolesToAssign.Count != 0)
             await _userManager.AddToRolesAsync(user, rolesToAssign);
 
         return result;
