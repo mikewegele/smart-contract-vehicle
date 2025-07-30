@@ -6,7 +6,9 @@
     "ganache": "ganache --port 7545",
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset",
-    "copy-contracts": "cp -r ./build/contracts ../frontend/src",
+    "copy-contracts": "run-script-os",
+    "copy-contracts:default": "cp -r ./build/contracts ../frontend/src",
+    "copy-contracts:win32": "robocopy ./build/contracts ../frontend/src /MIR & if %ERRORLEVEL% LSS 8 (exit 0) else (exit 1)",
     "deploy-and-copy": "npm run compile && npm run migrate && npm run copy-contracts"
   },
   "keywords": [],
@@ -15,7 +17,8 @@
   "description": "",
   "devDependencies": {
     "@nomiclabs/hardhat-waffle": "^2.0.6",
-    "chai": "^5.2.0",
+    "chai": "^5.2.0",    
+    "run-script-os": "^1.1.6",
     "ethereum-waffle": "^4.0.10",
     "ethers": "^5.8.0",
     "hardhat": "^2.24.2"
