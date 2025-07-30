@@ -5,11 +5,15 @@
     "application": "concurrently -n db,be,cc,sc,fe -c blue,green,grey,magenta,yellow \"npm run database\" \"npm run backend\" \"npm run car-clients\" \"npm run smart-contract\" \"npm run frontend\"",
     "application-no-car-clients": "concurrently -n db,be,sc,fe -c blue,green,magenta,yellow \"npm run database\" \"npm run backend\" \"npm run smart-contract\" \"npm run frontend\"",
     "database": "cd stack && docker-compose up",
-    "backend": "wait-on tcp:5432 && /bin/bash run_backend.sh",
+    "backend": "run-script-os",
+    "backend:win32": "wait-on -t 30000 -v tcp:127.0.0.1:5432 && run_backend.bat",
+    "backend:default": "wait-on -t 30000 -v tcp:127.0.0.1:5432 && bash run_backend.sh",
     "smart-contract": "cd blockchain && npm i && npm run ganache",
     "frontend": "cd blockchain && npm i && npm run deploy-and-copy && cd .. && cd ./frontend && npm i && npm run typechain && npm run dev && npm run apiGenerate",
-    "drop-all-tables": "/bin/bash drop_all_tables.sh",
-    "car-clients": "dotnet dev-certs https --trust && wait-on -v https://localhost:7258/ --interval 5000 && echo 'Backend is ready!'  && cd CarClient && dotnet run"
+    "drop-all-tables": "run-script-os",
+    "drop-all-tables:win32": "drop_all_tables.bat",
+    "drop-all-tables:default": "bash drop_all_tables.sh",
+    "car-clients": "dotnet dev-certs https --trust && wait-on -v https:localhost:7258 --interval 5000 && echo 'Backend is ready!' && cd CarClient && dotnet run"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +21,7 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "run-script-os": "^1.1.6",
     "wait-on": "^8.0.3"
   }
 }
