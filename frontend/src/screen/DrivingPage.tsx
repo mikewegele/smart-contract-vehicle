@@ -212,7 +212,7 @@ const DrivingPage: React.FC = () => {
 
             <Box className={classes.glassBox}>
                 <video
-                    src="/videos/driving.mp4"
+                    src="/videos/driving.webm"
                     autoPlay
                     muted
                     loop
